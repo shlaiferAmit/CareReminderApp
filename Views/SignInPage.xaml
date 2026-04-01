@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CareReminderApp.ViewModels"
+             x:Class="CareReminderApp.Views.SignInPage"
+             Title="Elder Reminders"
+                      BackgroundColor="#99C1E9">
+    <ScrollView>
+        <VerticalStackLayout Margin="30,50,30,20" Spacing="20" VerticalOptions="Center">
+
+            <Label Text="SIGN IN"
+               FontSize="32"
+               FontAttributes="Bold"
+               TextColor="#2C3E50"
+               HorizontalOptions="Center"
+               Margin="0,0,0,20"/>
+
+            <Frame BackgroundColor="White" 
+               CornerRadius="5" 
+               Padding="15,5" 
+               HasShadow="False"
+               BorderColor="Transparent">
+                <Entry Placeholder="Email"
+                   PlaceholderColor="Gray"
+                   Keyboard="Email"
+                   Text="{Binding UserName}"
+                   TextColor="#333"
+                   HorizontalTextAlignment="Center"
+                   FontSize="16"/>
+            </Frame>
+
+            <Frame BackgroundColor="White" 
+               CornerRadius="5" 
+               Padding="15,5" 
+               HasShadow="False"
+               BorderColor="Transparent">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Entry Placeholder="Password"
+                       PlaceholderColor="Gray"
+                       IsPassword="{Binding EntryAsPassword}"
+                       Text="{Binding UserPassword}"
+                       TextColor="#333"
+                       HorizontalTextAlignment="Center"
+                       FontSize="16"
+                       Grid.Column="0"/>
+
+                    <ImageButton Source="{Binding PasswordImage}"
+                             Command="{Binding ShowPasswordCommand}"
+                             BackgroundColor="Transparent"
+                             HeightRequest="20"
+                             WidthRequest="20"
+                             VerticalOptions="Center"
+                             Grid.Column="1"/>
+                </Grid>
+            </Frame>
+
+            <Button Text="LOGIN"
+                Command="{Binding SignInCommand}"
+                TextColor="White"
+                BackgroundColor="#E67E22" 
+                HeightRequest="60"
+                CornerRadius="5"
+                FontSize="18"
+                FontAttributes="Bold"
+                Margin="0,10,0,0"/>
+
+            <BoxView HeightRequest="1" 
+                 BackgroundColor="White" 
+                 HorizontalOptions="FillAndExpand" 
+                 Margin="20,10"/>
+
+            <Button Text="Don't have an account? Sign Up"
+                Command="{Binding GoToSignUpCommand}"
+                BackgroundColor="Transparent"
+                TextColor="White"
+                FontSize="16"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"/>
+
+
+
+
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+
+</ContentPage>

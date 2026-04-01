@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CareReminderApp.Views.MainPage"
+             Title="Home"
+             BackgroundColor="#99C1E9">
+
+    <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+        <Image Source="app_logo.png" HeightRequest="150" HorizontalOptions="Center"/>
+        <Label Text="Welcome!" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#2C3E50"/>
+
+        <Button Text="Sign In" 
+                Clicked="OnSignInClicked" 
+                BackgroundColor="#8D7B68" 
+                TextColor="White" 
+                HeightRequest="55"/>
+
+        <Button Text="Sign Up" 
+                Clicked="OnSignUpClicked" 
+                BackgroundColor="Transparent" 
+                BorderColor="#8D7B68" 
+                BorderWidth="2" 
+                TextColor="#8D7B68" 
+                HeightRequest="55"/>
+    </VerticalStackLayout>
+</ContentPage>
