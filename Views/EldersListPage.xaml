@@ -3,13 +3,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CareReminderApp.Views.EldersListPage"
              Title="Elders List">
-    <CollectionView ItemsSource="{Binding Elders}">
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
-                <StackLayout Padding="10">
-                    <Label Text="{Binding Name}" FontSize="Medium"/>
-                </StackLayout>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+    <Grid RowDefinitions="Auto, *, Auto">
+        <Label Grid.Row="0" Text="My Seniors" FontSize="28" FontAttributes="Bold" 
+               HorizontalOptions="Center" Margin="20" TextColor="#2C3E50"/>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Seniors}" Margin="20">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="White" CornerRadius="10" Margin="0,5" Padding="10" HasShadow="False">
+                        <HorizontalStackLayout Spacing="15">
+                            <Border StrokeShape="RoundRectangle 25" HeightRequest="50" WidthRequest="50">
+                                <Image Source="profile_placeholder.png" Aspect="AspectFill"/>
+                            </Border>
+                            <VerticalStackLayout VerticalOptions="Center">
+                                <Label Text="{Binding FirstName}" FontAttributes="Bold" FontSize="16" TextColor="Black"/>
+                                <Label Text="Grandmother" FontSize="12" TextColor="Gray"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="2" Text="+ Add new senior" BackgroundColor="#1ABC9C" 
+                CornerRadius="10" Margin="30" HeightRequest="50"/>
+    </Grid>
 </ContentPage>

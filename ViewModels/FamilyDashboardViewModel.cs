@@ -9,21 +9,54 @@ using CommunityToolkit.Mvvm.Input;
 using CareReminderApp.Services;
 using CareReminderApp.Models;
 
+using CareReminderApp.Views;
+
+
+
 namespace CareReminderApp.ViewModels
 {
+    [QueryProperty(nameof(CurrentUser), "CurrentUser")]
     public partial class FamilyDashboardViewModel : ObservableObject
     {
-        private readonly IDataService? _dataService;
+        private readonly IDataService _dataService;
 
-        // ה-Constructor הריק שמונע שגיאות ב-XAML
-        public FamilyDashboardViewModel()
-        {
-        }
+        [ObservableProperty]
+        private User? _currentUser;
 
-        // ה-Constructor שמקבל את השירות (הוסיפי פרמטרים אם את מעבירה יותר מזה)
+        [ObservableProperty]
+        private string _welcomeMessage = "Good Morning!";
+
         public FamilyDashboardViewModel(IDataService dataService)
         {
             _dataService = dataService;
+        }
+
+        // המילה partial כאן פותרת את שגיאה CS0759
+        partial void OnCurrentUserChanged(User? value)
+        {
+            if (value != null)
+            {
+                WelcomeMessage = $"Good Morning, {value.FirstName}";
+            }
+        }
+
+        [RelayCommand]
+        private async Task NavigateToSeniors()
+        {
+            // שיניתי ל-EldersListPage כדי שיתאים לקובץ שלך
+            await Shell.Current.GoToAsync("EldersListPage", new Dictionary<string, object>
+    {
+        { "CurrentUser", CurrentUser! }
+    });
+        }
+
+        [RelayCommand]
+        private async Task NavigateToProfile()
+        {
+            await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
+            {
+                { "CurrentUser", CurrentUser! }
+            });
         }
     }
 }

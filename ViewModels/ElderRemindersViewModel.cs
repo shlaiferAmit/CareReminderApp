@@ -8,53 +8,76 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CareReminderApp.Services;
 using CareReminderApp.Models;
+using System.Collections.Generic;
+using CareReminderApp.Views;
 
 namespace CareReminderApp.ViewModels
 {
-    public partial class ElderRemindersViewModel : ObservableObject
+    [QueryProperty(nameof(CurrentUser), "CurrentUser")]
+    public partial class ElderRemindersViewModel : ObservableObject, IQueryAttributable
     {
-        public ObservableCollection<Reminder> Reminders { get; } = new();
-
         private readonly IDataService _dataService;
-        private string _elderId;
 
-        // 1. ה-Constructor הריק שחייב להיות כאן בשביל ה-XAML (יפתור את XLS0507)
-        public ElderRemindersViewModel()
-        {
-        }
+        [ObservableProperty]
+        private User _currentUser;
 
-        // 2. ה-Constructor שבו את משתמשת כשאת עוברת לדף מהקוד
-        public ElderRemindersViewModel(IDataService dataService, string elderId)
+        [ObservableProperty]
+        private string _welcomeMessage;
+
+        [ObservableProperty]
+        private int _remindersCount;
+
+        [ObservableProperty]
+        private string _remindersSummaryText;
+
+        public ElderRemindersViewModel(IDataService dataService)
         {
             _dataService = dataService;
-            _elderId = elderId;
-            LoadReminders();
         }
 
-        private async void LoadReminders()
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            // בדיקת בטיחות: אם השירות לא הוגדר (למשל בגלל שימוש ב-Constructor הריק), אל תמשיך
-            if (_dataService == null || string.IsNullOrEmpty(_elderId))
-                return;
-
-            try
+            if (query.ContainsKey("CurrentUser"))
             {
-                var reminders = await _dataService.GetRemindersByUserIdAsync(_elderId);
-
-                if (reminders != null)
+                CurrentUser = query["CurrentUser"] as User;
+                if (CurrentUser != null)
                 {
-                    Reminders.Clear();
-                    foreach (var r in reminders)
-                    {
-                        Reminders.Add(r);
-                    }
+                    WelcomeMessage = $"Good Morning, {CurrentUser.FirstName}";
+                    // הרצה של טעינת הנתונים
+                    _ = LoadRemindersAsync();
                 }
             }
-            catch (Exception ex)
+        }
+
+        // פונקציה ציבורית כדי שנוכל לקרוא לה גם מה-Page
+        public async Task LoadRemindersAsync()
+        {
+            if (CurrentUser == null) return;
+
+            var reminders = await _dataService.GetRemindersAsync(CurrentUser.Id);
+
+            // סופר רק תזכורות שעוד לא סומנו כבוצעו
+            RemindersCount = reminders.Count(r => !r.IsCompleted);
+
+            RemindersSummaryText = $"You have {RemindersCount} reminders today";
+        }
+
+        [RelayCommand]
+        private async Task NavigateToTodayReminders()
+        {
+            await Shell.Current.GoToAsync(nameof(TodayRemindersPage), new Dictionary<string, object>
             {
-                // כאן תוכלי להוסיף הדפסה של השגיאה ל-Debug אם תרצי
-                System.Diagnostics.Debug.WriteLine($"Error loading reminders: {ex.Message}");
-            }
+                { "CurrentUser", CurrentUser }
+            });
+        }
+
+        [RelayCommand]
+        private async Task NavigateToProfile()
+        {
+            await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
+            {
+                { "CurrentUser", CurrentUser }
+            });
         }
     }
 }

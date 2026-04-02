@@ -6,10 +6,10 @@ namespace CareReminderApp.Views
 {
     public partial class EldersListPage : ContentPage
     {
-        public EldersListPage(IDataService dataService, string userId)
+        public EldersListPage(EldersListViewModel viewModel)
         {
             InitializeComponent();
-            BindingContext = new EldersListViewModel(dataService, userId);
+            BindingContext = viewModel;
         }
     }
 }

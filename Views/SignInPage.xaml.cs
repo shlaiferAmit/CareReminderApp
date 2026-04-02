@@ -6,10 +6,10 @@ namespace CareReminderApp.Views
 {
     public partial class SignInPage : ContentPage
     {
-        public SignInPage(IDataService dataService)
+        public SignInPage()
         {
             InitializeComponent();
-            BindingContext = new SignInPageViewModel(dataService);
+            BindingContext = new SignInPageViewModel(new MockDataService());
         }
     }
 }

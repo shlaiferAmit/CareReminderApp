@@ -3,91 +3,101 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CareReminderApp.Views.SignUpPage"
              Title="Sign Up"
-                      BackgroundColor="#99C1E9">
+             BackgroundColor="#99C1E9">
     <ScrollView>
         <VerticalStackLayout Margin="30,40,30,20" Spacing="12">
 
             <Label Text="SIGN UP"
-               FontSize="32"
-               FontAttributes="Bold"
-               TextColor="#2C3E50"
-               HorizontalOptions="Center"
-               Margin="0,0,0,15"/>
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   TextColor="#2C3E50"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,15"/>
 
             <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
                 <Entry Placeholder="First Name"
-                   PlaceholderColor="Gray"
-                   Text="{Binding FirstName}"
-                   TextColor="#333"
-                   HorizontalTextAlignment="Center"/>
+                       PlaceholderColor="Gray"
+                       Text="{Binding FirstName}"
+                       TextColor="#333"
+                       HorizontalTextAlignment="Center"/>
             </Frame>
 
             <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
                 <Entry Placeholder="Last Name"
-                   PlaceholderColor="Gray"
-                   Text="{Binding LastName}"
-                   TextColor="#333"
-                   HorizontalTextAlignment="Center"/>
+                       PlaceholderColor="Gray"
+                       Text="{Binding LastName}"
+                       TextColor="#333"
+                       HorizontalTextAlignment="Center"/>
             </Frame>
 
             <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
                 <Entry Placeholder="Email"
-                   PlaceholderColor="Gray"
-                   Keyboard="Email"
-                   Text="{Binding UserEmail}"
-                   TextColor="#333"
-                   HorizontalTextAlignment="Center"/>
+                       PlaceholderColor="Gray"
+                       Keyboard="Email"
+                       Text="{Binding UserEmail}"
+                       TextColor="#333"
+                       HorizontalTextAlignment="Center"/>
             </Frame>
 
             <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
                 <Grid ColumnDefinitions="*,Auto">
                     <Entry Placeholder="Password"
-                       PlaceholderColor="Gray"
-                       IsPassword="{Binding EntryAsPassword}"
-                       Text="{Binding UserPassword}"
-                       TextColor="#333"
-                       HorizontalTextAlignment="Center"
-                       Grid.Column="0"/>
+                           PlaceholderColor="Gray"
+                           IsPassword="{Binding EntryAsPassword}"
+                           Text="{Binding UserPassword}"
+                           TextColor="#333"
+                           HorizontalTextAlignment="Center"
+                           Grid.Column="0"/>
 
                     <ImageButton Source="{Binding PasswordImage}"
-                             Command="{Binding ShowPasswordCommand}"
-                             BackgroundColor="Transparent"
-                             HeightRequest="20"
-                             WidthRequest="20"
-                             VerticalOptions="Center"
-                             Grid.Column="1"/>
+                                 Command="{Binding TogglePasswordCommand}"
+                                 BackgroundColor="Transparent"
+                                 HeightRequest="20"
+                                 WidthRequest="20"
+                                 VerticalOptions="Center"
+                                 Grid.Column="1"/>
                 </Grid>
             </Frame>
 
             <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
                 <Entry Placeholder="Mobile"
-                   PlaceholderColor="Gray"
-                   Keyboard="Telephone"
-                   Text="{Binding Mobile}"
-                   TextColor="#333"
-                   HorizontalTextAlignment="Center"/>
+                       PlaceholderColor="Gray"
+                       Keyboard="Telephone"
+                       Text="{Binding Mobile}"
+                       TextColor="#333"
+                       HorizontalTextAlignment="Center"/>
+            </Frame>
+
+            <Label Text="Register as:" TextColor="#2C3E50" FontAttributes="Bold" Margin="5,5,0,0"/>
+            <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
+                <Picker Title="Select Account Type"
+                        TitleColor="Gray"
+                        ItemsSource="{Binding RoleOptions}"
+                        SelectedItem="{Binding SelectedRole}"
+                        TextColor="#333"
+                        HorizontalTextAlignment="Center"/>
             </Frame>
 
             <Button Text="SIGN UP"
-                Command="{Binding SignUpCommand}"
-                BackgroundColor="#8D7B68" 
-                TextColor="White"
-                HeightRequest="60"
-                CornerRadius="5"
-                FontAttributes="Bold"
-                Margin="0,15,0,0"/>
+                    Command="{Binding SignUpCommand}"
+                    BackgroundColor="#8D7B68" 
+                    TextColor="White"
+                    HeightRequest="60"
+                    CornerRadius="5"
+                    FontAttributes="Bold"
+                    Margin="0,15,0,0"/>
 
             <BoxView HeightRequest="1" 
-                 BackgroundColor="White" 
-                 HorizontalOptions="FillAndExpand" 
-                 Margin="20,10,20,0"/>
+                     BackgroundColor="White" 
+                     HorizontalOptions="Fill" 
+                     Margin="20,10,20,0"/>
 
             <Button Text="Already have an account? Sign In"
-                BackgroundColor="Transparent"
-                TextColor="White"
-                FontSize="14"
-                HorizontalOptions="Center"
-                Command="{Binding GoToSignInCommand}" />
+                    BackgroundColor="Transparent"
+                    TextColor="White"
+                    FontSize="14"
+                    HorizontalOptions="Center"
+                    Command="{Binding GoToSignInCommand}" />
 
         </VerticalStackLayout>
     </ScrollView>

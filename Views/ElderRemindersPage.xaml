@@ -2,16 +2,75 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CareReminderApp.Views.ElderRemindersPage"
-             Title="Elder Reminders">
-    <CollectionView ItemsSource="{Binding Reminders}">
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
-                <StackLayout Padding="10">
-                    <Label Text="{Binding Title}" FontSize="Medium"/>
-                    <Label Text="{Binding Description}" FontSize="Small"/>
-                    <Label Text="{Binding ReminderDate}" FontSize="Small"/>
-                </StackLayout>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+             BackgroundColor="#99C1E9"
+             Title="My Reminders">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="20,10">
+            <Label Text="CareRemind" TextColor="#2C3E50" FontSize="36" FontAttributes="Bold" HorizontalOptions="Center"/>
+            <Label Text="Welcome Home!" TextColor="#2C3E50" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="25" Margin="30">
+
+                <Image Source="family_logo_placeholder.png" HeightRequest="100" HorizontalOptions="Center"/>
+
+                <Frame BackgroundColor="#E67E22" CornerRadius="10" Padding="20" HasShadow="True">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="{Binding WelcomeMessage}" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="{Binding RemindersSummaryText}" TextColor="White" FontSize="14" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame BackgroundColor="#1ABC9C" CornerRadius="10" Padding="20" HasShadow="True">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Upcoming Reminder:" TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="Take medication - 8:00 AM" TextColor="White" FontSize="14" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Label Text="Your Family:" TextColor="#2C3E50" FontSize="18" FontAttributes="Bold" Margin="0,15,0,0"/>
+
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
+                    <Frame Grid.Column="0" BackgroundColor="White" CornerRadius="10" Padding="10" HasShadow="False">
+                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Ellipse Fill="#7F8C8D" WidthRequest="60" HeightRequest="60" HorizontalOptions="Center"/>
+                            <Label Text="Sarah" TextColor="#2C3E50" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            <Label Text="Granddaughter" TextColor="Gray" FontSize="10" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <Frame Grid.Column="1" BackgroundColor="White" CornerRadius="10" Padding="10" HasShadow="False">
+                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Ellipse Fill="#7F8C8D" WidthRequest="60" HeightRequest="60" HorizontalOptions="Center"/>
+                            <Label Text="Noa" TextColor="#2C3E50" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            <Label Text="Granddaughter" TextColor="Gray" FontSize="10" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" BackgroundColor="White" HeightRequest="70" Padding="10">
+
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="Today's Reminders" TextColor="#2C3E50" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToTodayRemindersCommand}"/>
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                <Label Text="My Profile" TextColor="#2C3E50" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}"/>
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+        </Grid>
+
+    </Grid>
 </ContentPage>

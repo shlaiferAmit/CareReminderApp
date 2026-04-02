@@ -8,18 +8,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
+using CareReminderApp.Views;
 
 namespace CareReminderApp.ViewModels
 {
-    // השימוש ב-partial וב-ObservableObject פותר את שגיאות ה-CS0103 וה-CS0246
     public partial class SignInPageViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
 
+        // שים לב: שיניתי ל-UserEmail כדי שיתאים לקריאה ב-Service
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SignInCommand))]
-        private string _userName = string.Empty;
+        private string _userEmail = string.Empty;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SignInCommand))]
@@ -28,43 +28,51 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private bool _entryAsPassword = true;
 
-        public ICommand ShowPasswordCommand { get; }
-        public ICommand GoToSignUpCommand { get; }
+        // Command להצגת/הסתרת סיסמה
+        [RelayCommand]
+        private void ShowPassword() => EntryAsPassword = !EntryAsPassword;
+
+        // Command למעבר לדף הרשמה
+        [RelayCommand]
+        private async Task GoToSignUp() => await Shell.Current.GoToAsync(nameof(SignUpPage));
 
         public SignInPageViewModel(IDataService dataService)
         {
             _dataService = dataService;
-
-            ShowPasswordCommand = new RelayCommand(() => EntryAsPassword = !EntryAsPassword);
-
-            GoToSignUpCommand = new AsyncRelayCommand(async () =>
-                await Shell.Current.GoToAsync("SignUpPage"));
         }
 
+        // מאפיין דינמי לתמונה של העין
         public string PasswordImage => EntryAsPassword ? "closeeye.png" : "openeye.png";
 
+        // עדכון התמונה כשהסיסמה משתנה ממוסתרת לגלויה
         partial void OnEntryAsPasswordChanged(bool value) => OnPropertyChanged(nameof(PasswordImage));
+
+        // בדיקה האם ניתן ללחוץ על כפתור ההתחברות
+        private bool CanSignIn() => !string.IsNullOrWhiteSpace(UserEmail) && !string.IsNullOrWhiteSpace(UserPassword);
 
         [RelayCommand(CanExecute = nameof(CanSignIn))]
         private async Task SignIn()
         {
-            // ודאי שהמתודה ב-Service שלך היא GetUserAsync
-            var user = await _dataService.GetUserAsync(UserName, UserPassword);
+            var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
 
             if (user != null)
             {
-                if (Application.Current is App app)
+                // יצירת מילון עם נתוני המשתמש להעברה
+                var navigationParameter = new Dictionary<string, object>
+        {
+            { "CurrentUser", user }
+        };
+
+                if (user.Role == UserRole.Senior)
                 {
-                    app.CurrentUser = user;
+                    // העברת הפרמטר בניווט
+                    await Shell.Current.GoToAsync(nameof(ElderRemindersPage), navigationParameter);
                 }
-                await Shell.Current.GoToAsync("//FamilyDashboardPage");
-            }
-            else
-            {
-                await Application.Current.MainPage.DisplayAlert("Error", "Email or password incorrect", "OK");
+                else
+                {
+                    await Shell.Current.GoToAsync(nameof(FamilyDashboardPage), navigationParameter);
+                }
             }
         }
-
-        private bool CanSignIn() => !string.IsNullOrWhiteSpace(UserName) && !string.IsNullOrWhiteSpace(UserPassword);
     }
 }

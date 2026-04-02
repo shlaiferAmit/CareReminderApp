@@ -2,15 +2,52 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CareReminderApp.Views.FamilyDashboardPage"
-             Title="Family Dashboard">
-    <CollectionView ItemsSource="{Binding FamilyMembers}">
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
-                <StackLayout Padding="10">
-                    <Label Text="{Binding Name}" FontSize="Medium"/>
-                    <Label Text="{Binding Email}" FontSize="Small"/>
-                </StackLayout>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+             BackgroundColor="#99C1E9"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="20,10">
+            <Label Text="CareRemind" TextColor="#2C3E50" FontSize="36" FontAttributes="Bold" HorizontalOptions="Center"/>
+            <Label Text="Welcome Home!" TextColor="#2C3E50" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" Spacing="25" Margin="30">
+
+            <Image Source="family_dashboard_icon.png" HeightRequest="120" HorizontalOptions="Center"/>
+
+            <Frame BackgroundColor="#E67E22" CornerRadius="10" Padding="15" HasShadow="False" BorderColor="Transparent">
+                <Label Text="{Binding WelcomeMessage}" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+            </Frame>
+
+            <Frame BackgroundColor="#1ABC9C" CornerRadius="10" Padding="15" HasShadow="False" BorderColor="Transparent">
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToSeniorsCommand}"/>
+                </Frame.GestureRecognizers>
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Reminds for Esther:" TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+                    <Label Text="Take medication - 8:00 AM" TextColor="White" FontSize="14" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" BackgroundColor="White" HeightRequest="70">
+
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="My Seniors" TextColor="#2C3E50" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToSeniorsCommand}"/>
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                <Label Text="My Profile" TextColor="#2C3E50" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}"/>
+                </VerticalStackLayout.GestureRecognizers>
+            </VerticalStackLayout>
+
+        </Grid>
+    </Grid>
 </ContentPage>

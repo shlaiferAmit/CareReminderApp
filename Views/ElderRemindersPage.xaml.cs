@@ -2,14 +2,26 @@
 using CareReminderApp.ViewModels;
 using CareReminderApp.Services;
 
+
 namespace CareReminderApp.Views
 {
     public partial class ElderRemindersPage : ContentPage
     {
-        public ElderRemindersPage(IDataService dataService, string elderId)
+        public ElderRemindersPage(ElderRemindersViewModel viewModel)
         {
-            InitializeComponent(); // חייב להיות אחד בלבד
-            BindingContext = new ElderRemindersViewModel(dataService, elderId);
+            InitializeComponent();
+            BindingContext = viewModel;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            // בכל פעם שהדף מופיע (גם בחזרה מניווט), אנחנו מעדכנים את הספירה
+            if (BindingContext is ElderRemindersViewModel vm)
+            {
+                await vm.LoadRemindersAsync();
+            }
         }
     }
 }

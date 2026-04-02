@@ -15,18 +15,14 @@
                HorizontalOptions="Center"
                Margin="0,0,0,20"/>
 
-            <Frame BackgroundColor="White" 
-               CornerRadius="5" 
-               Padding="15,5" 
-               HasShadow="False"
-               BorderColor="Transparent">
+            <Frame BackgroundColor="White" CornerRadius="5" Padding="15,5" HasShadow="False" BorderColor="Transparent">
                 <Entry Placeholder="Email"
-                   PlaceholderColor="Gray"
-                   Keyboard="Email"
-                   Text="{Binding UserName}"
-                   TextColor="#333"
-                   HorizontalTextAlignment="Center"
-                   FontSize="16"/>
+           PlaceholderColor="Gray"
+           Keyboard="Email"
+           Text="{Binding UserEmail}" 
+           TextColor="#333"
+           HorizontalTextAlignment="Center"
+           FontSize="16"/>
             </Frame>
 
             <Frame BackgroundColor="White" 

@@ -9,6 +9,8 @@ using CommunityToolkit.Mvvm.Input;
 using CareReminderApp.Services;
 using CareReminderApp.Models;
 
+
+
 namespace CareReminderApp.ViewModels
 {
     public partial class EldersListViewModel : ObservableObject
@@ -17,18 +19,25 @@ namespace CareReminderApp.ViewModels
 
         private readonly IDataService _dataService;
 
-        public EldersListViewModel(IDataService dataService, string id)
+        // תיקון: הורדנו את ה-string id מה-Constructor כי הוא מפריע להרצה
+        public EldersListViewModel(IDataService dataService)
         {
             _dataService = dataService;
-            LoadElders();
+            // קריאה לפונקציית הטעינה
+            _ = LoadElders();
         }
 
-        private async void LoadElders()
+        private async Task LoadElders()
         {
             var users = await _dataService.GetUsersAsync();
             Elders.Clear();
-            foreach (var user in users.Where(u => u.RoleId == "Elder"))
+
+            // תיקון שגיאה CS0019: השוואה בין int ל-Enum במקום למחרוזת
+            // אנחנו בודקים אם ה-RoleId תואם לערך המספרי של Senior
+            foreach (var user in users.Where(u => u.RoleId == (int)UserRole.Senior))
+            {
                 Elders.Add(user);
+            }
         }
     }
 }

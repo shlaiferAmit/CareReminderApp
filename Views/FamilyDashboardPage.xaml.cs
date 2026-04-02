@@ -6,11 +6,10 @@ namespace CareReminderApp.Views
 {
     public partial class FamilyDashboardPage : ContentPage
     {
-        public FamilyDashboardPage(IDataService dataService)
+        public FamilyDashboardPage()
         {
             InitializeComponent();
-            // כאן אנחנו מחברים את ה-ViewModel ומעבירים לו את ה-Service
-            BindingContext = new FamilyDashboardViewModel(dataService);
+            BindingContext = new FamilyDashboardViewModel(new MockDataService());
         }
     }
 }

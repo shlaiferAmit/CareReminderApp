@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CareReminderApp.Views;
 
 namespace CareReminderApp.ViewModels
 {
@@ -34,10 +35,22 @@ namespace CareReminderApp.ViewModels
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SignUpCommand))]
-        private string _mobile = string.Empty; // זה המקור ל-Mobile הציבורי
+        private string _mobile = string.Empty;
 
         [ObservableProperty]
         private bool _entryAsPassword = true;
+
+        // הוספת בחירת תפקיד - חשוב מאוד לניתוב
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(SignUpCommand))]
+        private UserRole _selectedRole;
+
+        // רשימה שתציג את האופציות ב-Picker ב-XAML
+        public List<UserRole> RoleOptions { get; } = new List<UserRole>
+        {
+            UserRole.Senior,
+            UserRole.FamilyMember
+        };
 
         public SignUpPageViewModel(IDataService dataService)
         {
@@ -54,23 +67,33 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task GoToSignIn()
         {
- 
-            await Shell.Current.GoToAsync("SignInPage");
+            await Shell.Current.GoToAsync($"//{nameof(SignInPage)}");
         }
+
         [RelayCommand(CanExecute = nameof(CanSignUp))]
         private async Task SignUp()
         {
-            // כאן אנחנו משתמשים ב-Mobile שה-Toolkit ייצר מה-_mobile
-            var success = await _dataService.RegisterUserAsync(FirstName, LastName, UserEmail, UserPassword, Mobile);
+            // שליחת כל הנתונים ל-Service כולל התפקיד שנבחר
+            bool success = await _dataService.RegisterUserAsync(FirstName, LastName, UserEmail, UserPassword, Mobile, SelectedRole);
 
             if (success)
             {
-                await Application.Current.MainPage.DisplayAlert("הצלחה", "החשבון נוצר!", "אישור");
-                await Shell.Current.GoToAsync("..");
+                // ניתוב מבוסס תפקיד לאחר הרשמה מוצלחת
+                if (SelectedRole == UserRole.Senior)
+                {
+                    await Shell.Current.GoToAsync($"//{nameof(ElderRemindersPage)}");
+                }
+                else
+                {
+                    await Shell.Current.GoToAsync($"//{nameof(FamilyDashboardPage)}");
+                }
             }
             else
             {
-                await Application.Current.MainPage.DisplayAlert("שגיאה", "הרישום נכשל", "אישור");
+                if (App.Current.MainPage != null)
+                {
+                    await App.Current.MainPage.DisplayAlert("שגיאה", "ההרשמה נכשלה. ייתכן שהאימייל כבר קיים במערכת.", "אישור");
+                }
             }
         }
 
