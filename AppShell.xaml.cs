@@ -24,7 +24,11 @@ namespace CareReminderApp
             Routing.RegisterRoute(nameof(TodayRemindersPage), typeof(TodayRemindersPage));
             Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage));
 
+            Routing.RegisterRoute(nameof(ReminderDetailsPage), typeof(ReminderDetailsPage));
+            Routing.RegisterRoute(nameof(ChangeProfilePage), typeof(ChangeProfilePage));
 
+
+            
 
         }
     }

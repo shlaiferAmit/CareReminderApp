@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:CareReminderApp.ViewModels"
+             xmlns:viewmodels="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.ProfilePage"
-             x:DataType="viewModels:ProfileViewModel"
-             BackgroundColor="#99C1E9"
-             Title="My Profile">
+             x:DataType="viewmodels:ProfileViewModel"
+             BackgroundColor="#99C1E9">
 
-    <Grid RowDefinitions="Auto, *, Auto" Padding="20">
+    <Grid RowDefinitions="Auto, *, Auto">
+        <ImageButton Source="logout_icon.png" 
+                     HorizontalOptions="Start" 
+                     Margin="20" 
+                     HeightRequest="30"
+                     Command="{Binding LogoutCommand}"/>
 
-        <VerticalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,20">
-            <Label Text="CareRemind" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#2C3E50"/>
-            <Label Text="User Profile" FontSize="18" HorizontalOptions="Center" TextColor="#2C3E50"/>
+        <VerticalStackLayout Grid.Row="1" Spacing="20" Padding="30" VerticalOptions="Center">
+            <Label Text="My Profile" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#2C3E50"/>
+
+            <Frame BackgroundColor="White" CornerRadius="15" HasShadow="False" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Ellipse Fill="#E67E22" WidthRequest="120" HeightRequest="120" HorizontalOptions="Center"/>
+
+                    <Label Text="{Binding CurrentUser.FirstName, StringFormat='First Name: {0}'}" TextColor="#2C3E50"/>
+                    <Label Text="{Binding CurrentUser.LastName, StringFormat='Last Name: {0}'}" TextColor="#2C3E50"/>
+                    <Label Text="{Binding CurrentUser.UserEmail, StringFormat='Email: {0}'}" TextColor="#2C3E50"/>
+                    <Label Text="{Binding CurrentUser.Mobile, StringFormat='Phone: {0}'}" TextColor="#2C3E50"/>
+
+                    <Button Text="Edit Profile" 
+                            BackgroundColor="#3498DB" 
+                            TextColor="White" 
+                            Command="{Binding EditProfileCommand}"/>
+                </VerticalStackLayout>
+            </Frame>
         </VerticalStackLayout>
 
-        <Frame Grid.Row="1" CornerRadius="15" BackgroundColor="White" HasShadow="True" VerticalOptions="Start">
-            <VerticalStackLayout Spacing="15">
-                <Ellipse Fill="#7F8C8D" WidthRequest="80" HeightRequest="80" HorizontalOptions="Center"/>
-
-                <Label Text="First Name:" FontAttributes="Bold" TextColor="Gray"/>
-                <Label Text="{Binding CurrentUser.FirstName}" FontSize="18" TextColor="#2C3E50"/>
-                <Label Text="Email:" FontAttributes="Bold" TextColor="Gray"/>
-                <Label Text="{Binding CurrentUser.UserEmail}" FontSize="18" TextColor="#2C3E50"/>
-                <Label Text="Account Type:" FontAttributes="Bold" TextColor="Gray"/>
-                <Label Text="{Binding RoleName}" FontSize="18" TextColor="#2C3E50"/>
-            </VerticalStackLayout>
-        </Frame>
-
-        <Button Grid.Row="2" 
-                Text="Log Out" 
-                Command="{Binding LogoutCommand}"
-                BackgroundColor="#E67E22" 
-                TextColor="White" 
-                CornerRadius="10"
-                HeightRequest="50"
-                Margin="0,20,0,0"/>
+        <Button Grid.Row="2" Text="Home" BackgroundColor="White" TextColor="#2C3E50" 
+                HeightRequest="60" Command="{Binding GoHomeCommand}"/>
     </Grid>
 </ContentPage>

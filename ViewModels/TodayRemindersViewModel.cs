@@ -1,13 +1,14 @@
-﻿using System;
+﻿using CareReminderApp.Models;
+using CareReminderApp.Services;
+using CareReminderApp.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CareReminderApp.Models;
-using CareReminderApp.Services;
-using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.ObjectModel;
-using CareReminderApp.Views;
 
 namespace CareReminderApp.ViewModels
 {
@@ -50,6 +51,18 @@ namespace CareReminderApp.ViewModels
         {
             await _dataService.UpdateReminderAsync(reminder);
             // כאן אפשר להוסיף הודעה "כל הכבוד!" אם הוא סימן בוצע
+        }
+
+        [RelayCommand]
+        private async Task NavigateToDetails(Reminder selectedReminder)
+        {
+            if (selectedReminder == null) return;
+
+            // הניווט שולח את האובייקט Reminder לדף החדש
+            await Shell.Current.GoToAsync(nameof(ReminderDetailsPage), new Dictionary<string, object>
+    {
+        { "SelectedReminder", selectedReminder }
+    });
         }
     }
 }

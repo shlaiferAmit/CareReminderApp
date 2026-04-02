@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:CareReminderApp.ViewModels"
+             x:Class="CareReminderApp.Views.ChangeProfilePage"
+             x:DataType="viewmodels:ProfileViewModel"
+             BackgroundColor="#99C1E9">
+
+    <VerticalStackLayout Spacing="15" Padding="25" VerticalOptions="Center">
+        <Label Text="Change Profile" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#2C3E50"/>
+
+        <Entry Placeholder="First Name" Text="{Binding CurrentUser.FirstName}" BackgroundColor="White"/>
+        <Entry Placeholder="Last Name" Text="{Binding CurrentUser.LastName}" BackgroundColor="White"/>
+        <Entry Placeholder="Phone" Text="{Binding CurrentUser.Mobile}" BackgroundColor="White"/>
+        <Entry Placeholder="Email" Text="{Binding CurrentUser.UserEmail}" BackgroundColor="White"/>
+
+        <Button Text="Save Change" BackgroundColor="#3498DB" TextColor="White" 
+                Command="{Binding SaveChangesCommand}"/>
+    </VerticalStackLayout>
+</ContentPage>
