@@ -1,12 +1,14 @@
-using CareReminderApp.ViewModels;
+﻿using CareReminderApp.ViewModels;
 
-namespace CareReminderApp.Views;
-
-public partial class ReminderDetailsPage : ContentPage
+namespace CareReminderApp.Views
 {
-    public ReminderDetailsPage(ReminderDetailsViewModel viewModel)
+    // השם כאן חייב להיות זהה ל-x:Class ב-XAML
+    public partial class ReminderDetailsPage : ContentPage
     {
-        InitializeComponent();
-        BindingContext = viewModel;
+        public ReminderDetailsPage(ReminderDetailsViewModel viewModel)
+        {
+            InitializeComponent();
+            BindingContext = viewModel;
+        }
     }
 }

@@ -9,7 +9,6 @@
 
     <Grid RowDefinitions="*, Auto">
         <VerticalStackLayout Spacing="25" Padding="25" VerticalOptions="Center">
-
             <Label Text="Remind Details" FontSize="32" FontAttributes="Bold" 
                    HorizontalOptions="Center" TextColor="#2C3E50" Margin="0,0,0,20"/>
 
@@ -17,7 +16,6 @@
                 <VerticalStackLayout Spacing="15" HorizontalOptions="Center">
                     <Label Text="{Binding SelectedReminder.Title}" FontSize="24" 
                            FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
-
                     <Frame BackgroundColor="#1ABC9C" CornerRadius="20" Padding="10,5" HasShadow="False" HorizontalOptions="Center">
                         <Label Text="{Binding StatusText}" TextColor="White" FontAttributes="Bold"/>
                     </Frame>
@@ -34,16 +32,13 @@
                 <Button Grid.Column="0" Text="Delete" BackgroundColor="#E74C3C" TextColor="White"
                         FontAttributes="Bold" CornerRadius="10" HeightRequest="80"
                         Command="{Binding DeleteCommand}"/>
-
                 <Button Grid.Column="1" Text="Mark as&#10;done" BackgroundColor="#1ABC9C" TextColor="White"
                         FontAttributes="Bold" CornerRadius="10" HeightRequest="80" LineBreakMode="WordWrap"
                         Command="{Binding MarkAsDoneCommand}"/>
-
                 <Button Grid.Column="2" Text="Mark as&#10;not done" BackgroundColor="#F1C40F" TextColor="#2C3E50"
                         FontAttributes="Bold" CornerRadius="10" HeightRequest="80" LineBreakMode="WordWrap"
                         Command="{Binding MarkAsNotDoneCommand}"/>
             </Grid>
-
         </VerticalStackLayout>
 
         <Button Grid.Row="1" Text="Home" BackgroundColor="White" TextColor="#2C3E50" 

@@ -9,16 +9,16 @@
              BackgroundColor="#99C1E9">
 
     <Grid RowDefinitions="*, Auto">
-
         <CollectionView Grid.Row="0" ItemsSource="{Binding Reminders}" Margin="20">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Reminder">
                     <Frame BackgroundColor="White" CornerRadius="10" Margin="0,5" HasShadow="False">
                         <Frame.GestureRecognizers>
                             <TapGestureRecognizer 
-                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodayRemindersViewModel}}, Path=NavigateToDetailsCommand}"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodayRemindersViewModel}}, Path=NavigateToReminderDetailsCommand}"
                                 CommandParameter="{Binding .}"/>
                         </Frame.GestureRecognizers>
+
                         <Grid ColumnDefinitions="*, Auto">
                             <VerticalStackLayout Grid.Column="0" Spacing="2">
                                 <Label Text="{Binding Title}" FontSize="18" FontAttributes="Bold" TextColor="#2C3E50"/>
@@ -43,7 +43,6 @@
         </CollectionView>
 
         <Grid Grid.Row="1" ColumnDefinitions="*,*" BackgroundColor="White" HeightRequest="70" Padding="5">
-
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding NavigateToSeniorsCommand}"/>
@@ -54,7 +53,7 @@
 
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                 <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding NavigateToSeniorsCommand}"/>
+                    <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}"/>
                 </VerticalStackLayout.GestureRecognizers>
                 <Label Text="My Profile" TextColor="Gray" HorizontalOptions="Center"/>
             </VerticalStackLayout>

@@ -3,10 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CareReminderApp.Models;
-
 using CareReminderApp.Services;
 
 namespace CareReminderApp.ViewModels
@@ -16,17 +14,19 @@ namespace CareReminderApp.ViewModels
     {
         private readonly IDataService _dataService;
 
+        // הוסר הקו התחתון כדי למנוע שגיאות Generator
         [ObservableProperty]
-        private Reminder? _selectedReminder;
+        private Reminder? selectedReminder;
 
         [ObservableProperty]
-        private string _statusText = "Not Done";
+        private string statusText = "Not Done";
 
         public ReminderDetailsViewModel(IDataService dataService)
         {
             _dataService = dataService;
         }
 
+        // פונקציה זו רצה אוטומטית כשהתזכורת מתקבלת מהדף הקודם
         partial void OnSelectedReminderChanged(Reminder? value)
         {
             if (value != null)
@@ -35,56 +35,42 @@ namespace CareReminderApp.ViewModels
             }
         }
 
-        // --- הפקודות החדשות לפי העיצוב החדש ---
-
         [RelayCommand]
-        private async Task MarkAsDone()
+        public async Task MarkAsDone()
         {
             if (SelectedReminder != null)
             {
-                // קביעת הסטטוס ל"בוצע"
                 SelectedReminder.IsCompleted = true;
-
-                // עדכון ה-Service כדי שהשינוי יישמר
                 await _dataService.UpdateReminderAsync(SelectedReminder);
-
-                // עדכון התצוגה בדף הנוכחי
-                StatusText = "Done";
+                StatusText = "Done"; // מעדכן את הבועה הירוקה בעיצוב
             }
         }
 
         [RelayCommand]
-        private async Task MarkAsNotDone()
+        public async Task MarkAsNotDone()
         {
             if (SelectedReminder != null)
             {
-                // קביעת הסטטוס ל"לא בוצע"
                 SelectedReminder.IsCompleted = false;
-
-                // עדכון ה-Service כדי שהשינוי יישמר
                 await _dataService.UpdateReminderAsync(SelectedReminder);
-
-                // עדכון התצוגה בדף הנוכחי
                 StatusText = "Not Done";
             }
         }
 
-        // --- הפקודות הקודמות (Delete ו-GoHome) נשארות ---
-
         [RelayCommand]
-        private async Task Delete()
+        public async Task Delete()
         {
             if (SelectedReminder != null)
             {
-                // בעתיד נוסיף כאן: await _dataService.DeleteReminderAsync(SelectedReminder);
-                await Shell.Current.GoToAsync(".."); // חזרה אחורה אחרי המחיקה
+                // כאן תבוא לוגיקת המחיקה מה-Service בעתיד
+                await Shell.Current.GoToAsync("..");
             }
         }
 
         [RelayCommand]
-        private async Task GoHome()
+        public async Task GoHome()
         {
-            // חזרה לדף הראשי של המבוגר (וודאי שהנתיב תואם ל-AppShell)
+            // ודאי שהנתיב "TodayRemindersPage" רשום ב-AppShell
             await Shell.Current.GoToAsync("///TodayRemindersPage");
         }
     }
