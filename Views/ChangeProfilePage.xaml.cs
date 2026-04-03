@@ -1,9 +1,13 @@
-namespace CareReminderApp.Views;
+using CareReminderApp.ViewModels;
 
-public partial class ChangeProfilePage : ContentPage
+namespace CareReminderApp.Views
 {
-	public ChangeProfilePage()
-	{
-		InitializeComponent();
-	}
+    public partial class ChangeProfilePage : ContentPage
+    {
+        public ChangeProfilePage(ProfileViewModel viewModel)
+        {
+            InitializeComponent();
+            BindingContext = viewModel;
+        }
+    }
 }

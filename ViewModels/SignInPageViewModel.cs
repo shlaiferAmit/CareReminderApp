@@ -49,7 +49,6 @@ namespace CareReminderApp.ViewModels
 
         // בדיקה האם ניתן ללחוץ על כפתור ההתחברות
         private bool CanSignIn() => !string.IsNullOrWhiteSpace(UserEmail) && !string.IsNullOrWhiteSpace(UserPassword);
-
         [RelayCommand(CanExecute = nameof(CanSignIn))]
         private async Task SignIn()
         {
@@ -57,7 +56,9 @@ namespace CareReminderApp.ViewModels
 
             if (user != null)
             {
-                // יצירת מילון עם נתוני המשתמש להעברה
+                // *** השורה החשובה ביותר: שמירת המשתמש ב-App ***
+                App.LoggedInUser = user;
+
                 var navigationParameter = new Dictionary<string, object>
         {
             { "CurrentUser", user }
@@ -65,13 +66,18 @@ namespace CareReminderApp.ViewModels
 
                 if (user.Role == UserRole.Senior)
                 {
-                    // העברת הפרמטר בניווט
                     await Shell.Current.GoToAsync(nameof(ElderRemindersPage), navigationParameter);
                 }
                 else
                 {
+                    // עבור בן משפחה, עוברים לדאשבורד
                     await Shell.Current.GoToAsync(nameof(FamilyDashboardPage), navigationParameter);
                 }
+            }
+            else
+            {
+                // אופציונלי: הודעת שגיאה אם המשתמש לא נמצא
+                await Shell.Current.DisplayAlert("Error", "Invalid email or password", "OK");
             }
         }
     }

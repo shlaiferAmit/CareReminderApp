@@ -1,68 +1,67 @@
-﻿using CareReminderApp.Models;
-using CareReminderApp.Services;
-using CareReminderApp.Views;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
+using CareReminderApp.Models;
+using CareReminderApp.Views;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
 {
-    [QueryProperty(nameof(CurrentUser), "CurrentUser")]
-    public partial class TodayRemindersViewModel : ObservableObject, IQueryAttributable
+    public partial class TodayRemindersViewModel : ObservableObject
     {
-        private readonly IDataService _dataService;
+        // עדכנתי את השם ל-"Amit" כפי שמופיע בטלפון שלך
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(WelcomeGreeting))] // מוודא שהברכה תתעדכן כשהשם משתנה
+        private string userFirstName = "Amit";
 
         [ObservableProperty]
-        private User _currentUser;
+        private int totalRemindersCount = 3;
 
-        public ObservableCollection<Reminder> Reminders { get; } = new();
+        [ObservableProperty]
+        private ObservableCollection<Reminder> reminders = new();
 
-        public TodayRemindersViewModel(IDataService dataService)
+        [ObservableProperty]
+        private Reminder upcomingReminder = new Reminder { Title = "Take medication", Time = DateTime.Today.AddHours(8) };
+
+        // המאפיין שיוצג בשני הדפים (מבוגר ומשפחה)
+        public string WelcomeGreeting
         {
-            _dataService = dataService;
-        }
-
-        public async void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-            if (query.ContainsKey("CurrentUser"))
+            get
             {
-                CurrentUser = query["CurrentUser"] as User;
-                await LoadRemindersAsync();
+                var hour = DateTime.Now.Hour;
+                string greeting;
+
+                if (hour >= 5 && hour < 12)
+                    greeting = "Good Morning";
+                else if (hour >= 12 && hour < 18)
+                    greeting = "Good Afternoon";
+                else if (hour >= 18 && hour < 22)
+                    greeting = "Good Evening";
+                else
+                    greeting = "Good Night";
+
+                return $"{greeting}, {UserFirstName}";
             }
         }
 
-        private async Task LoadRemindersAsync()
-        {
-            var data = await _dataService.GetRemindersAsync(CurrentUser.Id);
-            Reminders.Clear();
-            foreach (var item in data)
-            {
-                Reminders.Add(item);
-            }
-        }
+        public string RemindersSummary => $"You have {TotalRemindersCount} reminds today";
 
-        // פונקציה לעדכון סטטוס תזכורת
-        public async Task UpdateReminderStatusAsync(Reminder reminder)
+        [RelayCommand]
+        public async Task NavigateToSeniors()
         {
-            await _dataService.UpdateReminderAsync(reminder);
-            // כאן אפשר להוסיף הודעה "כל הכבוד!" אם הוא סימן בוצע
+            await Shell.Current.GoToAsync("EldersListPage");
         }
 
         [RelayCommand]
-        private async Task NavigateToDetails(Reminder selectedReminder)
+        public async Task UpdateReminderStatusAsync(Reminder reminder)
         {
-            if (selectedReminder == null) return;
-
-            // הניווט שולח את האובייקט Reminder לדף החדש
-            await Shell.Current.GoToAsync(nameof(ReminderDetailsPage), new Dictionary<string, object>
-    {
-        { "SelectedReminder", selectedReminder }
-    });
+            if (reminder == null) return;
+            await Task.CompletedTask;
         }
+
+        [RelayCommand]
+        public async Task NavigateToTodayReminders() => await Shell.Current.GoToAsync(nameof(TodayRemindersPage));
+
+        [RelayCommand]
+        public async Task NavigateToProfile() => await Shell.Current.GoToAsync(nameof(ProfilePage));
     }
 }

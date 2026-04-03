@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CareReminderApp.Models;
+using CareReminderApp.Services;
+using CareReminderApp.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CareReminderApp.Services;
-using CareReminderApp.Models;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using CareReminderApp.Views;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
 {
-    [QueryProperty(nameof(CurrentUser), "CurrentUser")]
     public partial class ElderRemindersViewModel : ObservableObject, IQueryAttributable
     {
         private readonly IDataService _dataService;
@@ -22,13 +18,13 @@ namespace CareReminderApp.ViewModels
         private User _currentUser;
 
         [ObservableProperty]
-        private string _welcomeMessage;
+        private string _welcomeMessage = string.Empty;
 
         [ObservableProperty]
-        private int _remindersCount;
+        private string _remindersSummaryText = string.Empty;
 
         [ObservableProperty]
-        private string _remindersSummaryText;
+        private ObservableCollection<Reminder> _elderRemindersList = new();
 
         public ElderRemindersViewModel(IDataService dataService)
         {
@@ -37,47 +33,37 @@ namespace CareReminderApp.ViewModels
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            if (query.ContainsKey("CurrentUser"))
+            if (query.TryGetValue("SelectedElder", out var elder))
             {
-                CurrentUser = query["CurrentUser"] as User;
+                CurrentUser = elder as User; // כאן CurrentUser הופך להיות המבוגר (למשל Esther)
+
                 if (CurrentUser != null)
                 {
-                    WelcomeMessage = $"Good Morning, {CurrentUser.FirstName}";
-                    // הרצה של טעינת הנתונים
-                    _ = LoadRemindersAsync();
+                    WelcomeMessage = $"{CurrentUser.FirstName}'s Profile";
+                    _ = LoadRemindersAsync(); // טוען רק את התזכורות של המבוגר הספציפי הזה
                 }
             }
         }
 
-        // פונקציה ציבורית כדי שנוכל לקרוא לה גם מה-Page
         public async Task LoadRemindersAsync()
         {
             if (CurrentUser == null) return;
 
-            var reminders = await _dataService.GetRemindersAsync(CurrentUser.Id);
+            var result = await _dataService.GetRemindersAsync(CurrentUser.Id);
 
-            // סופר רק תזכורות שעוד לא סומנו כבוצעו
-            RemindersCount = reminders.Count(r => !r.IsCompleted);
+            // המשתנה הזה נוצר אוטומטית בזכות ה-partial וה-ObservableProperty
+            ElderRemindersList = new ObservableCollection<Reminder>(result);
 
-            RemindersSummaryText = $"You have {RemindersCount} reminders today";
+            var count = ElderRemindersList.Count(r => !r.IsCompleted);
+            RemindersSummaryText = $"You have {count} reminders today";
         }
 
         [RelayCommand]
-        private async Task NavigateToTodayReminders()
-        {
-            await Shell.Current.GoToAsync(nameof(TodayRemindersPage), new Dictionary<string, object>
-            {
-                { "CurrentUser", CurrentUser }
-            });
-        }
+        private async Task NavigateToTodayReminders() =>
+            await Shell.Current.GoToAsync("TodayRemindersPage", new Dictionary<string, object> { { "CurrentUser", CurrentUser } });
 
         [RelayCommand]
-        private async Task NavigateToProfile()
-        {
-            await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
-            {
-                { "CurrentUser", CurrentUser }
-            });
-        }
+        private async Task NavigateToProfile() =>
+            await Shell.Current.GoToAsync("ProfilePage", new Dictionary<string, object> { { "CurrentUser", CurrentUser } });
     }
 }

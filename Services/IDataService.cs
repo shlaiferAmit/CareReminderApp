@@ -25,5 +25,6 @@ namespace CareReminderApp.Services
         Task<List<UserRole>> GetRolesAsync();
         Task<IEnumerable<Reminder>> GetRemindersAsync(string userId);
         Task UpdateReminderAsync(Reminder reminder);
+        Task<IEnumerable<User>> GetEldersForFamilyAsync(string familyId);
     }
 }

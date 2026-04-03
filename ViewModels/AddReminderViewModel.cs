@@ -1,45 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CareReminderApp.Services;
 using CareReminderApp.Models;
 
 namespace CareReminderApp.ViewModels
 {
+    [QueryProperty(nameof(SelectedElder), "SelectedElder")]
     public partial class AddReminderViewModel : ObservableObject
     {
-        [ObservableProperty] private string title;
-        [ObservableProperty] private string description;
-        [ObservableProperty] private DateTime reminderDate = DateTime.Now;
-
         private readonly IDataService _dataService;
-        private string _userId;
 
-        public AddReminderViewModel(IDataService dataService, string userId)
+        // המשתנים האלו ייצרו אוטומטית את ReminderTitle (בלי קו תחתון) עבור ה-XAML
+        [ObservableProperty]
+        private User _selectedElder;
+
+        [ObservableProperty]
+        private string _reminderTitle = string.Empty;
+
+        [ObservableProperty]
+        private string _notes = string.Empty;
+
+        [ObservableProperty]
+        private DateTime _selectedDate = DateTime.Now;
+
+        public AddReminderViewModel(IDataService dataService)
         {
             _dataService = dataService;
-            _userId = userId;
         }
 
-
-
         [RelayCommand]
-        private async Task AddReminderAsync()
+        private async Task SaveAndSendReminder()
         {
-            var reminder = new Reminder
+            // בדיקה שהשדות לא ריקים
+            if (string.IsNullOrWhiteSpace(ReminderTitle) || SelectedElder == null) return;
+
+            var newReminder = new Reminder
             {
-                Id = Guid.NewGuid().ToString(),
-                UserId = _userId,
-                Title = this.Title,
-                Description = this.Description,
-                ReminderDate = this.ReminderDate,
+                Title = ReminderTitle,
+                Description = Notes,
+                DueDate = SelectedDate,
+                Time = SelectedDate,
+                UserId = SelectedElder.Id,
                 IsCompleted = false
             };
-            await _dataService.AddReminderAsync(reminder);
+
+            await _dataService.AddReminderAsync(newReminder);
+            await Shell.Current.GoToAsync("..");
         }
     }
 }

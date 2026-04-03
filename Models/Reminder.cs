@@ -7,16 +7,20 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CareReminderApp.Models
 {
+    // הוספת partial ו-ObservableObject כדי שה-Toolkit יעבוד
     public partial class Reminder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
     {
-        public string Id { get; set; } = string.Empty;
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string UserId { get; set; } = string.Empty;
-
-        // שימוש במאפיינים רגילים כדי למנוע שגיאות קומפילציה ב-Service
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public DateTime ReminderDate { get; set; } = DateTime.Now;
-        public bool IsCompleted { get; set; }
+
+        // פותר את השגיאה ב-AddReminderViewModel
+        public DateTime DueDate { get; set; } = DateTime.Now;
+
+        // פותר את השגיאה ב-MockDataService (שורה 26)
         public DateTime Time { get; set; } = DateTime.Now;
+
+        public bool IsCompleted { get; set; }
     }
 }

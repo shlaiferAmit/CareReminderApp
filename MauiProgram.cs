@@ -42,7 +42,10 @@ namespace CareReminderApp
             builder.Services.AddTransient<TodayRemindersPage>();
             builder.Services.AddTransient<FamilyDashboardPage>();
             builder.Services.AddTransient<ReminderDetailsPage>();
+            builder.Services.AddTransient<ChangeProfilePage>();
 
+            builder.Services.AddTransient<AddReminderPage>();
+            builder.Services.AddTransient<AddReminderViewModel>();
 
 #if DEBUG
             builder.Logging.AddDebug();

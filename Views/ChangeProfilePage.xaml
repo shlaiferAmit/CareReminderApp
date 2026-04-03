@@ -9,10 +9,10 @@
     <VerticalStackLayout Spacing="15" Padding="25" VerticalOptions="Center">
         <Label Text="Change Profile" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#2C3E50"/>
 
-        <Entry Placeholder="First Name" Text="{Binding CurrentUser.FirstName}" BackgroundColor="White"/>
-        <Entry Placeholder="Last Name" Text="{Binding CurrentUser.LastName}" BackgroundColor="White"/>
-        <Entry Placeholder="Phone" Text="{Binding CurrentUser.Mobile}" BackgroundColor="White"/>
-        <Entry Placeholder="Email" Text="{Binding CurrentUser.UserEmail}" BackgroundColor="White"/>
+        <Entry Placeholder="First Name" Text="{Binding DisplayUser.FirstName}" BackgroundColor="White"/>
+        <Entry Placeholder="Last Name" Text="{Binding DisplayUser.LastName}" BackgroundColor="White"/>
+        <Entry Placeholder="Phone" Text="{Binding DisplayUser.Mobile}" BackgroundColor="White"/>
+        <Entry Placeholder="Email" Text="{Binding DisplayUser.UserEmail}" BackgroundColor="White"/>
 
         <Button Text="Save Change" BackgroundColor="#3498DB" TextColor="White" 
                 Command="{Binding SaveChangesCommand}"/>

@@ -8,46 +8,56 @@
              Title="Today's Reminders"
              BackgroundColor="#99C1E9">
 
-    <CollectionView ItemsSource="{Binding Reminders}" Margin="20">
-        <CollectionView.ItemTemplate>
-            <DataTemplate x:DataType="models:Reminder">
-                <Frame BackgroundColor="White" 
-                       CornerRadius="10" 
-                       Margin="0,5" 
-                       HasShadow="False">
+    <Grid RowDefinitions="*, Auto">
 
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer 
-                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodayRemindersViewModel}}, Path=NavigateToDetailsCommand}"
-                            CommandParameter="{Binding .}"/>
-                    </Frame.GestureRecognizers>
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Reminders}" Margin="20">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Reminder">
+                    <Frame BackgroundColor="White" CornerRadius="10" Margin="0,5" HasShadow="False">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodayRemindersViewModel}}, Path=NavigateToDetailsCommand}"
+                                CommandParameter="{Binding .}"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="*, Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding Title}" FontSize="18" FontAttributes="Bold" TextColor="#2C3E50"/>
+                                <Label Text="{Binding Time, StringFormat='{0:HH:mm}'}" FontSize="14" TextColor="Gray"/>
+                            </VerticalStackLayout>
 
-                    <Grid ColumnDefinitions="*, Auto">
-                        <VerticalStackLayout Grid.Column="0" Spacing="2">
-                            <Label Text="{Binding Title}" 
-                                   FontSize="18" 
-                                   FontAttributes="Bold" 
-                                   TextColor="#2C3E50"/>
-                            <Label Text="{Binding Time, StringFormat='{0:HH:mm}'}" 
-                                   FontSize="14" 
-                                   TextColor="Gray"/>
-                        </VerticalStackLayout>
+                            <Frame Grid.Column="1" 
+                                   BackgroundColor="{Binding IsCompleted, Converter={StaticResource StatusToColorConverter}}" 
+                                   CornerRadius="15" Padding="12,5" HasShadow="False" VerticalOptions="Center">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TodayRemindersViewModel}}, Path=UpdateReminderStatusAsyncCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+                                <Label Text="{Binding IsCompleted, Converter={StaticResource StatusToTextConverter}}" 
+                                       TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            </Frame>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
 
-                        <Frame Grid.Column="1" 
-                               BackgroundColor="{Binding IsCompleted, Converter={StaticResource StatusToColorConverter}}" 
-                               CornerRadius="15" 
-                               Padding="12,5" 
-                               HasShadow="False"
-                               VerticalOptions="Center">
-                            <Label Text="{Binding IsCompleted, Converter={StaticResource StatusToTextConverter}}" 
-                                   TextColor="White" 
-                                   FontSize="12" 
-                                   FontAttributes="Bold"
-                                   HorizontalOptions="Center"/>
-                        </Frame>
-                    </Grid>
-                </Frame>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" BackgroundColor="White" HeightRequest="70" Padding="5">
+
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToSeniorsCommand}"/>
+                </VerticalStackLayout.GestureRecognizers>
+                <Label Text="Reminders" TextColor="#2C3E50" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <BoxView HeightRequest="3" BackgroundColor="#2C3E50" WidthRequest="40" HorizontalOptions="Center" Margin="0,2,0,0"/>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToSeniorsCommand}"/>
+                </VerticalStackLayout.GestureRecognizers>
+                <Label Text="My Profile" TextColor="Gray" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
 </ContentPage>

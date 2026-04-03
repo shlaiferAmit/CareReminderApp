@@ -1,12 +1,34 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.AddReminderPage"
-             Title="Add Reminder">
-    <StackLayout Padding="20" Spacing="10">
-        <Entry Placeholder="Title" Text="{Binding Title}" />
-        <Editor Placeholder="Description" Text="{Binding Description}" HeightRequest="100"/>
-        <DatePicker Date="{Binding ReminderDate}" />
-        <Button Text="Add Reminder" Command="{Binding AddReminderCommand}" />
-    </StackLayout>
+             x:DataType="viewmodels:AddReminderViewModel"
+             BackgroundColor="#99C1E9">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="30">
+
+            <Label Text="{Binding SelectedElder.FirstName, StringFormat='New remainder for {0}'}" 
+                   FontSize="28" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Center" />
+
+            <Frame BackgroundColor="White" CornerRadius="10" Padding="0" HasShadow="False">
+                <Entry Placeholder="Reminder Title" Text="{Binding ReminderTitle}" 
+                       HorizontalTextAlignment="Center" HeightRequest="60" TextColor="Black"/>
+            </Frame>
+
+            <Frame BackgroundColor="White" CornerRadius="10" Padding="0" HasShadow="False">
+                <DatePicker Date="{Binding SelectedDate}" HeightRequest="60" TextColor="Black"/>
+            </Frame>
+
+            <Frame BackgroundColor="White" CornerRadius="10" Padding="10" HasShadow="False">
+                <Editor Placeholder="Notes" Text="{Binding Notes}" HeightRequest="150" TextColor="Black"/>
+            </Frame>
+
+            <Button Text="Save and send reminder" 
+                    Command="{Binding SaveAndSendReminderCommand}"
+                    BackgroundColor="#1ABC9C" TextColor="White" CornerRadius="30" HeightRequest="65"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
