@@ -80,5 +80,22 @@ namespace CareReminderApp.ViewModels
 
         [RelayCommand]
         private async Task SaveChanges() => await Shell.Current.GoToAsync("..");
+
+
+        [RelayCommand]
+        async Task Logout()
+        {
+            await Shell.Current.GoToAsync("//SignInPage");
+        }
+
+        [RelayCommand]
+        async Task GoToHome()
+        {
+            // משתמש במערכת הניווט של Shell כדי לחזור אחורה או לדף הראשי
+            await Shell.Current.GoToAsync("..");
+        }
     }
+
+
+
 }

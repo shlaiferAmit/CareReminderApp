@@ -57,5 +57,18 @@ namespace CareReminderApp.ViewModels
     };
             await Shell.Current.GoToAsync(nameof(ProfilePage), navParam);
         }
+
+        [RelayCommand]
+        async Task Logout()
+        {
+            await Shell.Current.GoToAsync("//SignInPage");
+        }
+
+        [RelayCommand]
+        async Task GoToHome()
+        {
+            // ניווט חזרה למסך הראשי (Family Dashboard)
+            await Shell.Current.GoToAsync("//FamilyDashboardPage");
+        }
     }
 }

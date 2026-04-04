@@ -107,5 +107,28 @@ namespace CareReminderApp.ViewModels
         {
             await Shell.Current.GoToAsync("///TodayRemindersPage");
         }
+
+        [RelayCommand]
+        async Task Logout()
+        {
+            bool answer = await Shell.Current.DisplayAlert("Logout", "Are you sure you want to exit?", "Yes", "No");
+            if (answer)
+            {
+                await Shell.Current.GoToAsync("//LoginPage");
+            }
+        }
+
+        [RelayCommand]
+        async Task AddSenior()
+        {
+            // בינתיים לא עושה כלום - פונקציה ריקה
+            await Task.CompletedTask;
+        }
+
+        [RelayCommand]
+        async Task GoToHome()
+        {
+            await Shell.Current.GoToAsync("//FamilyDashboardPage"); // או הנתיב המדויק לדף הבית שלך
+        }
     }
 }
