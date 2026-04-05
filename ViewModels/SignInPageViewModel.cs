@@ -16,7 +16,6 @@ namespace CareReminderApp.ViewModels
     {
         private readonly IDataService _dataService;
 
-        // שים לב: שיניתי ל-UserEmail כדי שיתאים לקריאה ב-Service
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SignInCommand))]
         private string _userEmail = string.Empty;
@@ -49,6 +48,7 @@ namespace CareReminderApp.ViewModels
 
         // בדיקה האם ניתן ללחוץ על כפתור ההתחברות
         private bool CanSignIn() => !string.IsNullOrWhiteSpace(UserEmail) && !string.IsNullOrWhiteSpace(UserPassword);
+
         [RelayCommand(CanExecute = nameof(CanSignIn))]
         private async Task SignIn()
         {
@@ -56,13 +56,19 @@ namespace CareReminderApp.ViewModels
 
             if (user != null)
             {
-                // *** השורה החשובה ביותר: שמירת המשתמש ב-App ***
+                // שמירת המשתמש ב-App
                 App.LoggedInUser = user;
 
+                // --- עדכון מצב התפריטים ב-AppShell ---
+                if (Shell.Current is AppShell appShell)
+                {
+                    appShell.SetLoggedInState(true);
+                }
+
                 var navigationParameter = new Dictionary<string, object>
-        {
-            { "CurrentUser", user }
-        };
+                {
+                    { "CurrentUser", user }
+                };
 
                 if (user.Role == UserRole.Senior)
                 {
@@ -76,7 +82,6 @@ namespace CareReminderApp.ViewModels
             }
             else
             {
-                // אופציונלי: הודעת שגיאה אם המשתמש לא נמצא
                 await Shell.Current.DisplayAlert("Error", "Invalid email or password", "OK");
             }
         }

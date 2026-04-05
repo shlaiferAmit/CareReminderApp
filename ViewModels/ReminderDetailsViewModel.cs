@@ -68,10 +68,9 @@ namespace CareReminderApp.ViewModels
         }
 
         [RelayCommand]
-        public async Task GoHome()
+        private async Task GoToHome()
         {
-            // ודאי שהנתיב "TodayRemindersPage" רשום ב-AppShell
-            await Shell.Current.GoToAsync("///TodayRemindersPage");
+            await Shell.Current.GoToAsync("///MainPage");
         }
     }
 }

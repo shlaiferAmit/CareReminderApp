@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.SignInPage"
-             Title="Elder Reminders"
+             Title="Sign In"
                       BackgroundColor="#99C1E9">
     <ScrollView>
         <VerticalStackLayout Margin="30,50,30,20" Spacing="20" VerticalOptions="Center">
