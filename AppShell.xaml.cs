@@ -21,8 +21,8 @@ namespace CareReminderApp
 
         private void RegisterRoutes()
         {
-            Routing.RegisterRoute(nameof(SignUpPage), typeof(SignUpPage));
-            Routing.RegisterRoute(nameof(SignInPage), typeof(SignInPage));
+            Routing.RegisterRoute("SignUpPage", typeof(SignUpPage));
+            Routing.RegisterRoute("SignInPage", typeof(SignInPage));
             Routing.RegisterRoute(nameof(AddReminderPage), typeof(AddReminderPage));
             Routing.RegisterRoute(nameof(ReminderDetailsPage), typeof(ReminderDetailsPage));
             Routing.RegisterRoute(nameof(ChangeProfilePage), typeof(ChangeProfilePage));

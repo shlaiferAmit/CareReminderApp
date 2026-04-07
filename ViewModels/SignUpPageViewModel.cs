@@ -73,20 +73,29 @@ namespace CareReminderApp.ViewModels
         [RelayCommand(CanExecute = nameof(CanSignUp))]
         private async Task SignUp()
         {
-            // שליחת כל הנתונים ל-Service כולל התפקיד שנבחר
+            // 1. הרשמה ב-Service
             bool success = await _dataService.RegisterUserAsync(FirstName, LastName, UserEmail, UserPassword, Mobile, SelectedRole);
 
             if (success)
             {
-                // ניתוב מבוסס תפקיד לאחר הרשמה מוצלחת
-                if (SelectedRole == UserRole.Senior)
+                // 2. יצירת אובייקט המשתמש החדש כדי לעדכן את ה-Shell
+                var newUser = new User
                 {
-                    await Shell.Current.GoToAsync($"//{nameof(ElderRemindersPage)}");
-                }
-                else
+                    FirstName = FirstName,
+                    LastName = LastName,
+                    UserEmail = UserEmail,
+                    Role = SelectedRole
+                };
+
+                App.LoggedInUser = newUser;
+
+                // 3. עדכון ה-Shell (בניית טאבים וניווט אוטומטי)
+                if (Shell.Current is AppShell appShell)
                 {
-                    await Shell.Current.GoToAsync($"//{nameof(FamilyDashboardPage)}");
+                    appShell.SetLoggedInState(true, newUser);
                 }
+
+                // הסרנו את ה-GoToAsync המקורי שגרם לשגיאה!
             }
             else
             {
