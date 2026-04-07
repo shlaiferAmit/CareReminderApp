@@ -6,7 +6,8 @@
              x:Class="CareReminderApp.Views.EldersListPage"
              x:DataType="viewmodels:EldersListViewModel"
              BackgroundColor="#99C1E9"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="True"
+             >
 
     <Grid RowDefinitions="Auto, Auto, *, 80">
 
@@ -59,15 +60,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Grid Grid.Row="3" BackgroundColor="White" Padding="10">
-            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
-                </VerticalStackLayout.GestureRecognizers>
-                <Image Source="home.png" WidthRequest="30" HeightRequest="30" HorizontalOptions="Center"/>
-                <Label Text="Home" HorizontalOptions="Center" TextColor="#2C3E50" FontSize="14" FontAttributes="Bold"/>
-            </VerticalStackLayout>
-        </Grid>
+  
 
     </Grid>
 </ContentPage>

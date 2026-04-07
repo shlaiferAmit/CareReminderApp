@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CareReminderApp.Views.MainPage"
-             Title="Home"
              BackgroundColor="#99C1E9">
 
     <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">

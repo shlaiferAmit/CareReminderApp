@@ -26,6 +26,9 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private ObservableCollection<Reminder> _reminders;
 
+        [ObservableProperty]
+        private ImageSource _profileImageSource = "user_placeholder.png";
+
         public ProfileViewModel(IDataService dataService)
         {
             _dataService = dataService;
@@ -34,7 +37,6 @@ namespace CareReminderApp.ViewModels
 
         public async void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            // כאן אנחנו בודקים אם הגענו מהמבוגרים או מהפרופיל האישי
             if (query.TryGetValue("SelectedUser", out var selected) && selected is User elder)
             {
                 DisplayUser = elder;
@@ -53,6 +55,31 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        [RelayCommand]
+        private async Task ChangePhoto()
+        {
+            try
+            {
+                var photo = await MediaPicker.Default.PickPhotoAsync();
+                if (photo != null)
+                {
+                    ProfileImageSource = ImageSource.FromFile(photo.FullPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", "Could not pick photo: " + ex.Message, "OK");
+            }
+        }
+
+        // הפקודה שחוסרת את השגיאה ב-ChangeProfilePage
+        [RelayCommand]
+        private async Task SaveChanges()
+        {
+            // כאן אפשר להוסיף שמירה ל-Firebase בעתיד
+            await Shell.Current.GoToAsync("..");
+        }
+
         private async Task LoadRemindersAsync()
         {
             if (DisplayUser == null) return;
@@ -63,7 +90,6 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task EditProfile()
         {
-            // שליחת המשתמש הנכון לדף העריכה
             var navParam = new Dictionary<string, object> { { "DisplayUser", DisplayUser } };
             await Shell.Current.GoToAsync(nameof(ChangeProfilePage), navParam);
         }
@@ -72,30 +98,31 @@ namespace CareReminderApp.ViewModels
         private async Task AddReminder()
         {
             if (DisplayUser == null) return;
-
-            // שליחת המבוגר הנבחר לדף הוספת התזכורת
             var navParam = new Dictionary<string, object> { { "SelectedElder", DisplayUser } };
             await Shell.Current.GoToAsync("AddReminderPage", navParam);
         }
 
         [RelayCommand]
-        private async Task SaveChanges() => await Shell.Current.GoToAsync("..");
-
-
-        [RelayCommand]
-        async Task Logout()
+        private async Task GoToHome()
         {
-            await Shell.Current.GoToAsync("//SignInPage");
+            if (App.LoggedInUser == null)
+            {
+                await Shell.Current.GoToAsync("//MainPage");
+                return;
+            }
+
+            // בדיקה לפי ה-Enum שהגדרת במודל
+            if (App.LoggedInUser.Role == UserRole.Senior)
+            {
+                // אם הוא מבוגר - הולך לדף התזכורות שלו
+                await Shell.Current.GoToAsync("//ElderRemindersPage");
+            }
+            else
+            {
+                // אם הוא בן משפחה - הולך לדשבורד
+                await Shell.Current.GoToAsync("//FamilyDashboardPage");
+            }
         }
 
-        [RelayCommand]
-        async Task GoToHome()
-        {
-            // משתמש במערכת הניווט של Shell כדי לחזור אחורה או לדף הראשי
-            await Shell.Current.GoToAsync("..");
-        }
     }
-
-
-
 }

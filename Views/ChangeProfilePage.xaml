@@ -4,7 +4,8 @@
              xmlns:viewmodels="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.ChangeProfilePage"
              x:DataType="viewmodels:ProfileViewModel"
-             BackgroundColor="#99C1E9">
+             BackgroundColor="#99C1E9"
+             Shell.NavBarIsVisible="True">
 
     <VerticalStackLayout Spacing="15" Padding="25" VerticalOptions="Center">
         <Label Text="Change Profile" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#2C3E50"/>

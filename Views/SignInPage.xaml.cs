@@ -1,4 +1,4 @@
-using Microsoft.Maui.Controls;
+﻿using Microsoft.Maui.Controls;
 using CareReminderApp.ViewModels;
 using CareReminderApp.Services;
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using CareReminderApp.Services;
+﻿using CareReminderApp.Services;
 using CareReminderApp.ViewModels;
 
 namespace CareReminderApp.Views
@@ -9,6 +8,7 @@ namespace CareReminderApp.Views
         public FamilyDashboardPage()
         {
             InitializeComponent();
+            // הזרקת השירות ל-ViewModel
             BindingContext = new FamilyDashboardViewModel(new MockDataService());
         }
     }

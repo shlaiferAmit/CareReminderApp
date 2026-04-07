@@ -3,23 +3,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.FamilyDashboardPage"
-             x:DataType="viewmodels:TodayRemindersViewModel"
+             x:DataType="viewmodels:FamilyDashboardViewModel"
              BackgroundColor="#99C1E9"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="True">
 
-    <Grid RowDefinitions="Auto, *, 70">
+    <Grid RowDefinitions="Auto, *">
 
         <VerticalStackLayout Grid.Row="0" Margin="20,10">
-
-
             <Image Source="logo.png" HeightRequest="150" Margin="0,10"/>
-            <Label Text="Welcome Home!" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#2C3E50"/>
-            <Label Text="CareRemind" FontSize="30" HorizontalOptions="Center" TextColor="#546E7A"/>
+            <Label Text="Welcome Home!" 
+                   FontSize="32" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" 
+                   TextColor="#2C3E50"/>
+            <Label Text="CareRemind" 
+                   FontSize="30" 
+                   HorizontalOptions="Center" 
+                   TextColor="#546E7A"/>
         </VerticalStackLayout>
 
         <VerticalStackLayout Grid.Row="1" Spacing="20" Margin="30,10" VerticalOptions="Center">
             <Frame BackgroundColor="#E67E22" CornerRadius="15" HasShadow="True" BorderColor="Transparent">
-                <Label Text="{Binding WelcomeGreeting}" TextColor="White" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Label Text="{Binding WelcomeMessage}" 
+                       TextColor="White" 
+                       FontSize="20" 
+                       FontAttributes="Bold" 
+                       HorizontalOptions="Center"/>
             </Frame>
 
             <Button Text="+ Add new senior" 
@@ -31,22 +40,5 @@
                     Command="{Binding AddSeniorCommand}"/>
         </VerticalStackLayout>
 
-        <Grid Grid.Row="2" ColumnDefinitions="*,*" BackgroundColor="White" Padding="5">
-            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding NavigateToSeniorsCommand}"/>
-                </VerticalStackLayout.GestureRecognizers>
-                <Image Source="list_icon.png" WidthRequest="25" HorizontalOptions="Center"/>
-                <Label Text="My Seniors" HorizontalOptions="Center" TextColor="#2C3E50" FontAttributes="Bold" FontSize="12"/>
-            </VerticalStackLayout>
-
-            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}"/>
-                </VerticalStackLayout.GestureRecognizers>
-                <Image Source="profile_icon.png" WidthRequest="25" HorizontalOptions="Center"/>
-                <Label Text="My Profile" HorizontalOptions="Center" TextColor="Gray" FontSize="12"/>
-            </VerticalStackLayout>
-        </Grid>
     </Grid>
 </ContentPage>

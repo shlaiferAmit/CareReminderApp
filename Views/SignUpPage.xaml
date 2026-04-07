@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CareReminderApp.Views.SignUpPage"
-             Title="Sign Up"
              BackgroundColor="#99C1E9">
     <ScrollView>
         <VerticalStackLayout Margin="30,40,30,20" Spacing="12">

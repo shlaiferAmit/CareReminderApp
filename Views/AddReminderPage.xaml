@@ -4,7 +4,8 @@
              xmlns:viewmodels="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.AddReminderPage"
              x:DataType="viewmodels:AddReminderViewModel"
-             BackgroundColor="#99C1E9">
+             BackgroundColor="#99C1E9"
+             Shell.NavBarIsVisible="True">
 
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="30">

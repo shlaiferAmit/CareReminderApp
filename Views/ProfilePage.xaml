@@ -6,65 +6,96 @@
              x:Class="CareReminderApp.Views.ProfilePage"
              x:DataType="viewmodels:ProfileViewModel"
              BackgroundColor="#99C1E9"
-             Shell.NavBarIsVisible="False">
+            >
+    <Grid RowDefinitions="*, 80">
 
-    <Grid RowDefinitions="Auto, *, 80">
-
-
-
-        <ScrollView Grid.Row="1">
+        <ScrollView Grid.Row="0">
             <VerticalStackLayout Spacing="20" Padding="30">
-                <Label Text="{Binding ProfileTitle}" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#2C3E50"/>
+                <Label Text="{Binding ProfileTitle}" 
+                       FontSize="28" 
+                       FontAttributes="Bold" 
+                       HorizontalOptions="Center" 
+                       TextColor="#2C3E50"/>
 
-                <Frame BackgroundColor="White" CornerRadius="20" Padding="20" HasShadow="True" BorderColor="Transparent">
+                <Frame BackgroundColor="White" 
+                       CornerRadius="20" 
+                       Padding="20" 
+                       HasShadow="True" 
+                       BorderColor="Transparent">
+
                     <VerticalStackLayout Spacing="10">
-                        <Grid WidthRequest="80" HeightRequest="80" HorizontalOptions="Center">
-                            <Ellipse Fill="#E67E22"/>
-                            <Label Text="image" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="12"/>
+
+                        <Grid HorizontalOptions="Center" WidthRequest="110" HeightRequest="110">
+                            <Frame CornerRadius="55" 
+                                   HeightRequest="110" 
+                                   WidthRequest="110" 
+                                   Padding="0" 
+                                   IsClippedToBounds="True"
+                                   BorderColor="#E67E22">
+
+                                <Image Source="{Binding ProfileImageSource}" 
+                                       Aspect="AspectFill"
+                                       HeightRequest="110" 
+                                       WidthRequest="110"/>
+                            </Frame>
+
+                            <ImageButton Source="camera_icon.png"
+                                         Command="{Binding ChangePhotoCommand}"
+                                         IsVisible="{Binding IsMyPersonalProfile}"
+                                         BackgroundColor="White"
+                                         CornerRadius="15"
+                                         HeightRequest="50" 
+                                         WidthRequest="50"
+                                         VerticalOptions="End" 
+                                         HorizontalOptions="End"
+                                         Padding="5"
+                                         Margin="0,0,-5,-5"/>
                         </Grid>
 
-                        <Label Text="{Binding DisplayUser.FirstName}" FontSize="20" HorizontalOptions="Center" FontAttributes="Bold" TextColor="Black"/>
-                        <Label Text="{Binding DisplayUser.UserEmail}" FontSize="14" HorizontalOptions="Center" TextColor="Gray"/>
+                        <Label Text="{Binding DisplayUser.FirstName}" 
+                               FontSize="20" 
+                               HorizontalOptions="Center" 
+                               FontAttributes="Bold" 
+                               TextColor="Black"/>
 
-                        <Button Text="Edit Profile" 
+                        <Label Text="{Binding DisplayUser.UserEmail}" 
+                               FontSize="14" 
+                               HorizontalOptions="Center" 
+                               TextColor="Gray"/>
+
+                        <Button Text="Edit Details" 
                                 Command="{Binding EditProfileCommand}"
                                 IsVisible="{Binding IsMyPersonalProfile}"
                                 BackgroundColor="#3498DB" 
                                 CornerRadius="10"
-                                Margin="0,10"/>
+                                Margin="0,10,0,0"/>
 
                         <VerticalStackLayout IsVisible="{Binding IsViewingElder}">
-                            <Label Text="Reminders List" FontAttributes="Bold" Margin="0,10,0,5" TextColor="#2C3E50"/>
+                            <Label Text="Reminders List" 
+                                   FontAttributes="Bold" 
+                                   Margin="0,10,0,5" 
+                                   TextColor="#2C3E50"/>
+
                             <CollectionView ItemsSource="{Binding Reminders}">
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate x:DataType="models:Reminder">
-                                        <Frame Margin="0,5" Padding="10" BackgroundColor="#E1F5FE" CornerRadius="10" HasShadow="False">
-                                            <Label Text="{Binding Title}" TextColor="#2C3E50"/>
+                                        <Frame Margin="0,5" 
+                                               Padding="10" 
+                                               BackgroundColor="#E1F5FE" 
+                                               CornerRadius="10">
+                                            <Label Text="{Binding Title}" 
+                                                   TextColor="#2C3E50"/>
                                         </Frame>
                                     </DataTemplate>
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
-
-                            <Button Text="Add New Reminder" 
-                                    Command="{Binding AddReminderCommand}"
-                                    BackgroundColor="#2ECC71" 
-                                    CornerRadius="10"
-                                    Margin="0,10"/>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
                 </Frame>
             </VerticalStackLayout>
         </ScrollView>
 
-        <Grid Grid.Row="2" BackgroundColor="White" Padding="10">
-            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                <VerticalStackLayout.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
-                </VerticalStackLayout.GestureRecognizers>
-                <Image Source="home.png" WidthRequest="30" HeightRequest="30" HorizontalOptions="Center"/>
-                <Label Text="Home" HorizontalOptions="Center" TextColor="#2C3E50" FontSize="14" FontAttributes="Bold"/>
-            </VerticalStackLayout>
-        </Grid>
+
 
     </Grid>
 </ContentPage>

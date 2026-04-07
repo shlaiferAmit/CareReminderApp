@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CareReminderApp.Views;
 
+
+
 namespace CareReminderApp.ViewModels
 {
     public partial class SignInPageViewModel : ObservableObject
@@ -27,26 +29,22 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private bool _entryAsPassword = true;
 
-        // Command להצגת/הסתרת סיסמה
-        [RelayCommand]
-        private void ShowPassword() => EntryAsPassword = !EntryAsPassword;
-
-        // Command למעבר לדף הרשמה
-        [RelayCommand]
-        private async Task GoToSignUp() => await Shell.Current.GoToAsync(nameof(SignUpPage));
-
         public SignInPageViewModel(IDataService dataService)
         {
             _dataService = dataService;
         }
 
-        // מאפיין דינמי לתמונה של העין
+        // תמונה דינמית לעין לפי השמות בתיקייה שלך
         public string PasswordImage => EntryAsPassword ? "closeeye.png" : "openeye.png";
 
-        // עדכון התמונה כשהסיסמה משתנה ממוסתרת לגלויה
         partial void OnEntryAsPasswordChanged(bool value) => OnPropertyChanged(nameof(PasswordImage));
 
-        // בדיקה האם ניתן ללחוץ על כפתור ההתחברות
+        [RelayCommand]
+        private void ShowPassword() => EntryAsPassword = !EntryAsPassword;
+
+        [RelayCommand]
+        private async Task GoToSignUp() => await Shell.Current.GoToAsync(nameof(SignUpPage));
+
         private bool CanSignIn() => !string.IsNullOrWhiteSpace(UserEmail) && !string.IsNullOrWhiteSpace(UserPassword);
 
         [RelayCommand(CanExecute = nameof(CanSignIn))]
@@ -56,33 +54,20 @@ namespace CareReminderApp.ViewModels
 
             if (user != null)
             {
-                // שמירת המשתמש ב-App
                 App.LoggedInUser = user;
 
-                // --- עדכון מצב התפריטים ב-AppShell ---
                 if (Shell.Current is AppShell appShell)
                 {
-                    appShell.SetLoggedInState(true);
+                    // אנחנו שולחים את המשתמש לפונקציה ב-AppShell
+                    // הפונקציה הזו תבנה את הטאבים ותבצע את הניווט הפנימי
+                    appShell.SetLoggedInState(true, user);
                 }
 
-                var navigationParameter = new Dictionary<string, object>
-                {
-                    { "CurrentUser", user }
-                };
-
-                if (user.Role == UserRole.Senior)
-                {
-                    await Shell.Current.GoToAsync(nameof(ElderRemindersPage), navigationParameter);
-                }
-                else
-                {
-                    // עבור בן משפחה, עוברים לדאשבורד
-                    await Shell.Current.GoToAsync(nameof(FamilyDashboardPage), navigationParameter);
-                }
+                // הסרנו את ה-GoToAsync מכאן! אין בו צורך יותר.
             }
             else
             {
-                await Shell.Current.DisplayAlert("Error", "Invalid email or password", "OK");
+                await Shell.Current.DisplayAlert("Error", "Invalid Email or Password", "OK");
             }
         }
     }
