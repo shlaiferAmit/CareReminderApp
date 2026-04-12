@@ -8,17 +8,13 @@ namespace CareReminderApp.Views
 {
     public partial class SignUpPage : ContentPage
     {
-        // זה מה שיפתור את השגיאה בתמונה 9
-        public SignUpPage(IDataService dataService)
+        // הדרך הנכונה: מקבלים את ה-ViewModel מוכן מהמערכת
+        public SignUpPage(SignUpPageViewModel viewModel)
         {
             InitializeComponent();
-            BindingContext = new SignUpPageViewModel(dataService);
+            BindingContext = viewModel;
         }
 
-        // בנאי ריק כגיבוי ל-Shell
-        public SignUpPage()
-        {
-            InitializeComponent();
-        }
+        // אין צורך בבנאי ריק אם רשמת את הדף ב-MauiProgram.cs
     }
 }

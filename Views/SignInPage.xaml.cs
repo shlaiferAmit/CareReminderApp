@@ -1,15 +1,15 @@
 ﻿using Microsoft.Maui.Controls;
 using CareReminderApp.ViewModels;
-using CareReminderApp.Services;
 
 namespace CareReminderApp.Views
 {
     public partial class SignInPage : ContentPage
     {
-        public SignInPage()
+        // אנחנו מקבלים את ה-ViewModel מוכן דרך הבנאי
+        public SignInPage(SignInPageViewModel viewModel)
         {
             InitializeComponent();
-            BindingContext = new SignInPageViewModel(new MockDataService());
+            BindingContext = viewModel;
         }
     }
 }

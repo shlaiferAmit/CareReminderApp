@@ -58,17 +58,40 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task ChangePhoto()
         {
+            // בדיקה שזה אכן הפרופיל שלי לפני שמאפשרים שינוי
+            if (!IsMyPersonalProfile) return;
+
             try
             {
+                // פתיחת הגלריה
                 var photo = await MediaPicker.Default.PickPhotoAsync();
+
                 if (photo != null)
                 {
-                    ProfileImageSource = ImageSource.FromFile(photo.FullPath);
+                    // 1. יצירת נתיב קבוע בתיקיית האפליקציה (כדי שהתמונה לא תימחק)
+                    string localFilePath = Path.Combine(FileSystem.AppDataDirectory, photo.FileName);
+
+                    // 2. העתקת הקובץ מהתיקייה הזמנית לתיקייה הקבועה
+                    using (Stream sourceStream = await photo.OpenReadAsync())
+                    using (FileStream localFileStream = File.OpenWrite(localFilePath))
+                    {
+                        await sourceStream.CopyToAsync(localFileStream);
+                    }
+
+                    // 3. עדכון ה-UI
+                    ProfileImageSource = ImageSource.FromFile(localFilePath);
+
+                    // 4. עדכון אובייקט המשתמש (כדי שיוכל להישמר ב-DB בעתיד)
+                    if (DisplayUser != null)
+                    {
+                        // כאן תעדכן את השדה הרלוונטי במודל User שלך
+                        // DisplayUser.ProfilePicturePath = localFilePath;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", "Could not pick photo: " + ex.Message, "OK");
+                await Shell.Current.DisplayAlert("שגיאה", "לא ניתן היה לבחור תמונה: " + ex.Message, "אוקיי");
             }
         }
 

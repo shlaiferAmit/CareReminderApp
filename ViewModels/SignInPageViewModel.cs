@@ -2,21 +2,15 @@
 using CareReminderApp.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using CareReminderApp.Views;
-
-
+using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
 {
     public partial class SignInPageViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
+        private readonly AuthService _authService; // הוספנו את ה-AuthService
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SignInCommand))]
@@ -29,12 +23,13 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private bool _entryAsPassword = true;
 
-        public SignInPageViewModel(IDataService dataService)
+        // הזרקת השירותים בבנאי
+        public SignInPageViewModel(IDataService dataService, AuthService authService)
         {
             _dataService = dataService;
+            _authService = authService;
         }
 
-        // תמונה דינמית לעין לפי השמות בתיקייה שלך
         public string PasswordImage => EntryAsPassword ? "closeeye.png" : "openeye.png";
 
         partial void OnEntryAsPasswordChanged(bool value) => OnPropertyChanged(nameof(PasswordImage));
@@ -50,24 +45,33 @@ namespace CareReminderApp.ViewModels
         [RelayCommand(CanExecute = nameof(CanSignIn))]
         private async Task SignIn()
         {
-            var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
-
-            if (user != null)
+            try
             {
-                App.LoggedInUser = user;
+                // שלב 1: אימות מול Firebase Auth
+                var userCredential = await _authService.SignInAsync(UserEmail, UserPassword);
 
-                if (Shell.Current is AppShell appShell)
+                if (userCredential != null)
                 {
-                    // אנחנו שולחים את המשתמש לפונקציה ב-AppShell
-                    // הפונקציה הזו תבנה את הטאבים ותבצע את הניווט הפנימי
-                    appShell.SetLoggedInState(true, user);
-                }
+                    // שלב 2: משיכת נתוני המשתמש מה-Database שלנו (למשל שם, תפקיד וכו')
+                    // אנחנו משתמשים באימייל כדי למצוא את המשתמש המתאים
+                    var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
 
-                // הסרנו את ה-GoToAsync מכאן! אין בו צורך יותר.
+                    if (user != null)
+                    {
+                        App.LoggedInUser = user;
+
+                        if (Shell.Current is AppShell appShell)
+                        {
+                            // מעבר לדף הבית ועדכון הסטטוס
+                            appShell.SetLoggedInState(true, user);
+                        }
+                    }
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", "Invalid Email or Password", "OK");
+                // אם הפרטים לא נכונים, Firebase יזרוק שגיאה שנתפוס כאן
+                await Shell.Current.DisplayAlert("Error", "התחברות נכשלה: אימייל או סיסמה לא נכונים", "OK");
             }
         }
     }

@@ -24,32 +24,39 @@
                        BorderColor="Transparent">
 
                     <VerticalStackLayout Spacing="10">
-
                         <Grid HorizontalOptions="Center" WidthRequest="110" HeightRequest="110">
                             <Frame CornerRadius="55" 
-                                   HeightRequest="110" 
-                                   WidthRequest="110" 
-                                   Padding="0" 
-                                   IsClippedToBounds="True"
-                                   BorderColor="#E67E22">
+           HeightRequest="110" 
+           WidthRequest="110" 
+           Padding="0" 
+           IsClippedToBounds="True"
+           BorderColor="#E67E22">
+
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ChangePhotoCommand}" />
+                                </Frame.GestureRecognizers>
 
                                 <Image Source="{Binding ProfileImageSource}" 
-                                       Aspect="AspectFill"
-                                       HeightRequest="110" 
-                                       WidthRequest="110"/>
+               Aspect="AspectFill"
+               HeightRequest="110" 
+               WidthRequest="110"/>
                             </Frame>
 
                             <ImageButton Source="camera_icon.png"
-                                         Command="{Binding ChangePhotoCommand}"
-                                         IsVisible="{Binding IsMyPersonalProfile}"
-                                         BackgroundColor="White"
-                                         CornerRadius="15"
-                                         HeightRequest="50" 
-                                         WidthRequest="50"
-                                         VerticalOptions="End" 
-                                         HorizontalOptions="End"
-                                         Padding="5"
-                                         Margin="0,0,-5,-5"/>
+                 Command="{Binding ChangePhotoCommand}"
+                 IsVisible="{Binding IsMyPersonalProfile}"
+                 BackgroundColor="White"
+                 CornerRadius="15"
+                 HeightRequest="50" 
+                 WidthRequest="50"
+                 VerticalOptions="End" 
+                 HorizontalOptions="End"
+                 Padding="5"
+                 Margin="0,0,-5,-5">
+                                <ImageButton.Shadow>
+                                    <Shadow Brush="Black" Offset="2,2" Radius="5" Opacity="0.2"/>
+                                </ImageButton.Shadow>
+                            </ImageButton>
                         </Grid>
 
                         <Label Text="{Binding DisplayUser.FirstName}" 

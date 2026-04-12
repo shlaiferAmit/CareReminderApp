@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "576830955168",
+    "firebase_url": "https://remaindsdb-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "remaindsdb",
+    "storage_bucket": "remaindsdb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:576830955168:android:062c4292c0a4b9b99433c5",
+        "android_client_info": {
+          "package_name": "com.companyname.carereminderapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJIwRq4lAEC6zWkjM-A-e6fsELljIyeWc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

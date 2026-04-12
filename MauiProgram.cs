@@ -21,7 +21,8 @@ namespace CareReminderApp
                 });
 
             // 1. רישום השירותים (Services)
-            builder.Services.AddSingleton<IDataService, MockDataService>();
+            builder.Services.AddSingleton<IDataService, FirebaseDataService>();
+            builder.Services.AddSingleton<AuthService>();
 
             // 2. רישום ה-ViewModels
             builder.Services.AddTransient<SignInPageViewModel>();
@@ -32,6 +33,7 @@ namespace CareReminderApp
             builder.Services.AddTransient<TodayRemindersViewModel>();
             builder.Services.AddTransient<FamilyDashboardViewModel>();
             builder.Services.AddTransient<ReminderDetailsViewModel>();
+            builder.Services.AddTransient<AddReminderViewModel>();
 
             // 3. רישום הדפים (Views)
             builder.Services.AddTransient<SignInPage>();
@@ -43,9 +45,8 @@ namespace CareReminderApp
             builder.Services.AddTransient<FamilyDashboardPage>();
             builder.Services.AddTransient<ReminderDetailsPage>();
             builder.Services.AddTransient<ChangeProfilePage>();
-
             builder.Services.AddTransient<AddReminderPage>();
-            builder.Services.AddTransient<AddReminderViewModel>();
+
 
 #if DEBUG
             builder.Logging.AddDebug();
