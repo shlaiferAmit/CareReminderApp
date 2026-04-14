@@ -16,8 +16,7 @@ namespace CareReminderApp.Services
         // תזכורות
         Task<List<Reminder>> GetRemindersByUserIdAsync(string userId);
         Task<IEnumerable<Reminder>> GetRemindersAsync(string userId);
-        Task AddReminderAsync(Reminder reminder);
-        Task UpdateReminderAsync(Reminder reminder);
+        Task SaveReminderAsync(Reminder reminder); 
 
         // קשרים קבועים
         Task<List<UserConnection>> GetUserConnectionsAsync(string userId);
@@ -31,5 +30,7 @@ namespace CareReminderApp.Services
         Task RejectConnectionAsync(PendingConnection request);
 
         Task<List<UserRole>> GetRolesAsync();
+
+        Task UpdateReminderAsync(Reminder reminder);
     }
 }

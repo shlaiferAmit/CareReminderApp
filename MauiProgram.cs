@@ -34,7 +34,7 @@ namespace CareReminderApp
             builder.Services.AddTransient<FamilyDashboardViewModel>();
             builder.Services.AddTransient<ReminderDetailsViewModel>();
             builder.Services.AddTransient<AddReminderViewModel>();
-
+            builder.Services.AddTransient<ElderProfileViewModel>(); // ודאי שהשורה הזו קיימת
 
 
             // 3. רישום הדפים (Views)
@@ -48,7 +48,7 @@ namespace CareReminderApp
             builder.Services.AddTransient<ReminderDetailsPage>();
             builder.Services.AddTransient<ChangeProfilePage>();
             builder.Services.AddTransient<AddReminderPage>();
-
+            builder.Services.AddTransient<ElderProfilePage>(); // ודאי שהשורה הזו קיימת
 
 
 #if DEBUG

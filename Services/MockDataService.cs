@@ -48,12 +48,7 @@ namespace CareReminderApp.Services
         public async Task<List<Reminder>> GetRemindersByUserIdAsync(string userId) =>
             await Task.FromResult(_reminders.Where(r => r.UserId == userId).ToList());
 
-        public async Task AddReminderAsync(Reminder reminder)
-        {
-            reminder.Id = Guid.NewGuid().ToString();
-            _reminders.Add(reminder);
-            await Task.CompletedTask;
-        }
+   
 
         public async Task<List<UserConnection>> GetUserConnectionsAsync(string userId) =>
             await Task.FromResult(_connections.Where(c => c.UserId == userId || c.ConnectedUserId == userId).ToList());
@@ -122,6 +117,16 @@ namespace CareReminderApp.Services
         public async Task RejectConnectionAsync(PendingConnection request)
         {
             request.IsRejected = true;
+            await Task.CompletedTask;
+        }
+
+        public async Task SaveReminderAsync(Reminder reminder)
+        {
+            // ב-Mock אנחנו רק מוסיפים לרשימה המקומית בזיכרון
+            if (string.IsNullOrEmpty(reminder.Id))
+                reminder.Id = Guid.NewGuid().ToString();
+
+            _reminders.Add(reminder);
             await Task.CompletedTask;
         }
     }

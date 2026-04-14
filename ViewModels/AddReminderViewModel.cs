@@ -10,7 +10,6 @@ namespace CareReminderApp.ViewModels
     {
         private readonly IDataService _dataService;
 
-        // המשתנים האלו ייצרו אוטומטית את ReminderTitle (בלי קו תחתון) עבור ה-XAML
         [ObservableProperty]
         private User _selectedElder;
 
@@ -31,20 +30,37 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task SaveAndSendReminder()
         {
-            // בדיקה שהשדות לא ריקים
-            if (string.IsNullOrWhiteSpace(ReminderTitle) || SelectedElder == null) return;
-
-            var newReminder = new Reminder
+            try
             {
-                Title = ReminderTitle,
-                Description = Notes,
-                DueDate = SelectedDate,
-                UserId = SelectedElder.Id,
-                IsCompleted = false
-            };
+                // בדיקה שהנתונים לא ריקים
+                if (string.IsNullOrWhiteSpace(ReminderTitle) || SelectedElder == null)
+                {
+                    await Shell.Current.DisplayAlert("חסרים פרטים", "נא למלא כותרת ולבחור מבוגר", "אוקיי");
+                    return;
+                }
 
-            await _dataService.AddReminderAsync(newReminder);
-            await Shell.Current.GoToAsync("..");
+                var newReminder = new Reminder
+                {
+                    Title = ReminderTitle,
+                    Description = Notes,
+                    DueDate = SelectedDate,
+                    UserId = SelectedElder.Id,
+                    IsCompleted = false
+                };
+
+                // זה ידפיס לך הודעה ב-Visual Studio ברגע הלחיצה!
+                System.Diagnostics.Debug.WriteLine("נסיונית לשמור תזכורת ל-Firebase...");
+
+                await _dataService.SaveReminderAsync(newReminder);
+
+                await Shell.Current.DisplayAlert("הצלחה", "התזכורת נשמרה בהצלחה!", "מעולה");
+                await Shell.Current.GoToAsync("..");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"שגיאה בשמירה: {ex.Message}");
+                await Shell.Current.DisplayAlert("שגיאה", "השמירה נכשלה: " + ex.Message, "אוקיי");
+            }
         }
     }
 }

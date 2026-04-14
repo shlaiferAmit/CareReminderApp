@@ -114,13 +114,7 @@ namespace CareReminderApp.Services
         }
         // --- Reminder Management ---
 
-        public async Task AddReminderAsync(Reminder reminder)
-        {
-            if (string.IsNullOrEmpty(reminder.Id))
-                reminder.Id = Guid.NewGuid().ToString();
 
-            await _firebase.Child("Reminders").PostAsync(reminder);
-        }
 
         public async Task<List<Reminder>> GetRemindersByUserIdAsync(string userId) =>
             (await GetRemindersAsync(userId)).ToList();
@@ -277,6 +271,28 @@ namespace CareReminderApp.Services
             {
                 System.Diagnostics.Debug.WriteLine($"ERROR: {ex.Message}");
                 return new List<User>();
+            }
+
+        }
+
+        public async Task SaveReminderAsync(Reminder reminder)
+        {
+            try
+            {
+                // יצירת ID חדש אם לא קיים
+                if (string.IsNullOrEmpty(reminder.Id))
+                    reminder.Id = Guid.NewGuid().ToString();
+
+                // שמירה ב-Firebase תחת ענף Reminders
+                await _firebase
+                    .Child("Reminders")
+                    .PostAsync(reminder);
+
+                System.Diagnostics.Debug.WriteLine("✅ Reminder saved successfully to Firebase!");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Firebase Error: {ex.Message}");
             }
         }
     }

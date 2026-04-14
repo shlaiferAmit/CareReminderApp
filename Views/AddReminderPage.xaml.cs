@@ -1,17 +1,12 @@
-using Microsoft.Maui.Controls;
 using CareReminderApp.ViewModels;
-using CareReminderApp.Services;
 
-namespace CareReminderApp.Views
+namespace CareReminderApp.Views;
+
+public partial class AddReminderPage : ContentPage
 {
-    [QueryProperty(nameof(UserId), "UserId")]
-    public partial class AddReminderPage : ContentPage
+    public AddReminderPage(AddReminderViewModel vm)
     {
-        public string UserId { get; set; }
-
-        public AddReminderPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        BindingContext = vm;
     }
 }

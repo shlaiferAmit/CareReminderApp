@@ -5,19 +5,29 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
+using Newtonsoft.Json;
+
+
 namespace CareReminderApp.Models
 {
     public class Reminder
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string UserId { get; set; }
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("title")]
         public string Title { get; set; }
+
+        [JsonProperty("description")]
         public string Description { get; set; }
-        public DateTime DueDate { get; set; } = DateTime.Now;
 
-        // שדה עזר לתצוגה ב-XAML כדי שלא יקרוס
-        public string Time => DueDate.ToString("HH:mm");
+        [JsonProperty("dueDate")]
+        public DateTime DueDate { get; set; }
 
+        [JsonProperty("userId")]
+        public string UserId { get; set; }
+
+        [JsonProperty("isCompleted")]
         public bool IsCompleted { get; set; }
     }
 }
