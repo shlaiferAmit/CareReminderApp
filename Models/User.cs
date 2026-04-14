@@ -16,6 +16,8 @@ namespace CareReminderApp.Models
         public string Mobile { get; set; } = string.Empty;
         public UserRole Role { get; set; }
 
+        public string ProfilePicturePath { get; set; }
+
         public string FirstNameInitial =>
       string.IsNullOrEmpty(FirstName) ? "" : FirstName.Substring(0, 1);
     }

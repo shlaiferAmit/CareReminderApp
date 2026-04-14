@@ -10,6 +10,7 @@ namespace CareReminderApp.Views
         public MainPage()
         {
             InitializeComponent();
+            Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
         }
 
         public MainPage(IDataService dataService)

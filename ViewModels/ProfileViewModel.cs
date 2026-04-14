@@ -35,74 +35,66 @@ namespace CareReminderApp.ViewModels
             Reminders = new ObservableCollection<Reminder>();
         }
 
-        public async void ApplyQueryAttributes(IDictionary<string, object> query)
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            if (query.TryGetValue("SelectedUser", out var selected) && selected is User elder)
-            {
-                DisplayUser = elder;
-                ProfileTitle = $"{elder.FirstName}'s Profile";
-                IsViewingElder = true;
-                IsMyPersonalProfile = false;
-                await LoadRemindersAsync();
-            }
-            else
+            // אם עברנו לדף בלי פרמטרים (כלומר, הפרופיל שלי)
+            if (App.LoggedInUser != null)
             {
                 DisplayUser = App.LoggedInUser;
                 ProfileTitle = "My Profile";
-                IsViewingElder = false;
                 IsMyPersonalProfile = true;
-                Reminders.Clear();
+
+                // כאן אנחנו מעדכנים את שאר השדות אם צריך
+                OnPropertyChanged(nameof(DisplayUser));
+            }
+        }
+
+        private void UpdateProfileImage()
+        {
+            if (DisplayUser != null && !string.IsNullOrEmpty(DisplayUser.ProfilePicturePath))
+            {
+                ProfileImageSource = ImageSource.FromFile(DisplayUser.ProfilePicturePath);
+            }
+            else
+            {
+                ProfileImageSource = "user_placeholder.png";
             }
         }
 
         [RelayCommand]
         private async Task ChangePhoto()
         {
-            // בדיקה שזה אכן הפרופיל שלי לפני שמאפשרים שינוי
             if (!IsMyPersonalProfile) return;
 
             try
             {
-                // פתיחת הגלריה
                 var photo = await MediaPicker.Default.PickPhotoAsync();
-
                 if (photo != null)
                 {
-                    // 1. יצירת נתיב קבוע בתיקיית האפליקציה (כדי שהתמונה לא תימחק)
                     string localFilePath = Path.Combine(FileSystem.AppDataDirectory, photo.FileName);
 
-                    // 2. העתקת הקובץ מהתיקייה הזמנית לתיקייה הקבועה
                     using (Stream sourceStream = await photo.OpenReadAsync())
                     using (FileStream localFileStream = File.OpenWrite(localFilePath))
                     {
                         await sourceStream.CopyToAsync(localFileStream);
                     }
 
-                    // 3. עדכון ה-UI
                     ProfileImageSource = ImageSource.FromFile(localFilePath);
 
-                    // 4. עדכון אובייקט המשתמש (כדי שיוכל להישמר ב-DB בעתיד)
                     if (DisplayUser != null)
                     {
-                        // כאן תעדכן את השדה הרלוונטי במודל User שלך
-                        // DisplayUser.ProfilePicturePath = localFilePath;
+                        DisplayUser.ProfilePicturePath = localFilePath;
+                        // כאן מומלץ להוסיף קריאה לשירות נתונים כדי לשמור את הנתיב ב-DB
                     }
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("שגיאה", "לא ניתן היה לבחור תמונה: " + ex.Message, "אוקיי");
+                await Shell.Current.DisplayAlert("שגיאה", "לא ניתן היה לעדכן תמונה: " + ex.Message, "אוקיי");
             }
         }
 
-        // הפקודה שחוסרת את השגיאה ב-ChangeProfilePage
         [RelayCommand]
-        private async Task SaveChanges()
-        {
-            // כאן אפשר להוסיף שמירה ל-Firebase בעתיד
-            await Shell.Current.GoToAsync("..");
-        }
-
         private async Task LoadRemindersAsync()
         {
             if (DisplayUser == null) return;
@@ -134,18 +126,29 @@ namespace CareReminderApp.ViewModels
                 return;
             }
 
-            // בדיקה לפי ה-Enum שהגדרת במודל
             if (App.LoggedInUser.Role == UserRole.Senior)
-            {
-                // אם הוא מבוגר - הולך לדף התזכורות שלו
                 await Shell.Current.GoToAsync("//ElderRemindersPage");
-            }
             else
-            {
-                // אם הוא בן משפחה - הולך לדשבורד
                 await Shell.Current.GoToAsync("//FamilyDashboardPage");
-            }
         }
 
+        [RelayCommand]
+        private async Task SaveChanges()
+        {
+            // כאן תבוא לוגיקת השמירה (למשל ל-Firebase)
+            await Shell.Current.GoToAsync("..");
+        }
+
+        [RelayCommand]
+        private async Task GoToSeniors()
+        {
+            await Shell.Current.GoToAsync("//EldersListPage");
+        }
+
+        [RelayCommand]
+        private async Task GoToProfile()
+        {
+            // אנחנו כבר כאן, אז אולי רק רענון או כלום
+        }
     }
 }

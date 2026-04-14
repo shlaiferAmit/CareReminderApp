@@ -129,5 +129,16 @@ namespace CareReminderApp.Services
             _reminders.Add(reminder);
             await Task.CompletedTask;
         }
+
+        public async Task<bool> DeleteReminderAsync(string id)
+        {
+            var reminder = _reminders.FirstOrDefault(r => r.Id == id);
+            if (reminder != null)
+            {
+                _reminders.Remove(reminder);
+                return await Task.FromResult(true);
+            }
+            return await Task.FromResult(false);
+        }
     }
 }

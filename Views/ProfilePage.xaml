@@ -2,106 +2,72 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:CareReminderApp.ViewModels"
-             xmlns:models="clr-namespace:CareReminderApp.Models"
              x:Class="CareReminderApp.Views.ProfilePage"
              x:DataType="viewmodels:ProfileViewModel"
              BackgroundColor="#99C1E9"
-            >
-    <Grid RowDefinitions="*, 80">
+             Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="Auto, *, 80">
 
-        <ScrollView Grid.Row="0">
-            <VerticalStackLayout Spacing="20" Padding="30">
-                <Label Text="{Binding ProfileTitle}" 
-                       FontSize="28" 
-                       FontAttributes="Bold" 
-                       HorizontalOptions="Center" 
-                       TextColor="#2C3E50"/>
+        <Label Grid.Row="0" Text="My Profile" 
+               FontSize="32" HorizontalOptions="Center" VerticalOptions="Center"
+               TextColor="#2C3E50" Margin="0,20,0,10"/>
 
-                <Frame BackgroundColor="White" 
-                       CornerRadius="20" 
-                       Padding="20" 
-                       HasShadow="True" 
-                       BorderColor="Transparent">
+        <ScrollView Grid.Row="1">
+            <Frame BackgroundColor="White" 
+                   Margin="30,20" 
+                   Padding="30" 
+                   CornerRadius="0" 
+                   HasShadow="False"
+                   HorizontalOptions="FillAndExpand"
+                   VerticalOptions="Start">
 
-                    <VerticalStackLayout Spacing="10">
-                        <Grid HorizontalOptions="Center" WidthRequest="110" HeightRequest="110">
-                            <Frame CornerRadius="55" 
-           HeightRequest="110" 
-           WidthRequest="110" 
-           Padding="0" 
-           IsClippedToBounds="True"
-           BorderColor="#E67E22">
+                <VerticalStackLayout Spacing="20">
 
-                                <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding ChangePhotoCommand}" />
-                                </Frame.GestureRecognizers>
-
-                                <Image Source="{Binding ProfileImageSource}" 
-               Aspect="AspectFill"
-               HeightRequest="110" 
-               WidthRequest="110"/>
-                            </Frame>
-
-                            <ImageButton Source="camera_icon.png"
-                 Command="{Binding ChangePhotoCommand}"
-                 IsVisible="{Binding IsMyPersonalProfile}"
-                 BackgroundColor="White"
-                 CornerRadius="15"
-                 HeightRequest="50" 
-                 WidthRequest="50"
-                 VerticalOptions="End" 
-                 HorizontalOptions="End"
-                 Padding="5"
-                 Margin="0,0,-5,-5">
-                                <ImageButton.Shadow>
-                                    <Shadow Brush="Black" Offset="2,2" Radius="5" Opacity="0.2"/>
-                                </ImageButton.Shadow>
-                            </ImageButton>
-                        </Grid>
-
-                        <Label Text="{Binding DisplayUser.FirstName}" 
-                               FontSize="20" 
+                    <Frame CornerRadius="75" 
+                           HeightRequest="150" 
+                           WidthRequest="150" 
+                           BackgroundColor="#E67E22" 
+                           Padding="0" 
+                           HorizontalOptions="Center"
+                           BorderColor="Transparent">
+                        <Label Text="**image" 
+                               TextColor="White" 
                                HorizontalOptions="Center" 
-                               FontAttributes="Bold" 
-                               TextColor="Black"/>
+                               VerticalOptions="Center" 
+                               FontAttributes="Bold"/>
+                    </Frame>
 
-                        <Label Text="{Binding DisplayUser.UserEmail}" 
-                               FontSize="14" 
-                               HorizontalOptions="Center" 
-                               TextColor="Gray"/>
+                    <VerticalStackLayout Spacing="10" HorizontalOptions="Start">
+                        <HorizontalStackLayout Spacing="5">
+                            <Label Text="Full name: " FontAttributes="Bold" />
+                            <Label Text="{Binding DisplayUser.FirstName}" />
+                        </HorizontalStackLayout>
 
-                        <Button Text="Edit Details" 
-                                Command="{Binding EditProfileCommand}"
-                                IsVisible="{Binding IsMyPersonalProfile}"
-                                BackgroundColor="#3498DB" 
-                                CornerRadius="10"
-                                Margin="0,10,0,0"/>
+                        <HorizontalStackLayout Spacing="5">
+                            <Label Text="Email: " FontAttributes="Bold" />
+                            <Label Text="{Binding DisplayUser.UserEmail}" />
+                        </HorizontalStackLayout>
 
-                        <VerticalStackLayout IsVisible="{Binding IsViewingElder}">
-                            <Label Text="Reminders List" 
-                                   FontAttributes="Bold" 
-                                   Margin="0,10,0,5" 
-                                   TextColor="#2C3E50"/>
-
-                            <CollectionView ItemsSource="{Binding Reminders}">
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate x:DataType="models:Reminder">
-                                        <Frame Margin="0,5" 
-                                               Padding="10" 
-                                               BackgroundColor="#E1F5FE" 
-                                               CornerRadius="10">
-                                            <Label Text="{Binding Title}" 
-                                                   TextColor="#2C3E50"/>
-                                        </Frame>
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
-                        </VerticalStackLayout>
+                        <HorizontalStackLayout Spacing="5">
+                            <Label Text="Phone: " FontAttributes="Bold" />
+                            <Label Text="{Binding DisplayUser.Mobile, StringFormat='Phone: {0}'}" 
+       FontSize="18" 
+       TextColor="#2C3E50"/>
+                        </HorizontalStackLayout>
                     </VerticalStackLayout>
-                </Frame>
-            </VerticalStackLayout>
+                    
+                    <Button Text="Edit Profile" 
+                            Command="{Binding EditProfileCommand}"
+                            BackgroundColor="#3498DB" 
+                            TextColor="White" 
+                            CornerRadius="5" 
+                            HeightRequest="45"
+                            WidthRequest="200"
+                            HorizontalOptions="Center"
+                            Margin="0,20,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
         </ScrollView>
-
 
 
     </Grid>

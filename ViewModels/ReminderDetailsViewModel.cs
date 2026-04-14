@@ -1,9 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CareReminderApp.Models;
 using CareReminderApp.Services;
 
@@ -14,7 +10,6 @@ namespace CareReminderApp.ViewModels
     {
         private readonly IDataService _dataService;
 
-        // הוסר הקו התחתון כדי למנוע שגיאות Generator
         [ObservableProperty]
         private Reminder? selectedReminder;
 
@@ -26,51 +21,63 @@ namespace CareReminderApp.ViewModels
             _dataService = dataService;
         }
 
-        // פונקציה זו רצה אוטומטית כשהתזכורת מתקבלת מהדף הקודם
         partial void OnSelectedReminderChanged(Reminder? value)
         {
             if (value != null)
             {
-                StatusText = value.IsCompleted ? "Done" : "Not Done";
+                UpdateStatusText(value.IsCompleted);
             }
+        }
+
+        private void UpdateStatusText(bool isCompleted)
+        {
+            StatusText = isCompleted ? "Done" : "Not Done";
         }
 
         [RelayCommand]
         public async Task MarkAsDone()
         {
-            if (SelectedReminder != null)
-            {
-                SelectedReminder.IsCompleted = true;
-                await _dataService.UpdateReminderAsync(SelectedReminder);
-                StatusText = "Done"; // מעדכן את הבועה הירוקה בעיצוב
-            }
+            if (SelectedReminder == null) return;
+
+            SelectedReminder.IsCompleted = true;
+            await _dataService.UpdateReminderAsync(SelectedReminder);
+            UpdateStatusText(true);
+            await Shell.Current.DisplayAlert("Status", "Reminder marked as done!", "OK");
         }
 
         [RelayCommand]
         public async Task MarkAsNotDone()
         {
-            if (SelectedReminder != null)
-            {
-                SelectedReminder.IsCompleted = false;
-                await _dataService.UpdateReminderAsync(SelectedReminder);
-                StatusText = "Not Done";
-            }
+            if (SelectedReminder == null) return;
+
+            SelectedReminder.IsCompleted = false;
+            await _dataService.UpdateReminderAsync(SelectedReminder);
+            UpdateStatusText(false);
+            await Shell.Current.DisplayAlert("Status", "Reminder marked as not done", "OK");
         }
 
         [RelayCommand]
         public async Task Delete()
         {
-            if (SelectedReminder != null)
-            {
-                // כאן תבוא לוגיקת המחיקה מה-Service בעתיד
-                await Shell.Current.GoToAsync("..");
-            }
-        }
+            if (SelectedReminder == null) return;
 
-        [RelayCommand]
-        private async Task GoToHome()
-        {
-            await Shell.Current.GoToAsync("///MainPage");
+            bool confirm = await Shell.Current.DisplayAlert("Delete", "Are you sure you want to delete this reminder permanently?", "Yes", "No");
+            if (confirm)
+            {
+                // קריאה לפונקציית המחיקה האמיתית ב-Service
+                // הערה: ודאי שב-IDataService קיימת מתודה DeleteReminderAsync(string id)
+                var success = await _dataService.DeleteReminderAsync(SelectedReminder.Id);
+
+                if (success)
+                {
+                    await Shell.Current.DisplayAlert("Deleted", "Reminder removed successfully", "OK");
+                    await Shell.Current.GoToAsync(".."); // חזרה לדף הרשימה
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Error", "Could not delete from Firebase", "OK");
+                }
+            }
         }
     }
 }

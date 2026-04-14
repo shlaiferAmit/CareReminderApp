@@ -13,10 +13,10 @@ namespace CareReminderApp.ViewModels
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(WelcomeGreeting))]
-        private string userFirstName = "Amit";
+        private string userFirstName = "User";
 
         [ObservableProperty]
-        private string userId = "101";
+        private string userId;
 
         [ObservableProperty]
         private int totalRemindersCount = 0;
@@ -24,12 +24,17 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private ObservableCollection<Reminder> reminders = new();
 
-        [ObservableProperty]
-        private Reminder? upcomingReminder;
-
         public TodayRemindersViewModel(IDataService dataService)
         {
             _dataService = dataService;
+
+            // שליפת המשתמש המחובר מהאפליקציה
+            if (App.LoggedInUser != null)
+            {
+                UserId = App.LoggedInUser.Id;
+                UserFirstName = App.LoggedInUser.FirstName;
+            }
+
             _ = LoadDataAsync();
         }
 
@@ -37,14 +42,14 @@ namespace CareReminderApp.ViewModels
         {
             try
             {
-                // שימוש ב-UserId (U גדולה) שנוצר מה-Toolkit
+                if (string.IsNullOrEmpty(UserId)) return;
+
                 var userReminders = await _dataService.GetRemindersByUserIdAsync(UserId);
 
                 if (userReminders != null)
                 {
                     Reminders = new ObservableCollection<Reminder>(userReminders);
                     TotalRemindersCount = Reminders.Count;
-                    UpcomingReminder = Reminders.FirstOrDefault();
                 }
 
                 OnPropertyChanged(nameof(WelcomeGreeting));
@@ -52,83 +57,30 @@ namespace CareReminderApp.ViewModels
             }
             catch (Exception ex)
             {
-                // כאן אפשר להוסיף לוג לשגיאות במידת הצורך
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
             }
         }
 
-        public string WelcomeGreeting
-        {
-            get
-            {
-                var hour = DateTime.Now.Hour;
-                string greeting = hour switch
-                {
-                    >= 5 and < 12 => "Good Morning",
-                    >= 12 and < 18 => "Good Afternoon",
-                    >= 18 and < 22 => "Good Evening",
-                    _ => "Good Night"
-                };
-                return $"{greeting}, {UserFirstName}";
-            }
-        }
-
-        public string RemindersSummary => $"You have {TotalRemindersCount} reminds today";
-
-        [RelayCommand]
-        public async Task UpdateReminderStatusAsync(Reminder reminder)
-        {
-            if (reminder == null) return;
-            await _dataService.UpdateReminderAsync(reminder);
-            await LoadDataAsync(); // ריענון הרשימה לאחר העדכון
-        }
-
-        [RelayCommand]
-        public async Task NavigateToSeniors() => await Shell.Current.GoToAsync("EldersListPage");
-
-        [RelayCommand]
-        public async Task NavigateToProfile() => await Shell.Current.GoToAsync("ProfilePage");
+        public string WelcomeGreeting => $"Good Morning, {UserFirstName}";
+        public string RemindersSummary => $"You have {TotalRemindersCount} reminders today";
 
         [RelayCommand]
         public async Task NavigateToReminderDetails(Reminder reminder)
         {
             if (reminder == null) return;
 
-            var navigationParameter = new Dictionary<string, object>
+            await Shell.Current.GoToAsync(nameof(ReminderDetailsPage), new Dictionary<string, object>
             {
                 { "SelectedReminder", reminder }
-            };
-
-            // ודאי שהשם כאן תואם לרישום ב-AppShell
-            await Shell.Current.GoToAsync("ReminderDetailsPage", navigationParameter);
+            });
         }
 
         [RelayCommand]
-        public async Task NavigateToTodayReminders()
+        public async Task UpdateReminderStatusAsync(Reminder reminder)
         {
-            await Shell.Current.GoToAsync("///TodayRemindersPage");
-        }
-
-        [RelayCommand]
-        async Task Logout()
-        {
-            bool answer = await Shell.Current.DisplayAlert("Logout", "Are you sure you want to exit?", "Yes", "No");
-            if (answer)
-            {
-                await Shell.Current.GoToAsync("//LoginPage");
-            }
-        }
-
-        [RelayCommand]
-        async Task AddSenior()
-        {
-            // בינתיים לא עושה כלום - פונקציה ריקה
-            await Task.CompletedTask;
-        }
-
-        [RelayCommand]
-        async Task GoToHome()
-        {
-            await Shell.Current.GoToAsync("//FamilyDashboardPage"); // או הנתיב המדויק לדף הבית שלך
+            if (reminder == null) return;
+            await _dataService.UpdateReminderAsync(reminder);
+            await LoadDataAsync();
         }
     }
 }

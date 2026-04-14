@@ -24,6 +24,7 @@ namespace CareReminderApp.ViewModels
         private string _remindersSummaryText = string.Empty;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(RemindersCountMessage))] // מעדכן את הטקסט בכל פעם שהרשימה משתנה
         private ObservableCollection<Reminder> _elderRemindersList = new();
 
         [ObservableProperty]
@@ -37,17 +38,26 @@ namespace CareReminderApp.ViewModels
             _dataService = dataService;
         }
 
+        // מאפיין מחושב עבור הטקסט בכרטיסייה הכתומה
+        public string RemindersCountMessage
+        {
+            get
+            {
+                int count = ElderRemindersList?.Count ?? 0;
+                return count == 1 ? "You have 1 reminder today" : $"You have {count} reminders today";
+            }
+        }
+
         // ניהול קבלת נתונים בניווט
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            // בדיקה האם הגענו עם CurrentUser (בדרך כלל מהתחברות) או SelectedElder
             if (query.TryGetValue("CurrentUser", out var user) || query.TryGetValue("SelectedElder", out user))
             {
                 CurrentUser = user as User;
 
                 if (CurrentUser != null)
                 {
-                    WelcomeMessage = $"שלום, {CurrentUser.FirstName}";
+                    WelcomeMessage = $"Good Morning, {CurrentUser.FirstName}";
 
                     // רענון נתונים ראשוני
                     MainThread.BeginInvokeOnMainThread(async () =>
@@ -70,16 +80,13 @@ namespace CareReminderApp.ViewModels
 
                 if (result != null)
                 {
+                    // עדכון הרשימה יפעיל אוטומטית את עדכון ה-RemindersCountMessage
                     ElderRemindersList = new ObservableCollection<Reminder>(result);
-
-                    var count = ElderRemindersList.Count(r => !r.IsCompleted);
-                    RemindersSummaryText = count == 1
-                        ? "You have 1 reminder today"
-                        : $"You have {count} reminders today";
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // הסרת ex כדי למנוע אזהרת משתנה לא בשימוש
                 await Shell.Current.DisplayAlert("Error", "Could not load reminders", "OK");
             }
         }
@@ -104,16 +111,30 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task ApproveRequest(PendingConnection request)
         {
+            if (request == null) return;
             await _dataService.ApproveConnectionAsync(request);
-            await CheckPendingRequestsAsync(); // רענון הרשימה לאחר אישור
-            await Shell.Current.DisplayAlert("הצלחה", "החיבור אושר בהצלחה", "OK");
+            await CheckPendingRequestsAsync();
+            await Shell.Current.DisplayAlert("Success", "Connection approved!", "OK");
         }
 
         [RelayCommand]
         private async Task RejectRequest(PendingConnection request)
         {
+            if (request == null) return;
             await _dataService.RejectConnectionAsync(request);
-            await CheckPendingRequestsAsync(); // רענון הרשימה לאחר דחייה
+            await CheckPendingRequestsAsync();
+        }
+
+        // פקודה למעבר לדף פרטי תזכורת ספציפית
+        [RelayCommand]
+        private async Task NavigateToReminderDetails(Reminder reminder)
+        {
+            if (reminder == null) return;
+
+            await Shell.Current.GoToAsync(nameof(ReminderDetailsPage), new Dictionary<string, object>
+            {
+                { "SelectedReminder", reminder }
+            });
         }
 
         [RelayCommand]
@@ -128,7 +149,7 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task NavigateToProfile()
         {
-            await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
+            await Shell.Current.GoToAsync("ProfilePage", new Dictionary<string, object>
             {
                 { "CurrentUser", CurrentUser }
             });

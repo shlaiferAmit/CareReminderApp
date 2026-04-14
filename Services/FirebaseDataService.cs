@@ -295,5 +295,22 @@ namespace CareReminderApp.Services
                 System.Diagnostics.Debug.WriteLine($"❌ Firebase Error: {ex.Message}");
             }
         }
+
+        public async Task<bool> DeleteReminderAsync(string reminderId)
+        {
+            try
+            {
+                // וודאי שהשם כאן תואם לשם המשתנה המוגדר בראש המחלקה שלך
+                await _firebase
+                    .Child("Reminders")
+                    .Child(reminderId)
+                    .DeleteAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }
