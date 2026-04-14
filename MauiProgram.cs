@@ -35,6 +35,8 @@ namespace CareReminderApp
             builder.Services.AddTransient<ReminderDetailsViewModel>();
             builder.Services.AddTransient<AddReminderViewModel>();
 
+
+
             // 3. רישום הדפים (Views)
             builder.Services.AddTransient<SignInPage>();
             builder.Services.AddTransient<SignUpPage>(); // שורת התיקון עבור SignUp!
@@ -46,6 +48,7 @@ namespace CareReminderApp
             builder.Services.AddTransient<ReminderDetailsPage>();
             builder.Services.AddTransient<ChangeProfilePage>();
             builder.Services.AddTransient<AddReminderPage>();
+
 
 
 #if DEBUG

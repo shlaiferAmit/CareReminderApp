@@ -26,44 +26,119 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private ObservableCollection<Reminder> _elderRemindersList = new();
 
+        [ObservableProperty]
+        private ObservableCollection<PendingConnection> _pendingRequests = new();
+
+        [ObservableProperty]
+        private bool _hasPendingRequests;
+
         public ElderRemindersViewModel(IDataService dataService)
         {
             _dataService = dataService;
         }
 
+        // ניהול קבלת נתונים בניווט
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            if (query.TryGetValue("SelectedElder", out var elder))
+            // בדיקה האם הגענו עם CurrentUser (בדרך כלל מהתחברות) או SelectedElder
+            if (query.TryGetValue("CurrentUser", out var user) || query.TryGetValue("SelectedElder", out user))
             {
-                CurrentUser = elder as User; // כאן CurrentUser הופך להיות המבוגר (למשל Esther)
+                CurrentUser = user as User;
 
                 if (CurrentUser != null)
                 {
-                    WelcomeMessage = $"{CurrentUser.FirstName}'s Profile";
-                    _ = LoadRemindersAsync(); // טוען רק את התזכורות של המבוגר הספציפי הזה
+                    WelcomeMessage = $"שלום, {CurrentUser.FirstName}";
+
+                    // רענון נתונים ראשוני
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await LoadRemindersAsync();
+                        await CheckPendingRequestsAsync();
+                    });
                 }
             }
         }
 
+        // טעינת תזכורות מ-Firebase
         public async Task LoadRemindersAsync()
         {
             if (CurrentUser == null) return;
 
-            var result = await _dataService.GetRemindersAsync(CurrentUser.Id);
+            try
+            {
+                var result = await _dataService.GetRemindersAsync(CurrentUser.Id);
 
-            // המשתנה הזה נוצר אוטומטית בזכות ה-partial וה-ObservableProperty
-            ElderRemindersList = new ObservableCollection<Reminder>(result);
+                if (result != null)
+                {
+                    ElderRemindersList = new ObservableCollection<Reminder>(result);
 
-            var count = ElderRemindersList.Count(r => !r.IsCompleted);
-            RemindersSummaryText = $"You have {count} reminders today";
+                    var count = ElderRemindersList.Count(r => !r.IsCompleted);
+                    RemindersSummaryText = count == 1
+                        ? "You have 1 reminder today"
+                        : $"You have {count} reminders today";
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", "Could not load reminders", "OK");
+            }
+        }
+
+        // בדיקה האם יש בקשות הצטרפות ממשפחה שמחכות לאישור
+        public async Task CheckPendingRequestsAsync()
+        {
+            if (CurrentUser == null) return;
+
+            try
+            {
+                var requests = await _dataService.GetPendingForElderAsync(CurrentUser.Id);
+                PendingRequests = new ObservableCollection<PendingConnection>(requests);
+                HasPendingRequests = PendingRequests.Any();
+            }
+            catch
+            {
+                HasPendingRequests = false;
+            }
         }
 
         [RelayCommand]
-        private async Task NavigateToTodayReminders() =>
-            await Shell.Current.GoToAsync("TodayRemindersPage", new Dictionary<string, object> { { "CurrentUser", CurrentUser } });
+        private async Task ApproveRequest(PendingConnection request)
+        {
+            await _dataService.ApproveConnectionAsync(request);
+            await CheckPendingRequestsAsync(); // רענון הרשימה לאחר אישור
+            await Shell.Current.DisplayAlert("הצלחה", "החיבור אושר בהצלחה", "OK");
+        }
 
         [RelayCommand]
-        private async Task NavigateToProfile() =>
-            await Shell.Current.GoToAsync("ProfilePage", new Dictionary<string, object> { { "CurrentUser", CurrentUser } });
+        private async Task RejectRequest(PendingConnection request)
+        {
+            await _dataService.RejectConnectionAsync(request);
+            await CheckPendingRequestsAsync(); // רענון הרשימה לאחר דחייה
+        }
+
+        [RelayCommand]
+        private async Task NavigateToTodayReminders()
+        {
+            await Shell.Current.GoToAsync(nameof(TodayRemindersPage), new Dictionary<string, object>
+            {
+                { "CurrentUser", CurrentUser }
+            });
+        }
+
+        [RelayCommand]
+        private async Task NavigateToProfile()
+        {
+            await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
+            {
+                { "CurrentUser", CurrentUser }
+            });
+        }
+
+        [RelayCommand]
+        private async Task Refresh()
+        {
+            await LoadRemindersAsync();
+            await CheckPendingRequestsAsync();
+        }
     }
 }

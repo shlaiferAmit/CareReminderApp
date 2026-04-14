@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 
 namespace CareReminderApp.Models
 {
-    // הוספת partial ו-ObservableObject כדי שה-Toolkit יעבוד
-    public partial class Reminder : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
+    public class Reminder
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string UserId { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-
-        // פותר את השגיאה ב-AddReminderViewModel
+        public string UserId { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
         public DateTime DueDate { get; set; } = DateTime.Now;
 
-        // פותר את השגיאה ב-MockDataService (שורה 26)
-        public DateTime Time { get; set; } = DateTime.Now;
+        // שדה עזר לתצוגה ב-XAML כדי שלא יקרוס
+        public string Time => DueDate.ToString("HH:mm");
 
         public bool IsCompleted { get; set; }
     }

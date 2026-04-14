@@ -88,19 +88,24 @@ namespace CareReminderApp.ViewModels
 
                     if (dbSuccess)
                     {
-                        var newUser = new User
-                        {
-                            FirstName = FirstName,
-                            LastName = LastName,
-                            UserEmail = UserEmail,
-                            Role = SelectedRole
-                        };
+                        // 🔥 מושכים את המשתמש האמיתי עם ה-Id
+                        var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
 
-                        App.LoggedInUser = newUser;
-
-                        if (Shell.Current is AppShell appShell)
+                        if (user != null && !string.IsNullOrEmpty(user.Id))
                         {
-                            appShell.SetLoggedInState(true, newUser);
+                            App.LoggedInUser = user;
+
+                            await App.Current.MainPage.DisplayAlert("DEBUG",
+                                $"Signed up with ID: {user.Id}", "OK");
+
+                            if (Shell.Current is AppShell appShell)
+                            {
+                                appShell.SetLoggedInState(true, user);
+                            }
+                        }
+                        else
+                        {
+                            await App.Current.MainPage.DisplayAlert("Error", "User saved but not found in DB", "OK");
                         }
                     }
                 }

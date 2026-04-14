@@ -4,12 +4,14 @@ using CareReminderApp.Services;
 
 namespace CareReminderApp.Views
 {
+    [QueryProperty(nameof(UserId), "UserId")]
     public partial class AddReminderPage : ContentPage
     {
-        public AddReminderPage(AddReminderViewModel viewModel)
+        public string UserId { get; set; }
+
+        public AddReminderPage()
         {
             InitializeComponent();
-            BindingContext = viewModel;
         }
     }
 }

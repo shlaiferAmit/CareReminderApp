@@ -14,13 +14,15 @@ namespace CareReminderApp.Models
         public string UserEmail { get; set; } = string.Empty;
         public string UserPassword { get; set; } = string.Empty;
         public string Mobile { get; set; } = string.Empty;
-        public int RoleId { get; set; }
         public UserRole Role { get; set; }
+
+        public string FirstNameInitial =>
+      string.IsNullOrEmpty(FirstName) ? "" : FirstName.Substring(0, 1);
     }
 
     public enum UserRole
     {
-        Senior,
-        FamilyMember
+        Senior, //0
+        FamilyMember //1
     }
 }

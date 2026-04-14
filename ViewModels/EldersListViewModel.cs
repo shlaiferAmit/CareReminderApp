@@ -1,74 +1,63 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CareReminderApp.Models;
+using CareReminderApp.Services;
+using CareReminderApp.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CareReminderApp.Services;
-using CareReminderApp.Models;
-using CareReminderApp.Views;
+using System.Collections.ObjectModel;
 
 namespace CareReminderApp.ViewModels
 {
-    public partial class EldersListViewModel : ObservableObject, IQueryAttributable
+    public partial class EldersListViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-
-        [ObservableProperty]
-        private ObservableCollection<User> _elders = new();
-
-        // זה המשתנה שהיה חסר וגרם לשגיאות!
-        [ObservableProperty]
-        private User _currentUser;
 
         public EldersListViewModel(IDataService dataService)
         {
             _dataService = dataService;
+            Elders = new ObservableCollection<User>();
         }
 
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        // שימוש במבנה קלאסי שתואם לכל גרסאות C# 12 ומטה
+        [ObservableProperty]
+        private ObservableCollection<User> elders;
+
+        [ObservableProperty]
+        private bool isBusy;
+
+        [RelayCommand]
+        public async Task LoadElders()
         {
-            if (query.TryGetValue("CurrentUser", out var user))
+            if (IsBusy || App.LoggedInUser == null) return;
+            IsBusy = true;
+
+            try
             {
-                CurrentUser = user as User;
-                _ = LoadEldersAsync();
+                var result = await _dataService.GetEldersForFamilyAsync(App.LoggedInUser.Id);
+                Elders.Clear();
+                foreach (var elder in result)
+                {
+                    Elders.Add(elder);
+                }
+            }
+            catch (Exception ex)
+            {
+                // כאן תוכלי להוסיף הודעת שגיאה למשתמש בעתיד
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
-        public async Task LoadEldersAsync()
-        {
-            if (CurrentUser == null) return;
-
-            // עכשיו הפקודה הזו תעבוד כי הוספנו אותה ל-IDataService
-            var result = await _dataService.GetEldersForFamilyAsync(CurrentUser.Id);
-            Elders = new ObservableCollection<User>(result);
-        }
-
-   
-
         [RelayCommand]
-        private async Task GoToProfile(User selectedElder)
+        private async Task GoToProfile(User elder)
         {
-            if (selectedElder == null) return;
-
-            var navParam = new Dictionary<string, object>
-    {
-        { "SelectedUser", selectedElder } // המפתח הזה חייב להיות זהה למה שב-ProfileViewModel
-    };
-            await Shell.Current.GoToAsync(nameof(ProfilePage), navParam);
-        }
-
-        [RelayCommand]
-        async Task Logout()
-        {
-            await Shell.Current.GoToAsync("//SignInPage");
-        }
-
-        [RelayCommand]
-        async Task GoToHome()
-        {
-            // ניווט חזרה למסך הראשי (Family Dashboard)
-            await Shell.Current.GoToAsync("//FamilyDashboardPage");
+            if (elder == null) return;
+            await Shell.Current.GoToAsync(nameof(ElderProfilePage), new Dictionary<string, object>
+            {
+                { "Elder", elder }
+            });
         }
     }
 }

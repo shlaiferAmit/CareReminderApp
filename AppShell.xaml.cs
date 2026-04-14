@@ -26,6 +26,10 @@ namespace CareReminderApp
             Routing.RegisterRoute(nameof(AddReminderPage), typeof(AddReminderPage));
             Routing.RegisterRoute(nameof(ReminderDetailsPage), typeof(ReminderDetailsPage));
             Routing.RegisterRoute(nameof(ChangeProfilePage), typeof(ChangeProfilePage));
+            Routing.RegisterRoute(nameof(ElderProfilePage), typeof(ElderProfilePage));
+
+            // הוספת הדף החסר שמופיע בשגיאות שלך
+            Routing.RegisterRoute("ElderProfilePage", typeof(ElderProfilePage));
         }
 
         // --- פונקציה לבניית ה-Tabs דינמית לפי סוג המשתמש ---
@@ -95,28 +99,25 @@ namespace CareReminderApp
         {
             IsUserLoggedIn = isLoggedIn;
 
-            // 1. בניה מחדש של הטאבים
+            // 🔥 חשוב מאוד
+            App.LoggedInUser = currentUser;
+
             BuildTabs(currentUser);
 
             if (isLoggedIn && currentUser != null)
             {
-                // 2. השהיה קטנה כדי שה-Shell יתעדכן
                 await Task.Delay(100);
 
-                // 3. במקום לנווט לפי מחרוזת "//ElderRemindersPage", 
-                // פשוט נגיד ל-Shell להציג את הפריט הראשון שהוא הרגע יצר בתוך ה-TabBar.
                 if (this.Items.LastOrDefault() is TabBar mainBar && mainBar.Items.Count > 0)
                 {
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
-                        // הגדרת הטאב הראשון כפעיל (זה תמיד יהיה עמוד הבית של המשתמש)
                         this.CurrentItem = mainBar.Items[0];
                     });
                 }
             }
             else
             {
-                // חזרה לדף הבית המקורי (MainPageContent שמוגדר ב-XAML)
                 this.CurrentItem = MainPageContent;
             }
         }

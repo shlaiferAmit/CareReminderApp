@@ -39,7 +39,6 @@ namespace CareReminderApp.ViewModels
                 Title = ReminderTitle,
                 Description = Notes,
                 DueDate = SelectedDate,
-                Time = SelectedDate,
                 UserId = SelectedElder.Id,
                 IsCompleted = false
             };

@@ -1,8 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CareReminderApp.Models; // הוספתי את זה
 using CareReminderApp.Services;
-using CareReminderApp.Models;
-using CareReminderApp.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
 {
@@ -12,10 +15,13 @@ namespace CareReminderApp.ViewModels
         private readonly IDataService _dataService;
 
         [ObservableProperty]
-        private User? _currentUser;
+        private User? currentUser;
 
         [ObservableProperty]
-        private string _welcomeMessage = "שלום!";
+        private string welcomeMessage = "Hello!";
+
+        [ObservableProperty]
+        private bool isBusy;
 
         public FamilyDashboardViewModel(IDataService dataService)
         {
@@ -25,40 +31,35 @@ namespace CareReminderApp.ViewModels
         partial void OnCurrentUserChanged(User? value)
         {
             if (value != null)
-            {
-                // עדכון הודעת הפתיחה כשמתקבל משתמש
-                WelcomeMessage = $"בוקר טוב, {value.FirstName}!";
-            }
+                WelcomeMessage = $"Good morning, {value.FirstName}!";
         }
 
         [RelayCommand]
         private async Task AddSenior()
         {
-            // ניווט לדף הוספת קשיש
-            await Shell.Current.GoToAsync(nameof(EldersListPage), new Dictionary<string, object>
+            if (IsBusy || CurrentUser == null) return;
+
+            string email = await Shell.Current.DisplayPromptAsync("הוספת מבוגר", "הכנס אימייל של המבוגר:");
+            if (string.IsNullOrWhiteSpace(email)) return;
+
+            IsBusy = true;
+            try
             {
-                { "CurrentUser", CurrentUser! }
-            });
-        }
+                var senior = await _dataService.FindSeniorByEmailAsync(email.Trim().ToLower());
+                if (senior == null)
+                {
+                    await Shell.Current.DisplayAlert("שגיאה", "לא נמצא משתמש מבוגר עם אימייל זה", "OK");
+                    return;
+                }
 
-        [RelayCommand]
-        private async Task NavigateToProfile()
-        {
-            await Shell.Current.GoToAsync(nameof(ProfilePage), new Dictionary<string, object>
+                await _dataService.InviteElderAsync(CurrentUser.Id, senior.Id);
+                await Shell.Current.DisplayAlert("נשלח", "בקשת חיבור נשלחה למבוגר.", "OK");
+            }
+            catch (Exception)
             {
-                { "CurrentUser", CurrentUser! }
-            });
-        }
-
-        [RelayCommand]
-        private async Task NavigateToSeniors()
-        {
-            if (CurrentUser == null) return;
-
-            await Shell.Current.GoToAsync(nameof(EldersListPage), new Dictionary<string, object>
-    {
-        { "CurrentUser", CurrentUser }
-    });
+                await Shell.Current.DisplayAlert("שגיאה", "אירעה שגיאה", "OK");
+            }
+            finally { IsBusy = false; }
         }
     }
 }

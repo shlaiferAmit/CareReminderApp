@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:CareReminderApp.ViewModels"
+             x:Class="CareReminderApp.Views.ElderProfilePage"
+             x:DataType="viewmodels:ElderProfileViewModel"
+             Title="Senior Profile">
+    <VerticalStackLayout Padding="20" Spacing="15">
+        <Label Text="{Binding Elder.FirstName}" 
+               FontSize="28" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center"/>
+
+        <Label Text="Reminders:" FontSize="20" FontAttributes="Bold"/>
+
+        <CollectionView ItemsSource="{Binding Reminders}" HeightRequest="400">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="10" Margin="5" CornerRadius="10">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Title}" FontAttributes="Bold"/>
+                            <Label Text="{Binding DueDate, StringFormat='{0:dd/MM/yyyy HH:mm}'}" FontSize="12"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Text="➕ Add Reminder" 
+                Command="{Binding AddReminderCommand}"
+                BackgroundColor="#4CAF50" 
+                TextColor="White"/>
+    </VerticalStackLayout>
+</ContentPage>

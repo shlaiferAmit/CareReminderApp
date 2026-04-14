@@ -6,10 +6,10 @@ namespace CareReminderApp
 {
     public partial class App : Application
     {
-        // השאירי רק את זה
-        public static Models.User LoggedInUser { get; set; }
+        // 🔥 משתמש מחובר גלובלי
+        public static User LoggedInUser { get; set; }
 
-        public App(IDataService dataService)
+        public App()
         {
             InitializeComponent();
             MainPage = new AppShell();

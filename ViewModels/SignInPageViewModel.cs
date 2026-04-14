@@ -1,8 +1,9 @@
 ﻿using CareReminderApp.Models;
 using CareReminderApp.Services;
+using CareReminderApp.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CareReminderApp.Views;
+using Firebase.Auth;
 using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
@@ -47,31 +48,52 @@ namespace CareReminderApp.ViewModels
         {
             try
             {
-                // שלב 1: אימות מול Firebase Auth
+                if (string.IsNullOrWhiteSpace(UserEmail) || string.IsNullOrWhiteSpace(UserPassword))
+                {
+                    await Shell.Current.DisplayAlert("Error", "Enter email and password", "OK");
+                    return;
+                }
+
+                // שלב 1: התחברות ל-Firebase Auth
                 var userCredential = await _authService.SignInAsync(UserEmail, UserPassword);
 
-                if (userCredential != null)
+                if (userCredential == null)
                 {
-                    // שלב 2: משיכת נתוני המשתמש מה-Database שלנו (למשל שם, תפקיד וכו')
-                    // אנחנו משתמשים באימייל כדי למצוא את המשתמש המתאים
-                    var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
-
-                    if (user != null)
-                    {
-                        App.LoggedInUser = user;
-
-                        if (Shell.Current is AppShell appShell)
-                        {
-                            // מעבר לדף הבית ועדכון הסטטוס
-                            appShell.SetLoggedInState(true, user);
-                        }
-                    }
+                    await Shell.Current.DisplayAlert("Error", "Login failed", "OK");
+                    return;
                 }
+
+                // שלב 2: שליפת נתוני המשתמש מה-Database שלנו
+                // שימי לב: המשתנה נקרא כאן 'user' כדי להתאים לשאר הקוד
+                var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
+
+                if (user == null || string.IsNullOrEmpty(user.Id))
+                {
+                    await Shell.Current.DisplayAlert("Error", "User not found in database", "OK");
+                    return;
+                }
+
+                // שמירה גלובלית
+                App.LoggedInUser = user;
+
+                if (Shell.Current is AppShell appShell)
+                {
+                    appShell.SetLoggedInState(true, user);
+                }
+
+                // ניתוב חכם לפי תפקיד (Role)
+                string route = user.Role == UserRole.Senior
+                               ? "//ElderRemindersPage"
+                               : "//FamilyDashboardPage";
+
+                await Shell.Current.GoToAsync(route, new Dictionary<string, object>
+        {
+            { "CurrentUser", user }
+        });
             }
             catch (Exception ex)
             {
-                // אם הפרטים לא נכונים, Firebase יזרוק שגיאה שנתפוס כאן
-                await Shell.Current.DisplayAlert("Error", "התחברות נכשלה: אימייל או סיסמה לא נכונים", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Login error: {ex.Message}", "OK");
             }
         }
     }

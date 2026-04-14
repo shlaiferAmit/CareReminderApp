@@ -1,15 +1,13 @@
-﻿using CareReminderApp.Services;
-using CareReminderApp.ViewModels;
+﻿using CareReminderApp.ViewModels;
 
 namespace CareReminderApp.Views
 {
     public partial class FamilyDashboardPage : ContentPage
     {
-        public FamilyDashboardPage()
+        public FamilyDashboardPage(FamilyDashboardViewModel vm)
         {
             InitializeComponent();
-            // הזרקת השירות ל-ViewModel
-            BindingContext = new FamilyDashboardViewModel(new MockDataService());
+            BindingContext = vm;
         }
     }
 }

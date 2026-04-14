@@ -1,4 +1,5 @@
 ﻿using CareReminderApp.Models;
+using Microsoft.Maui.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,22 +12,24 @@ namespace CareReminderApp.Services
         private List<User> _users = new List<User>();
         private List<Reminder> _reminders = new List<Reminder>();
         private List<UserConnection> _connections = new List<UserConnection>();
+        private List<PendingConnection> _pendingConnections = new List<PendingConnection>();
 
+        // בתוך הבנאי של MockDataService
         public MockDataService()
         {
-            // 1. הגדרת המשתמשים - שימי לב ל-IDs
-            _users.Add(new User { Id = "1", FirstName = "Amit", UserEmail = "family@test.com", UserPassword = "123", Role = UserRole.FamilyMember });
-            _users.Add(new User { Id = "2", FirstName = "Saba", UserEmail = "senior@test.com", UserPassword = "123", Role = UserRole.Senior });
-            _users.Add(new User { Id = "101", FirstName = "Esther", UserEmail = "esther@test.com", UserPassword = "123", Role = UserRole.Senior });
-
-            // 2. הגדרת הקשרים - שימוש בשמות השדות המדויקים מהמודל שלך (UserId ו-ConnectedUserId)
+            _users.Add(new User { Id = "1", FirstName = "Amit", Role = UserRole.FamilyMember });
+            _users.Add(new User { Id = "101", FirstName = "Esther", Role = UserRole.Senior });
             _connections.Add(new UserConnection { UserId = "1", ConnectedUserId = "101" });
 
-            // 3. תזכורת לדוגמה עבור אסתר
-            _reminders.Add(new Reminder { Id = "1", Title = "Doctor appointment", Time = DateTime.Now.AddHours(1), IsCompleted = false, UserId = "101" });
+            // תיקון: DueDate במקום Time
+            _reminders.Add(new Reminder
+            {
+                Id = "1",
+                Title = "Medicine",
+                DueDate = DateTime.Now.AddHours(2),
+                UserId = "101"
+            });
         }
-
-        // --- מימוש פונקציות ה-Interface ---
 
         public async Task<User> GetUserAsync(string userEmail, string password) =>
             await Task.FromResult(_users.FirstOrDefault(u => u.UserEmail == userEmail && u.UserPassword == password));
@@ -35,7 +38,7 @@ namespace CareReminderApp.Services
         {
             if (_users.Any(u => u.UserEmail == userEmail)) return false;
             _users.Add(new User { Id = Guid.NewGuid().ToString(), FirstName = firstName, LastName = lastName, UserEmail = userEmail, UserPassword = password, Mobile = mobile, Role = role });
-            return true;
+            return await Task.FromResult(true);
         }
 
         public async Task<List<User>> GetUsersAsync() => await Task.FromResult(_users.ToList());
@@ -68,17 +71,58 @@ namespace CareReminderApp.Services
             await Task.CompletedTask;
         }
 
-        // הפונקציה הקריטית שמסננת את עמית מהרשימה
         public async Task<IEnumerable<User>> GetEldersForFamilyAsync(string familyId)
         {
-            // מוצאים את ה-IDs של המבוגרים המחוברים לפי השדות הנכונים
             var connectedIds = _connections
                 .Where(c => c.UserId == familyId)
                 .Select(c => c.ConnectedUserId)
                 .ToList();
 
-            // מחזירים רק את המשתמשים שה-ID שלהם ברשימת המחוברים
-            return await Task.FromResult(_users.Where(u => connectedIds.Contains(u.Id)).ToList());
+            var result = _users
+                .Where(u => connectedIds.Contains(u.Id))
+                .ToList();
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<User> FindSeniorByEmailAsync(string email) =>
+            await Task.FromResult(_users.FirstOrDefault(u => u.UserEmail?.ToLower() == email.ToLower() && u.Role == UserRole.Senior));
+
+        public async Task AddUserConnectionAsync(string familyId, string seniorId)
+        {
+            _connections.Add(new UserConnection { UserId = familyId, ConnectedUserId = seniorId });
+            await Task.CompletedTask;
+        }
+
+        // --- מימוש הפונקציות החסרות עבור Pending Connections ---
+
+        public async Task InviteElderAsync(string familyId, string elderId)
+        {
+            _pendingConnections.Add(new PendingConnection
+            {
+                Id = Guid.NewGuid().ToString(),
+                FamilyId = familyId,
+                ElderId = elderId
+            });
+            await Task.CompletedTask;
+        }
+
+        public async Task<IEnumerable<PendingConnection>> GetPendingForElderAsync(string elderId)
+        {
+            return await Task.FromResult(_pendingConnections.Where(x => x.ElderId == elderId && !x.IsApproved && !x.IsRejected));
+        }
+
+        public async Task ApproveConnectionAsync(PendingConnection request)
+        {
+            request.IsApproved = true;
+            _connections.Add(new UserConnection { UserId = request.FamilyId, ConnectedUserId = request.ElderId });
+            await Task.CompletedTask;
+        }
+
+        public async Task RejectConnectionAsync(PendingConnection request)
+        {
+            request.IsRejected = true;
+            await Task.CompletedTask;
         }
     }
 }

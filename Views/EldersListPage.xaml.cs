@@ -1,15 +1,22 @@
-using Microsoft.Maui.Controls;
-using CareReminderApp.ViewModels;
-using CareReminderApp.Services;
+﻿using CareReminderApp.ViewModels;
 
-namespace CareReminderApp.Views
+namespace CareReminderApp.Views;
+
+public partial class EldersListPage : ContentPage
 {
-    public partial class EldersListPage : ContentPage
+    public EldersListPage(EldersListViewModel vm)
     {
-        public EldersListPage(EldersListViewModel viewModel)
+        InitializeComponent();
+        BindingContext = vm;
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is EldersListViewModel vm)
         {
-            InitializeComponent();
-            BindingContext = viewModel;
+            await vm.LoadEldersCommand.ExecuteAsync(null);
         }
     }
 }
