@@ -77,26 +77,24 @@ namespace CareReminderApp.ViewModels
         {
             try
             {
-                // שלב 1: הרשמה ב-Firebase Authentication
                 var authResult = await _authService.SignUpAsync(UserEmail, UserPassword);
 
                 if (authResult != null)
                 {
-                    // שלב 2: אם האימות הצליח, נשמור את שאר הפרטים בדאטא-בייס הרגיל
-                    // הערה: תוכלי להשתמש ב-authResult.User.Uid אם תרצי לקשר ביניהם בעתיד
                     bool dbSuccess = await _dataService.RegisterUserAsync(FirstName, LastName, UserEmail, UserPassword, Mobile, SelectedRole);
 
                     if (dbSuccess)
                     {
-                        // 🔥 מושכים את המשתמש האמיתי עם ה-Id
                         var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
 
                         if (user != null && !string.IsNullOrEmpty(user.Id))
                         {
                             App.LoggedInUser = user;
 
-                            await App.Current.MainPage.DisplayAlert("DEBUG",
-                                $"Signed up with ID: {user.Id}", "OK");
+                            if (App.Current?.MainPage != null)
+                            {
+                                await App.Current.MainPage.DisplayAlert("DEBUG", $"Signed up with ID: {user.Id}", "OK");
+                            }
 
                             if (Shell.Current is AppShell appShell)
                             {
@@ -105,14 +103,15 @@ namespace CareReminderApp.ViewModels
                         }
                         else
                         {
-                            await App.Current.MainPage.DisplayAlert("Error", "User saved but not found in DB", "OK");
+                            if (App.Current?.MainPage != null)
+                                await App.Current.MainPage.DisplayAlert("Error", "User saved but not found in DB", "OK");
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                if (App.Current.MainPage != null)
+                if (App.Current?.MainPage != null)
                 {
                     await App.Current.MainPage.DisplayAlert("Error", $"Registration failed: {ex.Message}", "OK");
                 }

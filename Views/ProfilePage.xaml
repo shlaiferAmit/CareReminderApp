@@ -5,7 +5,7 @@
              x:Class="CareReminderApp.Views.ProfilePage"
              x:DataType="viewmodels:ProfileViewModel"
              BackgroundColor="#99C1E9"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="True">
     <Grid RowDefinitions="Auto, *, 80">
 
         <Label Grid.Row="0" Text="My Profile" 
@@ -16,12 +16,12 @@
             <Frame BackgroundColor="White" 
                    Margin="30,20" 
                    Padding="30" 
-                   CornerRadius="0" 
-                   HasShadow="False"
+                   CornerRadius="15" 
+                   HasShadow="True"
                    HorizontalOptions="FillAndExpand"
                    VerticalOptions="Start">
 
-                <VerticalStackLayout Spacing="20">
+                <VerticalStackLayout Spacing="20" HorizontalOptions="FillAndExpand" Padding="10">
 
                     <Frame CornerRadius="75" 
                            HeightRequest="150" 
@@ -29,46 +29,46 @@
                            BackgroundColor="#E67E22" 
                            Padding="0" 
                            HorizontalOptions="Center"
+                           IsClippedToBounds="True"
                            BorderColor="Transparent">
-                        <Label Text="**image" 
-                               TextColor="White" 
-                               HorizontalOptions="Center" 
-                               VerticalOptions="Center" 
-                               FontAttributes="Bold"/>
+                        <Image Source="{Binding ProfileImageSource}" 
+                               Aspect="AspectFill" />
                     </Frame>
 
-                    <VerticalStackLayout Spacing="10" HorizontalOptions="Start">
-                        <HorizontalStackLayout Spacing="5">
-                            <Label Text="Full name: " FontAttributes="Bold" />
-                            <Label Text="{Binding DisplayUser.FirstName}" />
-                        </HorizontalStackLayout>
+                    <VerticalStackLayout Spacing="15" HorizontalOptions="Center" Margin="0,10">
 
-                        <HorizontalStackLayout Spacing="5">
-                            <Label Text="Email: " FontAttributes="Bold" />
-                            <Label Text="{Binding DisplayUser.UserEmail}" />
-                        </HorizontalStackLayout>
+                        <Grid ColumnDefinitions="*, 100" ColumnSpacing="10" WidthRequest="300">
+                            <HorizontalStackLayout Grid.Column="0" Spacing="5" HorizontalOptions="End">
+                                <Label Text="{Binding DisplayUser.FirstName}" TextColor="#2C3E50" FontSize="16" />
+                                <Label Text="{Binding DisplayUser.LastName}" TextColor="#2C3E50" FontSize="16" />
+                            </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Spacing="5">
-                            <Label Text="Phone: " FontAttributes="Bold" />
-                            <Label Text="{Binding DisplayUser.Mobile, StringFormat='Phone: {0}'}" 
-       FontSize="18" 
-       TextColor="#2C3E50"/>
-                        </HorizontalStackLayout>
+                            <Label Grid.Column="1" Text="Full Name:" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Start" FontSize="16" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*, 100" ColumnSpacing="10" WidthRequest="300">
+                            <Label Grid.Column="0" Text="{Binding DisplayUser.UserEmail}" TextColor="#2C3E50" HorizontalOptions="End" FontSize="16" />
+                            <Label Grid.Column="1" Text="Email:" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Start" FontSize="16" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*, 100" ColumnSpacing="10" WidthRequest="300">
+                            <Label Grid.Column="0" Text="{Binding DisplayUser.Mobile}" TextColor="#2C3E50" HorizontalOptions="End" FontSize="16" />
+                            <Label Grid.Column="1" Text="Phone:" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Start" FontSize="16" />
+                        </Grid>
+
                     </VerticalStackLayout>
-                    
+
                     <Button Text="Edit Profile" 
                             Command="{Binding EditProfileCommand}"
                             BackgroundColor="#3498DB" 
                             TextColor="White" 
-                            CornerRadius="5" 
-                            HeightRequest="45"
-                            WidthRequest="200"
+                            CornerRadius="10" 
+                            HeightRequest="50"
+                            WidthRequest="220"
                             HorizontalOptions="Center"
                             Margin="0,20,0,0"/>
                 </VerticalStackLayout>
             </Frame>
         </ScrollView>
-
-
     </Grid>
 </ContentPage>

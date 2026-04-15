@@ -5,7 +5,9 @@
              x:Class="CareReminderApp.Views.ReminderDetailsPage"
              x:DataType="viewmodels:ReminderDetailsViewModel"
              BackgroundColor="#99C1E9"
-             Title="Reminder Details">
+                          Shell.NavBarIsVisible="True"
+
+    Title="Reminder Details">
 
     <VerticalStackLayout Spacing="25" Padding="25" VerticalOptions="Center">
 

@@ -34,18 +34,31 @@ namespace CareReminderApp.ViewModels
             _dataService = dataService;
             Reminders = new ObservableCollection<Reminder>();
         }
-
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        public async void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            // אם עברנו לדף בלי פרמטרים (כלומר, הפרופיל שלי)
+            // ודאי שהמשתמש המחובר קיים
             if (App.LoggedInUser != null)
             {
-                DisplayUser = App.LoggedInUser;
-                ProfileTitle = "My Profile";
-                IsMyPersonalProfile = true;
+                try
+                {
+                    // שליפת המידע מהפיירבייס בצורה אסינכרונית
+                    var userFromServer = await _dataService.GetUserByIdAsync(App.LoggedInUser.Id);
 
-                // כאן אנחנו מעדכנים את שאר השדות אם צריך
-                OnPropertyChanged(nameof(DisplayUser));
+                    if (userFromServer != null)
+                    {
+                        // כאן קורה הקסם - ברגע שזה מתעדכן, המסך מתמלא
+                        DisplayUser = userFromServer;
+
+                        // עדכון תמונה וכותרת
+                        UpdateProfileImage();
+                        ProfileTitle = "My Profile";
+                        IsMyPersonalProfile = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlert("שגיאה", "לא הצלחנו לטעון נתונים", "אוקיי");
+                }
             }
         }
 

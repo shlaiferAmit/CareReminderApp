@@ -12,22 +12,11 @@ namespace CareReminderApp.Models
 {
     public class Reminder
     {
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
-        [JsonProperty("title")]
-        public string Title { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-
-        [JsonProperty("dueDate")]
+        public string Id { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public DateTime DueDate { get; set; }
-
-        [JsonProperty("userId")]
-        public string UserId { get; set; }
-
-        [JsonProperty("isCompleted")]
+        public string UserId { get; set; } = string.Empty;
         public bool IsCompleted { get; set; }
     }
 }

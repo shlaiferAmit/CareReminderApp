@@ -40,18 +40,24 @@
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="5" HorizontalOptions="Fill">
+
                         <HorizontalStackLayout Spacing="5">
-                            <Label Text="תאריך לידה:" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="***" TextColor="Black"/>
+                            <Label Text="First Name:" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="{Binding Elder.FirstName}" TextColor="Black"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Spacing="5">
-                            <Label Text="טלפון:" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="***" TextColor="Black"/>
+                            <Label Text="Last Name:" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="{Binding Elder.LastName}" TextColor="Black"/>
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Spacing="5">
-                            <Label Text="אימייל:" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="Mobile:" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="{Binding Elder.Mobile}" TextColor="Black"/>
+                        </HorizontalStackLayout>
+
+                        <HorizontalStackLayout Spacing="5">
+                            <Label Text="Email:" FontAttributes="Bold" TextColor="Black"/>
                             <Label Text="{Binding Elder.UserEmail}" TextColor="Black"/>
                         </HorizontalStackLayout>
                     </VerticalStackLayout>

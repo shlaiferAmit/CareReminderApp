@@ -6,8 +6,8 @@ namespace CareReminderApp
 {
     public partial class App : Application
     {
-        // 🔥 משתמש מחובר גלובלי
-        public static User LoggedInUser { get; set; }
+        // הוספת ה-? מאפשרת למשתמש להיות ריק בזמן הלוגאאוט
+        public static User? LoggedInUser { get; set; }
 
         public App()
         {

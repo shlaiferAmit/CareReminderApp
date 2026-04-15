@@ -9,11 +9,11 @@ namespace CareReminderApp.Models
 {
     public class PendingConnection
     {
-        public string Id { get; set; }
-        public string FamilyId { get; set; }
-        public string ElderId { get; set; }
-        public bool IsApproved { get; set; } = false; // שדה חובה לניהול האישורים
-        public bool IsRejected { get; set; } = false; // שדה חובה לניהול הדחיות
+        public string Id { get; set; } = string.Empty;
+        public string FamilyId { get; set; } = string.Empty;
+        public string ElderId { get; set; } = string.Empty;
+        public bool IsApproved { get; set; } = false;
+        public bool IsRejected { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-
 namespace CareReminderApp.Services
 {
     public class FirebaseDataService : IDataService
@@ -20,25 +19,47 @@ namespace CareReminderApp.Services
             _firebase = new FirebaseClient(FirebaseUrl);
         }
 
-        // --- User Management ---
-
-        public async Task<User> GetUserAsync(string userEmail, string password)
+        public async Task<User?> GetUserAsync(string email, string password)
         {
-            var users = await _firebase.Child("Users").OnceAsync<User>();
+            try
+            {
+                // שליפת כל המשתמשים כ-JObject כדי שנוכל לטפל בשמות שדות שונים (אותיות גדולות/קטנות)
+                var allUsersData = await _firebase.Child("Users").OnceAsync<JObject>();
+                if (allUsersData == null) return null;
 
-            return users
-                .Select(u =>
+                string searchEmail = email.Trim().ToLower();
+
+                foreach (var item in allUsersData)
                 {
-                    var user = u.Object;
-                    user.Id = u.Key; // 🔥 חשוב
-                    return user;
-                })
-                .FirstOrDefault(u =>
-                    u.UserEmail?.Trim().ToLower() == userEmail.Trim().ToLower() &&
-                    u.UserPassword == password);
+                    var userJson = item.Object;
+
+                    // בדיקה גמישה של שם השדה (UserEmail או userEmail)
+                    string firebaseEmail = (userJson["UserEmail"] ?? userJson["userEmail"])?.ToString().Trim().ToLower() ?? "";
+                    string firebasePass = (userJson["UserPassword"] ?? userJson["userPassword"])?.ToString().Trim() ?? "";
+
+                    if (firebaseEmail == searchEmail)
+                    {
+                        return new User
+                        {
+                            Id = item.Key,
+                            FirstName = (userJson["FirstName"] ?? userJson["firstName"])?.ToString() ?? "",
+                            LastName = (userJson["LastName"] ?? userJson["lastName"])?.ToString() ?? "",
+                            UserEmail = firebaseEmail,
+                            Mobile = (userJson["Mobile"] ?? userJson["mobile"])?.ToString() ?? "",
+                            Role = (UserRole)(userJson["Role"] ?? userJson["role"]).ToObject<int>()
+                        };
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in GetUserAsync: {ex.Message}");
+                return null;
+            }
         }
 
-        public async Task<bool> RegisterUserAsync(string firstName, string lastName, string userEmail, string password, string mobile, UserRole role)
+        public async Task<bool> RegisterUserAsync(string firstName, string lastName, string email, string password, string mobile, UserRole role)
         {
             try
             {
@@ -46,271 +67,138 @@ namespace CareReminderApp.Services
                 {
                     FirstName = firstName,
                     LastName = lastName,
-                    UserEmail = userEmail.Trim().ToLower(),
+                    UserEmail = email.Trim().ToLower(),
                     UserPassword = password,
                     Mobile = mobile,
                     Role = role
                 };
 
+                // יצירת מזהה חדש ושמירה
                 var result = await _firebase.Child("Users").PostAsync(newUser);
-
-                // 🔥 זה ה-Id האמיתי
                 newUser.Id = result.Key;
 
-                // עדכון המשתמש עם ה-Id
+                // עדכון האובייקט עם ה-Id שנוצר
                 await _firebase.Child("Users").Child(result.Key).PutAsync(newUser);
-
                 return true;
             }
-            catch
-            {
-                return false;
-            }
+            catch { return false; }
         }
 
         public async Task<List<User>> GetUsersAsync()
         {
             var users = await _firebase.Child("Users").OnceAsync<User>();
-
-            return users.Select(u =>
-            {
+            return users.Select(u => {
                 var user = u.Object;
                 user.Id = u.Key;
                 return user;
             }).ToList();
         }
 
-        public async Task<User> GetUserByIdAsync(string id)
+        public async Task<User?> GetUserByIdAsync(string id)
         {
             var user = await _firebase.Child("Users").Child(id).OnceSingleAsync<User>();
-            if (user != null)
-                user.Id = id;
-
+            if (user != null) user.Id = id;
             return user;
         }
 
-        public async Task<User> FindSeniorByEmailAsync(string email)
+        public async Task<User?> FindSeniorByEmailAsync(string email)
         {
-            var users = await _firebase.Child("Users").OnceAsync<User>();
-
-            if (users == null || users.Count == 0)
-                return null;
-
+            var users = await _firebase.Child("Users").OnceAsync<JObject>();
             string searchEmail = email.Trim().ToLower();
 
             foreach (var u in users)
             {
-                var user = u.Object;
-                user.Id = u.Key;
-
-                if (user.UserEmail?.Trim().ToLower() == searchEmail &&
-                    user.Role == UserRole.Senior)
+                string uEmail = (u.Object["UserEmail"] ?? u.Object["userEmail"])?.ToString().Trim().ToLower() ?? "";
+                if (uEmail == searchEmail)
                 {
-                    return user;
+                    return new User { Id = u.Key, UserEmail = uEmail, Role = UserRole.Senior };
                 }
             }
-
             return null;
         }
-        // --- Reminder Management ---
 
-
-
-        public async Task<List<Reminder>> GetRemindersByUserIdAsync(string userId) =>
-            (await GetRemindersAsync(userId)).ToList();
-
-        public async Task<IEnumerable<Reminder>> GetRemindersAsync(string userId)
+        public async Task<List<Reminder>> GetRemindersByUserIdAsync(string userId)
         {
-            var reminders = await _firebase.Child("Reminders").OnceAsync<Reminder>();
+            var data = await _firebase.Child("Reminders").OnceAsync<Reminder>();
+            return data.Select(x => {
+                var r = x.Object;
+                r.Id = x.Key;
+                return r;
+            }).Where(r => r.UserId == userId).ToList();
+        }
 
-            return reminders
-                .Select(r => r.Object)
-                .Where(r => r.UserId == userId);
+        public async Task<IEnumerable<Reminder>> GetRemindersAsync(string userId) => await GetRemindersByUserIdAsync(userId);
+
+        public async Task SaveReminderAsync(Reminder reminder)
+        {
+            await _firebase.Child("Reminders").PostAsync(reminder);
         }
 
         public async Task UpdateReminderAsync(Reminder reminder)
         {
-            var reminders = await _firebase.Child("Reminders").OnceAsync<Reminder>();
-
-            var toUpdate = reminders.FirstOrDefault(r => r.Object.Id == reminder.Id);
-
-            if (toUpdate != null)
+            if (!string.IsNullOrEmpty(reminder.Id))
             {
-                await _firebase.Child("Reminders").Child(toUpdate.Key).PutAsync(reminder);
+                await _firebase.Child("Reminders").Child(reminder.Id).PutAsync(reminder);
             }
         }
 
-        // --- Connection Management ---
+        public async Task<bool> DeleteReminderAsync(string id)
+        {
+            try
+            {
+                await _firebase.Child("Reminders").Child(id).DeleteAsync();
+                return true;
+            }
+            catch { return false; }
+        }
 
         public async Task AddUserConnectionAsync(string familyId, string seniorId)
         {
-            var connection = new UserConnection
-            {
-                UserId = familyId,          // 🔥 חייב להיות Firebase Key
-                ConnectedUserId = seniorId // 🔥 חייב להיות Firebase Key
-            };
-
-            await _firebase.Child("UserConnections").PostAsync(connection);
+            await _firebase.Child("UserConnections").PostAsync(new UserConnection { UserId = familyId, ConnectedUserId = seniorId });
         }
-
-
 
         public async Task<List<UserConnection>> GetUserConnectionsAsync(string userId)
         {
             var connections = await _firebase.Child("UserConnections").OnceAsync<UserConnection>();
-
-            return connections
-                .Select(c => c.Object)
-                .Where(c => c.UserId == userId || c.ConnectedUserId == userId)
-                .ToList();
+            return connections.Select(c => c.Object).Where(c => c.UserId == userId || c.ConnectedUserId == userId).ToList();
         }
 
-        // --- Helpers ---
-
-        public async Task<List<UserRole>> GetRolesAsync() =>
-            await Task.FromResult(new List<UserRole>
-            {
-                UserRole.Senior,
-                UserRole.FamilyMember
-            });
+        public async Task<IEnumerable<User>> GetEldersForFamilyAsync(string familyId)
+        {
+            var connections = await GetUserConnectionsAsync(familyId);
+            var elderIds = connections.Select(c => c.UserId == familyId ? c.ConnectedUserId : c.UserId).ToList();
+            var allUsers = await GetUsersAsync();
+            return allUsers.Where(u => elderIds.Contains(u.Id));
+        }
 
         public async Task InviteElderAsync(string familyId, string elderId)
         {
-            await _firebase.Child("PendingConnections")
-                .PostAsync(new PendingConnection
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    FamilyId = familyId,
-                    ElderId = elderId,
-                    IsApproved = false
-                });
+            await _firebase.Child("PendingConnections").PostAsync(new PendingConnection { FamilyId = familyId, ElderId = elderId });
         }
 
         public async Task<IEnumerable<PendingConnection>> GetPendingForElderAsync(string elderId)
         {
-            var data = await _firebase.Child("PendingConnections")
-                .OnceAsync<PendingConnection>();
-
-            return data
-                .Select(x => x.Object)
-                .Where(x => x.ElderId == elderId && !x.IsApproved && !x.IsRejected);
+            var data = await _firebase.Child("PendingConnections").OnceAsync<PendingConnection>();
+            return data.Select(x => {
+                var p = x.Object;
+                p.Id = x.Key;
+                return p;
+            }).Where(x => x.ElderId == elderId && !x.IsApproved && !x.IsRejected);
         }
 
         public async Task ApproveConnectionAsync(PendingConnection request)
         {
-            // 1. עדכון הסטטוס ב-PendingConnections ל-Approved
-            var requests = await _firebase.Child("PendingConnections").OnceAsync<PendingConnection>();
-            var toUpdate = requests.FirstOrDefault(x => x.Object.FamilyId == request.FamilyId && x.Object.ElderId == request.ElderId);
-
-            if (toUpdate != null)
-            {
-                request.IsApproved = true;
-                await _firebase.Child("PendingConnections").Child(toUpdate.Key).PutAsync(request);
-            }
-
-            // 2. יצירת הקשר הקבוע ב-UserConnections
-            // 🔥 שינוי כאן: ודאי שהשמות תואמים למה ש-GetEldersForFamilyAsync מחפש
-            var connection = new UserConnection
-            {
-                UserId = request.FamilyId,       // מזהה המשפחה
-                ConnectedUserId = request.ElderId // מזהה המבוגר
-            };
-
-            await _firebase.Child("UserConnections").PostAsync(connection);
+            request.IsApproved = true;
+            await _firebase.Child("PendingConnections").Child(request.Id).PutAsync(request);
+            await AddUserConnectionAsync(request.FamilyId, request.ElderId);
         }
 
         public async Task RejectConnectionAsync(PendingConnection request)
         {
             request.IsRejected = true;
-
-            await _firebase.Child("PendingConnections")
-                .Child(request.Id)
-                .PutAsync(request);
+            await _firebase.Child("PendingConnections").Child(request.Id).PutAsync(request);
         }
 
-        public async Task<IEnumerable<User>> GetEldersForFamilyAsync(string familyId)
-        {
-            try
-            {
-                // שליפת כל הקשרים
-                var connections = await _firebase
-                    .Child("UserConnections")
-                    .OnceAsync<UserConnection>();
-
-                var connectionsList = connections.Select(x => x.Object).ToList();
-
-                // מציאת כל ה-IDs של המבוגרים (לא משנה כיוון הקשר)
-                var elderIds = connectionsList
-                    .Where(x => x.UserId == familyId || x.ConnectedUserId == familyId)
-                    .Select(x => x.UserId == familyId ? x.ConnectedUserId : x.UserId)
-                    .Distinct()
-                    .ToList();
-
-                if (!elderIds.Any())
-                    return new List<User>();
-
-                // שליפת כל המשתמשים
-                var users = await _firebase
-                    .Child("Users")
-                    .OnceAsync<User>();
-
-                // התאמה לפי KEY (הדבר הכי חשוב!)
-                var result = users
-                    .Select(u =>
-                    {
-                        var user = u.Object;
-                        user.Id = u.Key; // 🔥 תמיד לקחת את ה-Key האמיתי
-                        return user;
-                    })
-                    .Where(u => elderIds.Contains(u.Id))
-                    .ToList();
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"ERROR: {ex.Message}");
-                return new List<User>();
-            }
-
-        }
-
-        public async Task SaveReminderAsync(Reminder reminder)
-        {
-            try
-            {
-                // יצירת ID חדש אם לא קיים
-                if (string.IsNullOrEmpty(reminder.Id))
-                    reminder.Id = Guid.NewGuid().ToString();
-
-                // שמירה ב-Firebase תחת ענף Reminders
-                await _firebase
-                    .Child("Reminders")
-                    .PostAsync(reminder);
-
-                System.Diagnostics.Debug.WriteLine("✅ Reminder saved successfully to Firebase!");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"❌ Firebase Error: {ex.Message}");
-            }
-        }
-
-        public async Task<bool> DeleteReminderAsync(string reminderId)
-        {
-            try
-            {
-                // וודאי שהשם כאן תואם לשם המשתנה המוגדר בראש המחלקה שלך
-                await _firebase
-                    .Child("Reminders")
-                    .Child(reminderId)
-                    .DeleteAsync();
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+        public async Task<List<UserRole>> GetRolesAsync() => new List<UserRole> { UserRole.Senior, UserRole.FamilyMember };
     }
 }

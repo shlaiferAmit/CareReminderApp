@@ -1,30 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json;
 
 namespace CareReminderApp.Models
 {
-    public partial class User : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
+    public partial class User : ObservableObject
     {
-        public string Id { get; set; } = string.Empty;
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string UserEmail { get; set; } = string.Empty;
-        public string UserPassword { get; set; } = string.Empty;
-        public string Mobile { get; set; } = string.Empty;
-        public UserRole Role { get; set; }
+        [ObservableProperty]
+        private string id = string.Empty;
 
-        public string ProfilePicturePath { get; set; }
+        [ObservableProperty]
+        private string firstName = string.Empty;
 
-        public string FirstNameInitial =>
-      string.IsNullOrEmpty(FirstName) ? "" : FirstName.Substring(0, 1);
+        [ObservableProperty]
+        private string lastName = string.Empty;
+
+        [ObservableProperty]
+        private string userEmail = string.Empty;
+
+        [ObservableProperty]
+        private string userPassword = string.Empty;
+
+        [ObservableProperty]
+        private string mobile = string.Empty;
+
+        [ObservableProperty]
+        private UserRole role;
+
+        [ObservableProperty]
+        private string? profilePicturePath; // סימן שאלה פותר את אזהרה CS8618
     }
 
-    public enum UserRole
-    {
-        Senior, //0
-        FamilyMember //1
-    }
+    public enum UserRole { Senior, FamilyMember }
 }

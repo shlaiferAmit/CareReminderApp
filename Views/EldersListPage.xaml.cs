@@ -1,22 +1,24 @@
 ﻿using CareReminderApp.ViewModels;
 
-namespace CareReminderApp.Views;
-
-public partial class EldersListPage : ContentPage
+namespace CareReminderApp.Views
 {
-    public EldersListPage(EldersListViewModel vm)
+    public partial class EldersListPage : ContentPage
     {
-        InitializeComponent();
-        BindingContext = vm;
-    }
-
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-
-        if (BindingContext is EldersListViewModel vm)
+        public EldersListPage(EldersListViewModel viewModel)
         {
-            await vm.LoadEldersCommand.ExecuteAsync(null);
+            InitializeComponent();
+            BindingContext = viewModel;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            // הפעלת פקודת הטעינה בכל פעם שהעמוד מופיע
+            if (BindingContext is EldersListViewModel viewModel)
+            {
+                await viewModel.LoadEldersCommand.ExecuteAsync(null);
+            }
         }
     }
 }

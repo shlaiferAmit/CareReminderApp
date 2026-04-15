@@ -21,15 +21,12 @@ namespace CareReminderApp
 
         private void RegisterRoutes()
         {
-            Routing.RegisterRoute("SignUpPage", typeof(SignUpPage));
-            Routing.RegisterRoute("SignInPage", typeof(SignInPage));
+            Routing.RegisterRoute(nameof(SignUpPage), typeof(SignUpPage));
+            Routing.RegisterRoute(nameof(SignInPage), typeof(SignInPage));
             Routing.RegisterRoute(nameof(AddReminderPage), typeof(AddReminderPage));
             Routing.RegisterRoute(nameof(ReminderDetailsPage), typeof(ReminderDetailsPage));
             Routing.RegisterRoute(nameof(ChangeProfilePage), typeof(ChangeProfilePage));
             Routing.RegisterRoute(nameof(ElderProfilePage), typeof(ElderProfilePage));
-
-            // הוספת הדף החסר שמופיע בשגיאות שלך
-            Routing.RegisterRoute("ElderProfilePage", typeof(ElderProfilePage));
         }
 
         // --- פונקציה לבניית ה-Tabs דינמית לפי סוג המשתמש ---
@@ -95,22 +92,19 @@ namespace CareReminderApp
             this.Items.Add(mainTabBar);
         }
 
-        public async void SetLoggedInState(bool isLoggedIn, User currentUser = null)
+        public async void SetLoggedInState(bool isLoggedIn, User? currentUser = null)
         {
             IsUserLoggedIn = isLoggedIn;
-
-            // 🔥 חשוב מאוד
-            App.LoggedInUser = currentUser;
+            App.LoggedInUser = currentUser; // עכשיו זה תקין
 
             BuildTabs(currentUser);
 
             if (isLoggedIn && currentUser != null)
             {
                 await Task.Delay(100);
-
                 if (this.Items.LastOrDefault() is TabBar mainBar && mainBar.Items.Count > 0)
                 {
-                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    MainThread.BeginInvokeOnMainThread(() =>
                     {
                         this.CurrentItem = mainBar.Items[0];
                     });
@@ -118,7 +112,8 @@ namespace CareReminderApp
             }
             else
             {
-                this.CurrentItem = MainPageContent;
+                // ודאי ש-MainPageContent מוגדר ב-XAML שלך
+                // this.CurrentItem = MainPageContent; 
             }
         }
 
