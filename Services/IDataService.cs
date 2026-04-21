@@ -32,5 +32,8 @@ namespace CareReminderApp.Services
         Task<List<UserRole>> GetRolesAsync();
         Task UpdateReminderAsync(Reminder reminder);
         Task<bool> DeleteReminderAsync(string id);
+
+        Task<bool> UpdateUserAsync(User user);
+        Task<string> UploadUserImageAsync(Stream imageStream, string userId);
     }
 }

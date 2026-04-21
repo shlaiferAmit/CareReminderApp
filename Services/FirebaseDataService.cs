@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Firebase.Storage;
 
 namespace CareReminderApp.Services
 {
@@ -200,5 +201,48 @@ namespace CareReminderApp.Services
         }
 
         public async Task<List<UserRole>> GetRolesAsync() => new List<UserRole> { UserRole.Senior, UserRole.FamilyMember };
+
+        public async Task<string> UploadUserImageAsync(Stream imageStream, string userId)
+        {
+            try
+            {
+                // החליפי את המחרוזת למטה בכתובת המדויקת שהעתקת מהקונסול
+                var storage = new FirebaseStorage("care-reminder-app-amit.appspot.com");
+
+                var task = storage
+                    .Child("ProfileImages")
+                    .Child($"{userId}.jpg")
+                    .PutAsync(imageStream);
+
+                var downloadUrl = await task;
+                return downloadUrl;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Storage Error: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<bool> UpdateUserAsync(User user)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(user.Id)) return false;
+
+                // מעדכן את המשתמש הספציפי לפי ה-ID שלו
+                await _firebase
+                    .Child("Users")
+                    .Child(user.Id)
+                    .PutAsync(user);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating user: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

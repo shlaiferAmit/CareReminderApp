@@ -27,7 +27,11 @@ namespace CareReminderApp.Models
         private UserRole role;
 
         [ObservableProperty]
-        private string? profilePicturePath; // סימן שאלה פותר את אזהרה CS8618
+        private string? profilePictureUrl;
+
+        // הוסיפי את השורה הזו:
+        [ObservableProperty]
+        private string? profilePicturePath;
     }
 
     public enum UserRole { Senior, FamilyMember }

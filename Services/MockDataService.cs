@@ -149,5 +149,23 @@ namespace CareReminderApp.Services
             }
             return await Task.FromResult(false);
         }
+
+        public async Task<bool> UpdateUserAsync(User user)
+        {
+            var existing = _users.FirstOrDefault(u => u.Id == user.Id);
+            if (existing != null)
+            {
+                _users.Remove(existing);
+                _users.Add(user);
+                return await Task.FromResult(true);
+            }
+            return await Task.FromResult(false);
+        }
+
+        public async Task<string> UploadUserImageAsync(Stream imageStream, string userId)
+        {
+            // ב-Mock אנחנו לא באמת מעלים לענן, פשוט מחזירים נתיב דמיוני
+            return await Task.FromResult("https://placeholder.com/user.jpg");
+        }
     }
 }

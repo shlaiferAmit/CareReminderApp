@@ -90,7 +90,7 @@
                         Command="{Binding MarkAsDoneCommand}"/>
 
                 <Button Grid.Column="2" 
-                        Text="Mark as not done" 
+                        Text="mark as not done" 
                         BackgroundColor="#F1C40F" 
                         TextColor="#2C3E50"
                         FontAttributes="Bold"

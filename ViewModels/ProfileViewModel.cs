@@ -64,10 +64,17 @@ namespace CareReminderApp.ViewModels
 
         private void UpdateProfileImage()
         {
-            if (DisplayUser != null && !string.IsNullOrEmpty(DisplayUser.ProfilePicturePath))
+            // קודם בודקים אם יש כתובת אינטרנטית (Firebase)
+            if (DisplayUser != null && !string.IsNullOrEmpty(DisplayUser.ProfilePictureUrl))
+            {
+                ProfileImageSource = ImageSource.FromUri(new Uri(DisplayUser.ProfilePictureUrl));
+            }
+            // אם אין, בודקים נתיב מקומי (למקרה של אופליין או פיתוח)
+            else if (DisplayUser != null && !string.IsNullOrEmpty(DisplayUser.ProfilePicturePath))
             {
                 ProfileImageSource = ImageSource.FromFile(DisplayUser.ProfilePicturePath);
             }
+            // ברירת מחדל
             else
             {
                 ProfileImageSource = "user_placeholder.png";
@@ -77,33 +84,50 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task ChangePhoto()
         {
-            if (!IsMyPersonalProfile) return;
+            // הדפסה לחלונית ה-Output לבדיקה
+            System.Diagnostics.Debug.WriteLine(">>> ChangePhoto Command Executed");
+
+            if (DisplayUser == null)
+            {
+                await Shell.Current.DisplayAlert("Error", "User data not loaded", "OK");
+                return;
+            }
 
             try
             {
-                var photo = await MediaPicker.Default.PickPhotoAsync();
-                if (photo != null)
+                // 1. בחירת תמונה מהגלריה
+                var photo = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
                 {
-                    string localFilePath = Path.Combine(FileSystem.AppDataDirectory, photo.FileName);
+                    Title = "Please select a photo"
+                });
 
-                    using (Stream sourceStream = await photo.OpenReadAsync())
-                    using (FileStream localFileStream = File.OpenWrite(localFilePath))
+                if (photo == null) return;
+
+                // 2. עדכון ויזואלי מיידי
+                var streamForDisplay = await photo.OpenReadAsync();
+                ProfileImageSource = ImageSource.FromStream(() => streamForDisplay);
+
+                // 3. העלאה ל-Firebase (מומלץ להוסיף Loading indicator אם יש לך)
+                using (var streamForUpload = await photo.OpenReadAsync())
+                {
+                    string firebaseUrl = await _dataService.UploadUserImageAsync(streamForUpload, DisplayUser.Id);
+
+                    if (!string.IsNullOrEmpty(firebaseUrl))
                     {
-                        await sourceStream.CopyToAsync(localFileStream);
-                    }
+                        // עדכון המודל
+                        DisplayUser.ProfilePictureUrl = firebaseUrl;
 
-                    ProfileImageSource = ImageSource.FromFile(localFilePath);
+                        // 4. שמירה בבסיס הנתונים
+                        await _dataService.UpdateUserAsync(DisplayUser);
 
-                    if (DisplayUser != null)
-                    {
-                        DisplayUser.ProfilePicturePath = localFilePath;
-                        // כאן מומלץ להוסיף קריאה לשירות נתונים כדי לשמור את הנתיב ב-DB
+                        await Shell.Current.DisplayAlert("Success", "Profile photo updated!", "Great");
                     }
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("שגיאה", "לא ניתן היה לעדכן תמונה: " + ex.Message, "אוקיי");
+                System.Diagnostics.Debug.WriteLine($">>> Photo Error: {ex.Message}");
+                await Shell.Current.DisplayAlert("Error", "Failed to upload: " + ex.Message, "OK");
             }
         }
 
