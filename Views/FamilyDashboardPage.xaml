@@ -8,19 +8,31 @@
              BackgroundColor="#99C1E9"
              Shell.NavBarIsVisible="True">
 
-    <Grid RowDefinitions="Auto, Auto, *">
+    <Grid RowDefinitions="Auto, Auto, *" Padding="20">
 
-        <VerticalStackLayout Grid.Row="0" Margin="20,10">
-            <Image Source="logo.png" HeightRequest="120" Margin="0,10"/>
+        <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,30,0,20">
+            <Image Source="logo.png" 
+                   HeightRequest="110" 
+                   HorizontalOptions="Center"/>
+            <Label Text="Welcome Home!" 
+                   FontSize="32" 
+                   FontAttributes="Bold" 
+                   TextColor="#2C3E50" 
+                   HorizontalOptions="Center"/>
             <Label Text="CareRemind" 
-                   FontSize="30" 
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center" 
-                   TextColor="#2C3E50"/>
+                   FontSize="20" 
+                   TextColor="#2C3E50" 
+                   Opacity="0.8"
+                   HorizontalOptions="Center"/>
         </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Row="1" Spacing="15" Margin="25,10">
-            <Frame BackgroundColor="#E67E22" CornerRadius="15" HasShadow="True" BorderColor="Transparent">
+        <VerticalStackLayout Grid.Row="1" Spacing="15">
+
+            <Frame BackgroundColor="#1ABC9C" 
+                   CornerRadius="15" 
+                   HasShadow="True" 
+                   BorderColor="Transparent"
+                   Padding="20">
                 <Label Text="{Binding WelcomeMessage}" 
                        TextColor="White" 
                        FontSize="18" 
@@ -29,15 +41,17 @@
             </Frame>
 
             <Button Text="+ Add New Senior" 
-                    BackgroundColor="#8E44AD" 
+                    BackgroundColor="#2C3E50" 
                     TextColor="White" 
                     CornerRadius="15" 
-                    HeightRequest="55" 
+                    HeightRequest="65" 
                     FontAttributes="Bold"
+                    FontSize="18"
                     Command="{Binding AddSeniorCommand}"/>
         </VerticalStackLayout>
 
-
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+        </Grid>
 
     </Grid>
 </ContentPage>

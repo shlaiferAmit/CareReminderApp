@@ -6,67 +6,73 @@
              x:Class="CareReminderApp.Views.ElderRemindersPage"
              x:DataType="viewmodels:ElderRemindersViewModel"
              BackgroundColor="#99C1E9"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="True"
+             FlowDirection="LeftToRight">
+    <ScrollView>
+        <Grid RowDefinitions="Auto, Auto, Auto, Auto" Padding="20" RowSpacing="15">
 
-    <Grid RowDefinitions="Auto, Auto, *" Padding="20">
+            <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,10,0,10">
+                <Image Source="logo.png" HeightRequest="100" HorizontalOptions="Center"/>
+                <Label Text="Welcome Home!" 
+                       FontSize="32" FontAttributes="Bold" 
+                       TextColor="#2C3E50" HorizontalOptions="Center"/>
+                <Label Text="CareRemind" 
+                       FontSize="24" TextColor="#2C3E50" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
 
-        <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,10,0,20">
-            <Image Source="logo.png" HeightRequest="100" HorizontalOptions="Center"/>
-            <Label Text="Welcome Home!" 
-                   FontSize="32" FontAttributes="Bold" 
-                   TextColor="#2C3E50" HorizontalOptions="Center"/>
-            <Label Text="CareRemind" 
-                   FontSize="28" TextColor="#2C3E50" HorizontalOptions="Center"/>
-        </VerticalStackLayout>
+            <Frame Grid.Row="1" 
+                   IsVisible="{Binding HasPendingRequests}" 
+                   BackgroundColor="#FFF3CD" Margin="0,0,0,5" Padding="10" CornerRadius="10" HasShadow="False">
+                <CollectionView ItemsSource="{Binding PendingRequests}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:PendingConnection">
+                            <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                                <Label Text="Family Connection Request" VerticalOptions="Center" TextColor="Black"/>
+                                <Button Text="Accept" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=ApproveRequestCommand}" 
+                                        CommandParameter="{Binding .}" 
+                                        BackgroundColor="Green" TextColor="White" HeightRequest="35"/>
+                                <Button Text="Decline" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=RejectRequestCommand}" 
+                                        CommandParameter="{Binding .}" 
+                                        BackgroundColor="Red" TextColor="White" HeightRequest="35"/>
+                            </HorizontalStackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Frame>
 
-        <Frame Grid.Row="1" 
-               IsVisible="{Binding HasPendingRequests}" 
-               BackgroundColor="#FFF3CD" Margin="0,0,0,15" Padding="10" CornerRadius="10">
-            <CollectionView ItemsSource="{Binding PendingRequests}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:PendingConnection">
-                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
-                            <Label Text="בקשת חיבור מהמשפחה" VerticalOptions="Center" TextColor="Black"/>
-                            <Button Text="אשר" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=ApproveRequestCommand}" CommandParameter="{Binding .}" BackgroundColor="Green" TextColor="White" HeightRequest="35"/>
-                            <Button Text="דחה" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=RejectRequestCommand}" CommandParameter="{Binding .}" BackgroundColor="Red" TextColor="White" HeightRequest="35"/>
+            <Frame Grid.Row="2" BackgroundColor="White" CornerRadius="15" Padding="20" HasShadow="False" IsVisible="{Binding HasReminders}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{Binding WelcomeMessage}" FontSize="18" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Center"/>
+                    <ProgressBar Progress="{Binding ProgressValue}" ProgressColor="#1ABC9C" HeightRequest="12" ScaleY="2"/>
+                    <Label Text="{Binding ProgressText}" FontSize="14" HorizontalOptions="Center" TextColor="#2C3E50" FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <VerticalStackLayout Grid.Row="3" Spacing="10" IsVisible="{Binding HasReminders}">
+                <Label Text="What's up next?" FontSize="20" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Start" Margin="5,0"/>
+
+                <Frame BackgroundColor="#1ABC9C" CornerRadius="20" Padding="10" HasShadow="True" BorderColor="Transparent">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToReminderDetailsCommand}" CommandParameter="{Binding NextReminder}"/>
+                    </Frame.GestureRecognizers>
+
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="{Binding NextReminder.Title, FallbackValue='All Done!'}" 
+                               FontSize="28" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                            <Label Text="At:" FontSize="20" TextColor="White" Opacity="0.9"/>
+                            <Label Text="{Binding NextReminder.DueDate, StringFormat='{0:HH:mm}'}" 
+                                   FontSize="24" FontAttributes="Bold" TextColor="White"/>
                         </HorizontalStackLayout>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </Frame>
 
-        <CollectionView Grid.Row="2" ItemsSource="{Binding ElderRemindersList}" SelectionMode="None">
-
-            <CollectionView.Header>
-                <Frame BackgroundColor="#E67E22" CornerRadius="15" HasShadow="False" Padding="20" Margin="0,0,0,15">
-                    <VerticalStackLayout HorizontalOptions="Center" Spacing="5">
-                        <Label Text="{Binding WelcomeMessage}" 
-                               FontSize="20" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
-                        <Label Text="{Binding RemindersCountMessage}" 
-                               FontSize="18" TextColor="White" HorizontalOptions="Center"/>
+                        <Label Text="Tap for details >" FontSize="18" TextColor="White" HorizontalOptions="Center" Margin="0,10,0,0"/>
                     </VerticalStackLayout>
                 </Frame>
-            </CollectionView.Header>
+            </VerticalStackLayout>
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:Reminder">
-                    <Frame BackgroundColor="#1ABC9C" CornerRadius="15" Margin="0,10" Padding="20" HasShadow="False">
-                        <Frame.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=NavigateToReminderDetailsCommand}" CommandParameter="{Binding .}"/>
-                        </Frame.GestureRecognizers>
-
-                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
-                            <Label Text="Upcoming Remind:" 
-                                   FontSize="18" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
-                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="5">
-                                <Label Text="{Binding Title}" FontSize="18" TextColor="White"/>
-                                <Label Text="-" FontSize="18" TextColor="White"/>
-                                <Label Text="{Binding DueDate, StringFormat='{0:HH:mm}'}" FontSize="18" TextColor="White"/>
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </Grid>
+        </Grid>
+    </ScrollView>
 </ContentPage>

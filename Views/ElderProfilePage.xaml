@@ -5,127 +5,128 @@
              xmlns:viewmodels="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.ElderProfilePage"
              x:DataType="viewmodels:ElderProfileViewModel"
-             BackgroundColor="#A0CFFF" 
-             Title="פרופיל מבוגר">
-    <ScrollView>
-        <Grid RowDefinitions="Auto, Auto" Padding="20" RowSpacing="20">
+             BackgroundColor="#99C1E9"
+             >
 
-            <Frame Grid.Row="0" 
-                   BackgroundColor="White" 
-                   CornerRadius="0" 
-                   HasShadow="True" 
-                   Padding="25">
+    <Grid RowDefinitions="*, Auto" Padding="20" FlowDirection="LeftToRight">
 
-                <VerticalStackLayout Spacing="20">
+        <Frame Grid.Row="0" 
+               BackgroundColor="White" 
+               CornerRadius="25" 
+               HasShadow="True" 
+               Padding="20"
+               BorderColor="Transparent">
 
-                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-                        <Border WidthRequest="120" 
-                                HeightRequest="120" 
-                                StrokeShape="RoundRectangle 60" 
-                                BackgroundColor="#F18A43" 
-                                StrokeThickness="0" 
-                                HorizontalOptions="Center">
-                            <Label Text="**image" 
-                                   TextColor="White" 
-                                   HorizontalOptions="Center" 
-                                   VerticalOptions="Center" 
-                                   FontAttributes="Bold"/>
-                        </Border>
+            <VerticalStackLayout Spacing="20">
 
+                <HorizontalStackLayout Spacing="15" HorizontalOptions="Start">
+                    <Frame WidthRequest="70" 
+                           HeightRequest="70" 
+                           CornerRadius="35" 
+                           BackgroundColor="#E67E22" 
+                           Padding="0" 
+                           HasShadow="False"
+                           BorderColor="Transparent">
                         <Label Text="{Binding Elder.FirstName}" 
-                               FontSize="22" 
+                               TextColor="White" 
+                               FontSize="20" 
                                FontAttributes="Bold" 
-                               TextColor="Black" 
-                               HorizontalOptions="Center"/>
-                    </VerticalStackLayout>
+                               HorizontalOptions="Center" 
+                               VerticalOptions="Center"/>
+                    </Frame>
 
-                    <VerticalStackLayout Spacing="5" HorizontalOptions="Fill">
-
-                        <HorizontalStackLayout Spacing="5">
-                            <Label Text="First Name:" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="{Binding Elder.FirstName}" TextColor="Black"/>
-                        </HorizontalStackLayout>
-
-                        <HorizontalStackLayout Spacing="5">
-                            <Label Text="Last Name:" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="{Binding Elder.LastName}" TextColor="Black"/>
-                        </HorizontalStackLayout>
-
-                        <HorizontalStackLayout Spacing="5">
-                            <Label Text="Mobile:" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="{Binding Elder.Mobile}" TextColor="Black"/>
-                        </HorizontalStackLayout>
-
-                        <HorizontalStackLayout Spacing="5">
-                            <Label Text="Email:" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="{Binding Elder.UserEmail}" TextColor="Black"/>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
-
-                    <BoxView HeightRequest="1" Color="#EEEEEE" HorizontalOptions="Fill"/>
-
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="רשימת תזכורות" 
-                               FontSize="18" 
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                        <Label Text="{Binding Elder.FirstName}" 
+                               FontSize="24" 
                                FontAttributes="Bold" 
-                               TextColor="Black" 
-                               HorizontalOptions="Center"
-                               Margin="0,0,0,10"/>
-
-                        <CollectionView ItemsSource="{Binding Reminders}" 
-                                        EmptyView="אין תזכורות למבוגר זה">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="models:Reminder">
-                                    <Frame BackgroundColor="#3282CE" 
-                                           CornerRadius="5" 
-                                           Padding="10" 
-                                           Margin="0,0,0,10" 
-                                           HasShadow="False">
-                                        <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
-
-                                            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                                                <Label Text="{Binding Title}" 
-                                                       TextColor="White" 
-                                                       FontAttributes="Bold" 
-                                                       FontSize="14"/>
-                                                <Label Text="{Binding DueDate, StringFormat='{0:dd/MM/yyyy HH:mm}'}" 
-                                                       TextColor="#D0EFFF" 
-                                                       FontSize="11"/>
-                                            </VerticalStackLayout>
-
-                                            <Frame Grid.Column="1" 
-                                                   BackgroundColor="#23BFA0" 
-                                                   CornerRadius="15" 
-                                                   Padding="15,5" 
-                                                   HasShadow="False" 
-                                                   VerticalOptions="Center">
-                                                <Label Text="Done" 
-                                                       TextColor="White" 
-                                                       FontSize="12" 
-                                                       FontAttributes="Bold"/>
-                                            </Frame>
-                                        </Grid>
-                                    </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
+                               TextColor="#2C3E50"/>
+                        <Label Text="Family Member" 
+                               FontSize="14" 
+                               TextColor="#7F8C8D"/>
                     </VerticalStackLayout>
+                </HorizontalStackLayout>
 
+                <BoxView HeightRequest="1" Color="#F0F0F0" HorizontalOptions="Fill"/>
+
+                <VerticalStackLayout Spacing="12">
+                    <HorizontalStackLayout Spacing="10">
+                        <Label Text="Mobile:" FontAttributes="Bold" TextColor="#2C3E50" WidthRequest="70"/>
+                        <Label Text="{Binding Elder.Mobile}" TextColor="#34495E"/>
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout Spacing="10">
+                        <Label Text="Email:" FontAttributes="Bold" TextColor="#2C3E50" WidthRequest="70"/>
+                        <Label Text="{Binding Elder.UserEmail}" TextColor="#34495E" FontSize="13"/>
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
 
-            <Button Grid.Row="1"
-                    Text="Add new reminder" 
-                    Command="{Binding AddReminderCommand}"
-                    BackgroundColor="#23BFA0" 
-                    TextColor="White"
-                    FontAttributes="Bold"
-                    FontSize="16"
-                    CornerRadius="5"
-                    HeightRequest="50"
-                    HorizontalOptions="Fill"
-                    Margin="0,0,0,20"/>
+                <BoxView HeightRequest="1" Color="#F0F0F0" HorizontalOptions="Fill"/>
 
-        </Grid>
-    </ScrollView>
+                <Label Text="Active Reminders" 
+                       FontSize="18" 
+                       FontAttributes="Bold" 
+                       TextColor="#2C3E50"/>
+
+                <CollectionView ItemsSource="{Binding Reminders}" 
+                                HeightRequest="280"
+                                EmptyView="No reminders scheduled.">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Reminder">
+                            <Frame BackgroundColor="#F8F9FA" 
+                                   CornerRadius="15" 
+                                   Padding="15" 
+                                   Margin="0,0,0,10" 
+                                   BorderColor="#E0E0E0"
+                                   HasShadow="False">
+                                <Grid ColumnDefinitions="*, Auto">
+
+                                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                        <Label Text="{Binding Title}" 
+                                               TextColor="#2C3E50" 
+                                               FontAttributes="Bold" 
+                                               FontSize="16"/>
+                                        <HorizontalStackLayout Spacing="5">
+                                            <Label Text="🕒" FontSize="12"/>
+                                            <Label Text="{Binding DueDate, StringFormat='{0:dd/MM/yyyy HH:mm}'}" 
+                                                   TextColor="#7F8C8D" 
+                                                   FontSize="13"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+
+                                    <Label Grid.Column="1" 
+                                           FontSize="14" 
+                                           FontAttributes="Bold" 
+                                           VerticalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsCompleted}" Value="True">
+                                                <Setter Property="Text" Value="Done ✓" />
+                                                <Setter Property="TextColor" Value="#23BFA0" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsCompleted}" Value="False">
+                                                <Setter Property="Text" Value="Pending" />
+                                                <Setter Property="TextColor" Value="#BDC3C7" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Frame>
+
+        <Button Grid.Row="1"
+                Text="+ Add New Reminder" 
+                Command="{Binding AddReminderCommand}"
+                BackgroundColor="#2C3E50" 
+                TextColor="White"
+                FontAttributes="Bold"
+                FontSize="18"
+                CornerRadius="15"
+                HeightRequest="60"
+                Margin="0,15,0,0"/>
+
+    </Grid>
 </ContentPage>

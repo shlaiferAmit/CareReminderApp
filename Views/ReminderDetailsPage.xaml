@@ -5,54 +5,99 @@
              x:Class="CareReminderApp.Views.ReminderDetailsPage"
              x:DataType="viewmodels:ReminderDetailsViewModel"
              BackgroundColor="#99C1E9"
-                          Shell.NavBarIsVisible="True"
+             Shell.NavBarIsVisible="True"
+             Title="Remind Details">
 
-    Title="Reminder Details">
+    <Frame BackgroundColor="White" 
+           CornerRadius="20" 
+           Margin="30,0" 
+           Padding="20" 
+           HasShadow="True"
+           VerticalOptions="Center"
+           HorizontalOptions="Fill">
 
-    <VerticalStackLayout Spacing="25" Padding="25" VerticalOptions="Center">
+        <VerticalStackLayout Spacing="40">
 
-        <Frame BackgroundColor="#E67E22" CornerRadius="15" HasShadow="False" Padding="30">
-            <VerticalStackLayout Spacing="15" HorizontalOptions="Center">
-                <Label Text="{Binding SelectedReminder.Title}" 
-                       FontSize="26" FontAttributes="Bold" TextColor="White" 
-                       HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+            <Frame BackgroundColor="#E67E22" 
+                   CornerRadius="10" 
+                   Padding="30" 
+                   HasShadow="False"
+                   BorderColor="Transparent">
 
-                <Frame BackgroundColor="#1ABC9C" CornerRadius="20" Padding="15,5" HorizontalOptions="Center">
-                    <Label Text="{Binding StatusText}" TextColor="White" FontAttributes="Bold"/>
-                </Frame>
-            </VerticalStackLayout>
-        </Frame>
+                <VerticalStackLayout Spacing="15" HorizontalOptions="Center">
+                    <Label Text="{Binding SelectedReminder.Title}" 
+                           FontSize="28" 
+                           FontAttributes="Bold" 
+                           TextColor="White" 
+                           HorizontalOptions="Center" 
+                           HorizontalTextAlignment="Center"/>
 
-        <Frame BackgroundColor="White" CornerRadius="10" Padding="15" HasShadow="False">
-            <VerticalStackLayout Spacing="10">
+                    <Frame BackgroundColor="#1ABC9C" 
+                           CornerRadius="25" 
+                           Padding="20,8" 
+                           HorizontalOptions="Center"
+                           HasShadow="False">
+                        <Label Text="{Binding StatusText}" 
+                               TextColor="White" 
+                               FontSize="18"
+                               FontAttributes="Bold"/>
+                    </Frame>
+                </VerticalStackLayout>
+            </Frame>
+
+            <VerticalStackLayout Spacing="12" Margin="10,0" FlowDirection="LeftToRight">
+
                 <HorizontalStackLayout Spacing="10">
-                    <Label Text="Time:" FontAttributes="Bold" TextColor="#2C3E50"/>
-                    <Label Text="{Binding SelectedReminder.DueDate, StringFormat='{0:HH:mm}'}" TextColor="#2C3E50"/>
+                    <Label Text="Time:" 
+               FontSize="20" 
+               FontAttributes="Bold" 
+               TextColor="#2C3E50"/>
+                    <Label Text="{Binding SelectedReminder.DueDate, StringFormat='{0:HH:mm}'}" 
+               FontSize="20" 
+               TextColor="#2C3E50"/>
                 </HorizontalStackLayout>
 
+
+
                 <HorizontalStackLayout Spacing="10">
-                    <Label Text="Date:" FontAttributes="Bold" TextColor="#2C3E50"/>
-                    <Label Text="{Binding SelectedReminder.DueDate, StringFormat='{0:dd/MM/yyyy}'}" TextColor="#2C3E50"/>
+                    <Label Text="Date:" 
+               FontSize="20" 
+               FontAttributes="Bold" 
+               TextColor="#2C3E50"/>
+                    <Label Text="{Binding SelectedReminder.DueDate, StringFormat='{0:dd.MM.yyyy}'}" 
+               FontSize="20" 
+               TextColor="#2C3E50"/>
                 </HorizontalStackLayout>
+
             </VerticalStackLayout>
-        </Frame>
 
-        <VerticalStackLayout Spacing="15">
-            <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
-                <Button Grid.Column="0" Text="Delete" 
-                        BackgroundColor="#E74C3C" TextColor="White"
-                        Command="{Binding DeleteCommand}" HeightRequest="65" CornerRadius="15"/>
+            <Grid ColumnDefinitions="*, *, *" ColumnSpacing="12" HeightRequest="110">
 
-                <Button Grid.Column="1" Text="Mark Done" 
-                        BackgroundColor="#1ABC9C" TextColor="White"
-                        Command="{Binding MarkAsDoneCommand}" HeightRequest="65" CornerRadius="15"/>
+                <Button Grid.Column="0" 
+                        Text="Delete" 
+                        BackgroundColor="#D64550" 
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="10"
+                        Command="{Binding DeleteCommand}"/>
+
+                <Button Grid.Column="1" 
+                        Text="Mark as done" 
+                        BackgroundColor="#1ABC9C" 
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="10"
+                        Command="{Binding MarkAsDoneCommand}"/>
+
+                <Button Grid.Column="2" 
+                        Text="Mark as not done" 
+                        BackgroundColor="#F1C40F" 
+                        TextColor="#2C3E50"
+                        FontAttributes="Bold"
+                        CornerRadius="10"
+                        Command="{Binding MarkAsNotDoneCommand}"/>
             </Grid>
 
-            <Button Text="Undo / Mark Not Done" 
-                    BackgroundColor="#F1C40F" TextColor="#2C3E50"
-                    Command="{Binding MarkAsNotDoneCommand}" 
-                    HeightRequest="60" CornerRadius="15" FontAttributes="Bold"/>
         </VerticalStackLayout>
-
-    </VerticalStackLayout>
+    </Frame>
 </ContentPage>

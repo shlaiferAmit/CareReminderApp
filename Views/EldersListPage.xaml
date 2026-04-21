@@ -6,105 +6,112 @@
              x:Class="CareReminderApp.Views.EldersListPage"
              x:DataType="viewmodels:EldersListViewModel"
              BackgroundColor="#99C1E9"
-             Shell.NavBarIsVisible="True">
+             Shell.NavBarIsVisible="True"
+             FlowDirection="LeftToRight">
 
-    <Grid RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto, Auto, *" Padding="20">
 
-        <!-- כותרת -->
-        <Label Grid.Row="0"
-               Text="My Seniors"
-               FontSize="34"
-               FontAttributes="Bold"
-               HorizontalOptions="Center"
-               TextColor="#1F2D3D"
-               Margin="0,20,0,10"/>
+        <VerticalStackLayout Grid.Row="0" Margin="0,10,0,20" Spacing="5">
+            <Label Text="My Seniors"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#2C3E50"/>
+            <Label Text="Manage your family connections" 
+                   FontSize="16" 
+                   TextColor="#2C3E50" 
+                   Opacity="0.8"
+                   HorizontalOptions="Center"/>
+        </VerticalStackLayout>
 
-        <!-- חיפוש -->
-        <SearchBar Grid.Row="1"
-                   Placeholder="Search senior..."
-                   BackgroundColor="White"
-                   Margin="20,0"
-                   CancelButtonColor="#2C3E50"/>
+        <Frame Grid.Row="1" 
+               Margin="10,0" 
+               Padding="15,2" 
+               CornerRadius="20" 
+               HasShadow="False" 
+               BackgroundColor="White"
+               HeightRequest="55"
+               BorderColor="Transparent">
 
-        <!-- רשימה -->
+            <SearchBar Placeholder="Search senior..."
+                       BackgroundColor="Transparent"
+                       FontSize="16"
+                       CancelButtonColor="#2C3E50"
+                       PlaceholderColor="#95A5A6"
+                       HorizontalOptions="Fill"/>
+        </Frame>
+
         <RefreshView Grid.Row="2"
                      IsRefreshing="{Binding IsBusy}"
-                     Command="{Binding LoadEldersCommand}">
+                     Command="{Binding LoadEldersCommand}"
+                     Margin="0,15,0,0">
 
             <CollectionView ItemsSource="{Binding Elders}"
-                            Margin="20,10"
-                            HorizontalOptions="Center">
-
+                            SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:User">
-
                         <Frame BackgroundColor="White"
-                               CornerRadius="14"
-                               Padding="10"
-                               Margin="0,6"
-                               HasShadow="True"
-                               WidthRequest="280"
-                               HorizontalOptions="Center">
+                               CornerRadius="15"
+                               Padding="15"
+                               Margin="0,8" 
+                               HasShadow="False"
+                               BorderColor="Transparent">
 
-                            <!-- לחיצה -->
                             <Frame.GestureRecognizers>
                                 <TapGestureRecognizer
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:EldersListViewModel}}, Path=GoToProfileCommand}"
                                     CommandParameter="{Binding .}" />
                             </Frame.GestureRecognizers>
 
-                            <HorizontalStackLayout Spacing="12"
-                                                   HorizontalOptions="Center">
+                            <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
 
-                                <!-- עיגול -->
-                                <Frame WidthRequest="45"
-                                       HeightRequest="45"
-                                       CornerRadius="22"
-                                       BackgroundColor="#7F8C8D"
+                                <Frame Grid.Column="0"
+                                       WidthRequest="55"
+                                       HeightRequest="55"
+                                       CornerRadius="27.5"
+                                       BackgroundColor="#E67E22"
                                        Padding="0"
-                                       HasShadow="False">
-
+                                       HasShadow="False"
+                                       BorderColor="Transparent">
                                     <Label Text="{Binding FirstName}" 
-       HorizontalOptions="Center"
-       VerticalOptions="Center"
-       TextColor="White"
-       FontAttributes="Bold"
-       FontSize="16"/>
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           TextColor="White"
+                                           FontAttributes="Bold"
+                                           FontSize="15"/>
                                 </Frame>
 
-                                <!-- טקסט -->
-                                <VerticalStackLayout VerticalOptions="Center"
-                                                     HorizontalOptions="Center">
-
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                     <Label Text="{Binding FirstName}"
-                                           FontSize="16"
+                                           FontSize="18"
                                            FontAttributes="Bold"
-                                           TextColor="#2C3E50"
-                                           HorizontalTextAlignment="Center"/>
-
-                                    <Label Text="Senior"
-                                           FontSize="12"
-                                           TextColor="#95A5A6"
-                                           HorizontalTextAlignment="Center"/>
-
+                                           TextColor="#2C3E50"/>
+                                    <Label Text="Connected" 
+                                           FontSize="13" 
+                                           TextColor="#7F8C8D"/>
                                 </VerticalStackLayout>
 
-                            </HorizontalStackLayout>
+                                
+                            </Grid>
                         </Frame>
-
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
 
-                <!-- אם ריק -->
                 <CollectionView.EmptyView>
-                    <Label Text="No seniors connected yet."
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
-                           Margin="0,50"/>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Margin="0,50" Spacing="10">
+                        <Label Text="No seniors connected yet."
+                               TextColor="#2C3E50"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"/>
+                        <Label Text="Try searching or adding a new senior."
+                               TextColor="#2C3E50"
+                               Opacity="0.7"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
                 </CollectionView.EmptyView>
 
             </CollectionView>
         </RefreshView>
-
     </Grid>
 </ContentPage>
