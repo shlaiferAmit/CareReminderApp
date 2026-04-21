@@ -4,7 +4,10 @@
              xmlns:vm="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.SignInPage"
                       BackgroundColor="#99C1E9">
-    <ScrollView>
+
+    <Grid>
+
+        <ScrollView>
         <VerticalStackLayout Margin="30,50,30,20" Spacing="20" VerticalOptions="Center">
 
             <Label Text="SIGN IN"
@@ -78,6 +81,25 @@
 
         </VerticalStackLayout>
     </ScrollView>
+        <Grid IsVisible="{Binding IsBusy}"
+              BackgroundColor="Black"
+              Opacity="0.5">
+
+            <ActivityIndicator
+                IsRunning="True"
+                Color="White"
+                WidthRequest="100"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"/>
+
+            <Label Text="Loading..."
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Margin="0,60,0,0"/>
+        </Grid>
+
+    </Grid>
 
 
 </ContentPage>

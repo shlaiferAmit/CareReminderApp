@@ -24,6 +24,9 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private bool _entryAsPassword = true;
 
+        [ObservableProperty]
+        private bool isBusy;
+
         // הזרקת השירותים בבנאי
         public SignInPageViewModel(IDataService dataService, AuthService authService)
         {
@@ -48,18 +51,19 @@ namespace CareReminderApp.ViewModels
         {
             try
             {
-                // 1. בדיקת תקינות קלט ראשונית
+                IsBusy = true;
+
+                // בדיקת קלט בסיסית
                 if (string.IsNullOrWhiteSpace(UserEmail) || string.IsNullOrWhiteSpace(UserPassword))
                 {
                     await Shell.Current.DisplayAlert("Error", "Please enter both email and password", "OK");
                     return;
                 }
 
-                // 2. הכנת הנתונים (נרמול) - מונע בעיות של רווחים או אותיות גדולות
                 string cleanedEmail = UserEmail.Trim().ToLower();
                 string password = UserPassword.Trim();
 
-                // 3. שלב א': אימות מול Firebase Auth
+                // 1. התחברות מול Firebase AuthService
                 var userCredential = await _authService.SignInAsync(cleanedEmail, password);
 
                 if (userCredential == null)
@@ -68,39 +72,36 @@ namespace CareReminderApp.ViewModels
                     return;
                 }
 
-                // 4. שלב ב': שליפת נתוני המשתמש המלאים מה-Realtime Database
-                // חשוב: משתמשים בערכים הנקיים כדי לוודא התאמה לנתונים בענן
+                // 2. שליפת נתוני המשתמש (Role וכו') מה-Database
                 var user = await _dataService.GetUserAsync(cleanedEmail, password);
 
                 if (user == null || string.IsNullOrEmpty(user.Id))
                 {
-                    await Shell.Current.DisplayAlert("Error", "User not found in database", "OK");
+                    await Shell.Current.DisplayAlert("Error", "User details not found in database", "OK");
                     return;
                 }
 
-                // 5. שמירת המשתמש בזיכרון הגלובלי של האפליקציה
-                App.LoggedInUser = user;
-
-                // 6. עדכון מצב התפריט (Shell) במידה וקיים
+                // 3. עדכון הסטייט הגלובלי והפעלת הלוגיקה של ה-AppShell
                 if (Shell.Current is AppShell appShell)
                 {
+                    // הפונקציה הזו בונה את הטאבים לפי ה-Role ומנווטת פנימה
                     appShell.SetLoggedInState(true, user);
                 }
-
-                // 7. ניתוב חכם לפי תפקיד המשתמש (Senior או FamilyMember)
-                string route = user.Role == UserRole.Senior
-                                ? "//ElderRemindersPage"
-                                : "//FamilyDashboardPage";
-
-                await Shell.Current.GoToAsync(route, new Dictionary<string, object>
-        {
-            { "CurrentUser", user }
-        });
+                else
+                {
+                    // מקרה קצה אם Shell.Current לא זמין - ניווט מסורתי כגיבוי
+                    App.LoggedInUser = user;
+                    string route = user.Role == UserRole.Senior ? "//ElderRemindersPage" : "//FamilyDashboardPage";
+                    await Shell.Current.GoToAsync(route);
+                }
             }
             catch (Exception ex)
             {
-                // תפיסת שגיאות בלתי צפויות (כמו בעיות תקשורת)
-                await Shell.Current.DisplayAlert("Error", $"An unexpected error occurred: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
     }

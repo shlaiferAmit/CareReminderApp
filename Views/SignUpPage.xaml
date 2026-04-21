@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CareReminderApp.Views.SignUpPage"
              BackgroundColor="#99C1E9">
-    <ScrollView>
+
+    <Grid>
+        <ScrollView>
         <VerticalStackLayout Margin="30,40,30,20" Spacing="12">
 
             <Label Text="SIGN UP"
@@ -100,4 +102,25 @@
 
         </VerticalStackLayout>
     </ScrollView>
+        <Grid IsVisible="{Binding IsBusy}"
+      BackgroundColor="Black"
+      Opacity="0.5">
+
+            <ActivityIndicator
+        IsRunning="True"
+        Color="White"
+        WidthRequest="100"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"/>
+
+            <Label Text="Loading..."
+           TextColor="White"
+           HorizontalOptions="Center"
+           VerticalOptions="Center"
+           Margin="0,60,0,0"/>
+        </Grid>
+
+    </Grid>
+
+
 </ContentPage>

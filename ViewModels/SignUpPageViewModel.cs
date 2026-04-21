@@ -46,6 +46,9 @@ namespace CareReminderApp.ViewModels
         [NotifyCanExecuteChangedFor(nameof(SignUpCommand))]
         private UserRole _selectedRole;
 
+        [ObservableProperty]
+        private bool isBusy;
+
         public List<UserRole> RoleOptions { get; } = new List<UserRole>
         {
             UserRole.Senior,
@@ -77,44 +80,50 @@ namespace CareReminderApp.ViewModels
         {
             try
             {
+                IsBusy = true;
+
+                // 1. הרשמה מול Firebase
                 var authResult = await _authService.SignUpAsync(UserEmail, UserPassword);
 
                 if (authResult != null)
                 {
-                    bool dbSuccess = await _dataService.RegisterUserAsync(FirstName, LastName, UserEmail, UserPassword, Mobile, SelectedRole);
+                    // 2. שמירת פרטי המשתמש ב-Database שלנו
+                    bool dbSuccess = await _dataService.RegisterUserAsync(
+                        FirstName, LastName, UserEmail, UserPassword, Mobile, SelectedRole);
 
                     if (dbSuccess)
                     {
+                        // 3. שליפת המשתמש המלא (כולל ה-ID וה-Role)
                         var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
 
-                        if (user != null && !string.IsNullOrEmpty(user.Id))
+                        if (user != null)
                         {
-                            App.LoggedInUser = user;
-
-                            if (App.Current?.MainPage != null)
-                            {
-                                await App.Current.MainPage.DisplayAlert("DEBUG", $"Signed up with ID: {user.Id}", "OK");
-                            }
-
+                            // 4. הפעלת ה-AppShell לעדכון הטאבים וניווט לדף הבית
                             if (Shell.Current is AppShell appShell)
                             {
                                 appShell.SetLoggedInState(true, user);
                             }
+                            else
+                            {
+                                // גיבוי למקרה שה-Shell לא זמין
+                                App.LoggedInUser = user;
+                                await Shell.Current.GoToAsync("//MainPage");
+                            }
                         }
-                        else
-                        {
-                            if (App.Current?.MainPage != null)
-                                await App.Current.MainPage.DisplayAlert("Error", "User saved but not found in DB", "OK");
-                        }
+                    }
+                    else
+                    {
+                        await Shell.Current.DisplayAlert("Error", "Registration failed in database", "OK");
                     }
                 }
             }
             catch (Exception ex)
             {
-                if (App.Current?.MainPage != null)
-                {
-                    await App.Current.MainPage.DisplayAlert("Error", $"Registration failed: {ex.Message}", "OK");
-                }
+                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 

@@ -24,7 +24,7 @@ namespace CareReminderApp.ViewModels
         private string _remindersSummaryText = string.Empty;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(RemindersCountMessage))] // מעדכן את הטקסט בכל פעם שהרשימה משתנה
+        [NotifyPropertyChangedFor(nameof(RemindersCountMessage))]
         private ObservableCollection<Reminder> _elderRemindersList = new();
 
         [ObservableProperty]
@@ -33,12 +33,23 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private bool _hasPendingRequests;
 
+        // --- בנאי (Constructor) מעודכן ---
         public ElderRemindersViewModel(IDataService dataService)
         {
             _dataService = dataService;
+
+            // בדיקה אם המשתמש כבר מחובר במערכת (מניעת מצב של 0 תזכורות בטעינה ראשונה)
+            if (App.LoggedInUser != null)
+            {
+                CurrentUser = App.LoggedInUser;
+                WelcomeMessage = $"Good Morning, {CurrentUser.FirstName}";
+
+                // הרצת טעינת נתונים ראשונית ברקע
+                _ = InitializeDataAsync();
+            }
         }
 
-        // מאפיין מחושב עבור הטקסט בכרטיסייה הכתומה
+        // מאפיין מחושב עבור הטקסט בכרטיסייה
         public string RemindersCountMessage
         {
             get
@@ -48,25 +59,25 @@ namespace CareReminderApp.ViewModels
             }
         }
 
-        // ניהול קבלת נתונים בניווט
+        // ניהול קבלת נתונים בניווט (נשאר עבור גמישות)
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             if (query.TryGetValue("CurrentUser", out var user) || query.TryGetValue("SelectedElder", out user))
             {
-                CurrentUser = user as User;
-
-                if (CurrentUser != null)
+                var incomingUser = user as User;
+                if (incomingUser != null)
                 {
+                    CurrentUser = incomingUser;
                     WelcomeMessage = $"Good Morning, {CurrentUser.FirstName}";
-
-                    // רענון נתונים ראשוני
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        await LoadRemindersAsync();
-                        await CheckPendingRequestsAsync();
-                    });
+                    _ = InitializeDataAsync();
                 }
             }
+        }
+
+        private async Task InitializeDataAsync()
+        {
+            await LoadRemindersAsync();
+            await CheckPendingRequestsAsync();
         }
 
         // טעינת תזכורות מ-Firebase
@@ -76,17 +87,17 @@ namespace CareReminderApp.ViewModels
 
             try
             {
+                // שליפת התזכורות לפי ה-ID של המבוגר המחובר
                 var result = await _dataService.GetRemindersAsync(CurrentUser.Id);
 
                 if (result != null)
                 {
-                    // עדכון הרשימה יפעיל אוטומטית את עדכון ה-RemindersCountMessage
+                    // עדכון הרשימה יפעיל את ה-NotifyPropertyChanged עבור ה-Count
                     ElderRemindersList = new ObservableCollection<Reminder>(result);
                 }
             }
             catch (Exception)
             {
-                // הסרת ex כדי למנוע אזהרת משתנה לא בשימוש
                 await Shell.Current.DisplayAlert("Error", "Could not load reminders", "OK");
             }
         }
@@ -125,7 +136,6 @@ namespace CareReminderApp.ViewModels
             await CheckPendingRequestsAsync();
         }
 
-        // פקודה למעבר לדף פרטי תזכורת ספציפית
         [RelayCommand]
         private async Task NavigateToReminderDetails(Reminder reminder)
         {
@@ -149,6 +159,7 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task NavigateToProfile()
         {
+            // שימוש ב-nameof מונע שגיאות כתיב ב-Route
             await Shell.Current.GoToAsync("ProfilePage", new Dictionary<string, object>
             {
                 { "CurrentUser", CurrentUser }
