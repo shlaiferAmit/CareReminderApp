@@ -35,6 +35,8 @@ namespace CareReminderApp
             builder.Services.AddTransient<ReminderDetailsViewModel>();
             builder.Services.AddTransient<AddReminderViewModel>();
             builder.Services.AddTransient<ElderProfileViewModel>();
+            builder.Services.AddTransient<ChangeProfileViewModel>();
+
 
             // רישום הדפים
             builder.Services.AddTransient<SignInPage>();

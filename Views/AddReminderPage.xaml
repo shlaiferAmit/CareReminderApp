@@ -6,33 +6,58 @@
              x:DataType="viewmodels:AddReminderViewModel"
              BackgroundColor="#99C1E9"
              Shell.NavBarIsVisible="True"
-             Title="הוספת תזכורת">
+             Title="Add Reminder"
+             FlowDirection="LeftToRight">
 
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="30">
 
-            <Label Text="{Binding SelectedElder.FirstName, StringFormat='תזכורת חדשה עבור {0}'}" 
-                   FontSize="28" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Center" />
+            <Label Text="{Binding SelectedElder.FirstName, StringFormat='New Reminder for {0}'}" 
+                   FontSize="28" 
+                   FontAttributes="Bold" 
+                   TextColor="#2C3E50" 
+                   HorizontalOptions="Center" 
+                   HorizontalTextAlignment="Center" />
 
-            <Frame BackgroundColor="White" CornerRadius="10" Padding="0" HasShadow="False">
-                <Entry Placeholder="Reminder Title" 
-                       Text="{Binding ReminderTitle, Mode=TwoWay}" 
-                       HorizontalTextAlignment="Center" HeightRequest="60" TextColor="Black"/>
-            </Frame>
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Reminder Title" TextColor="#2C3E50" FontAttributes="Bold" />
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5,0" HasShadow="False">
+                    <Entry Placeholder="Enter title here..." 
+                           Text="{Binding ReminderTitle, Mode=TwoWay}" 
+                           HorizontalTextAlignment="Start" 
+                           HeightRequest="60" 
+                           TextColor="Black"/>
+                </Frame>
+            </VerticalStackLayout>
 
-            <Frame BackgroundColor="White" CornerRadius="10" Padding="0" HasShadow="False">
-                <DatePicker Date="{Binding SelectedDate, Mode=TwoWay}" HeightRequest="60" TextColor="Black"/>
-            </Frame>
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Select Date" TextColor="#2C3E50" FontAttributes="Bold" />
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="5,0" HasShadow="False">
+                    <DatePicker Date="{Binding SelectedDate, Mode=TwoWay}" 
+                                HeightRequest="60" 
+                                TextColor="Black"/>
+                </Frame>
+            </VerticalStackLayout>
 
-            <Frame BackgroundColor="White" CornerRadius="10" Padding="10" HasShadow="False">
-                <Editor Placeholder="Notes" 
-                        Text="{Binding Notes, Mode=TwoWay}" 
-                        HeightRequest="150" TextColor="Black"/>
-            </Frame>
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Additional Notes" TextColor="#2C3E50" FontAttributes="Bold" />
+                <Frame BackgroundColor="White" CornerRadius="10" Padding="10" HasShadow="False">
+                    <Editor Placeholder="Add details or instructions..." 
+                            Text="{Binding Notes, Mode=TwoWay}" 
+                            HorizontalTextAlignment="Start"
+                            HeightRequest="150" 
+                            TextColor="Black"/>
+                </Frame>
+            </VerticalStackLayout>
 
-            <Button Text="Save and send reminder" 
+            <Button Text="Save and Send Reminder" 
                     Command="{Binding SaveAndSendReminderCommand}"
-                    BackgroundColor="#1ABC9C" TextColor="White" CornerRadius="30" HeightRequest="65"/>
+                    BackgroundColor="#1ABC9C" 
+                    TextColor="White" 
+                    FontAttributes="Bold"
+                    CornerRadius="30" 
+                    HeightRequest="65"
+                    Margin="0,10,0,0"/>
 
         </VerticalStackLayout>
     </ScrollView>

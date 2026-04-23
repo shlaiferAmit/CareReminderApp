@@ -21,25 +21,58 @@
             </VerticalStackLayout>
 
             <Frame Grid.Row="1" 
-                   IsVisible="{Binding HasPendingRequests}" 
-                   BackgroundColor="#FFF3CD" Margin="0,0,0,5" Padding="10" CornerRadius="10" HasShadow="False">
-                <CollectionView ItemsSource="{Binding PendingRequests}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="models:PendingConnection">
-                            <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
-                                <Label Text="Family Connection Request" VerticalOptions="Center" TextColor="Black"/>
-                                <Button Text="Accept" 
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=ApproveRequestCommand}" 
-                                        CommandParameter="{Binding .}" 
-                                        BackgroundColor="Green" TextColor="White" HeightRequest="35"/>
-                                <Button Text="Decline" 
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=RejectRequestCommand}" 
-                                        CommandParameter="{Binding .}" 
-                                        BackgroundColor="Red" TextColor="White" HeightRequest="35"/>
-                            </HorizontalStackLayout>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+       IsVisible="{Binding HasPendingRequests}" 
+       BackgroundColor="#FFF3CD" 
+       Margin="0,3" 
+       Padding="15" 
+       CornerRadius="15" 
+       HasShadow="True"
+       BorderColor="#FFE69C">
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="New Connection Requests" 
+               FontAttributes="Bold" 
+               TextColor="#856404" 
+               HorizontalOptions="Center"
+               FontSize="16"/>
+
+                    <CollectionView ItemsSource="{Binding PendingRequests}" HeightRequest="120">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:PendingConnection">
+                                <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="8" Padding="5">
+
+                                    <Label Text="Family Member" 
+                               VerticalOptions="Center" 
+                               TextColor="#856404"
+                               FontSize="14"
+                               LineBreakMode="TailTruncation"/>
+
+                                    <Button Grid.Column="1" 
+                                Text="Accept" 
+                                FontSize="12"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=ApproveRequestCommand}" 
+                                CommandParameter="{Binding .}" 
+                                BackgroundColor="#28A745" 
+                                TextColor="White" 
+                                HeightRequest="40"
+                                WidthRequest="80"
+                                CornerRadius="8"/>
+
+                                    <Button Grid.Column="2" 
+                                Text="Decline" 
+                                FontSize="12"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=RejectRequestCommand}" 
+                                CommandParameter="{Binding .}" 
+                                BackgroundColor="#DC3545" 
+                                TextColor="White" 
+                                HeightRequest="40"
+                                WidthRequest="80"
+                                CornerRadius="8"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
             </Frame>
 
             <Frame Grid.Row="2" BackgroundColor="White" CornerRadius="15" Padding="20" HasShadow="False" IsVisible="{Binding HasReminders}">

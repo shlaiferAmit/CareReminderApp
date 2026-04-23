@@ -55,27 +55,28 @@ namespace CareReminderApp.ViewModels
             UpdateStatusText(false);
             await Shell.Current.DisplayAlert("Status", "Reminder marked as not done", "OK");
         }
-
         [RelayCommand]
         public async Task Delete()
         {
-            if (SelectedReminder == null) return;
+            if (SelectedReminder == null || string.IsNullOrEmpty(SelectedReminder.Id))
+            {
+                await Shell.Current.DisplayAlert("Error", "Cannot find reminder ID", "OK");
+                return;
+            }
 
-            bool confirm = await Shell.Current.DisplayAlert("Delete", "Are you sure you want to delete this reminder permanently?", "Yes", "No");
+            bool confirm = await Shell.Current.DisplayAlert("Delete", "Are you sure you want to delete this reminder?", "Yes", "No");
+
             if (confirm)
             {
-                // קריאה לפונקציית המחיקה האמיתית ב-Service
-                // הערה: ודאי שב-IDataService קיימת מתודה DeleteReminderAsync(string id)
                 var success = await _dataService.DeleteReminderAsync(SelectedReminder.Id);
 
                 if (success)
                 {
-                    await Shell.Current.DisplayAlert("Deleted", "Reminder removed successfully", "OK");
-                    await Shell.Current.GoToAsync(".."); // חזרה לדף הרשימה
+                    await Shell.Current.GoToAsync(".."); // חוזר חזרה לרשימה
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlert("Error", "Could not delete from Firebase", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Failed to delete from server", "OK");
                 }
             }
         }

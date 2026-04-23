@@ -6,98 +6,90 @@
              x:DataType="viewmodels:ReminderDetailsViewModel"
              BackgroundColor="#99C1E9"
              Shell.NavBarIsVisible="True"
-             Title="Remind Details">
+             Title="Reminder Details"
+             FlowDirection="LeftToRight">
+    <Grid VerticalOptions="Center">
+        <Frame BackgroundColor="White" 
+               CornerRadius="20" 
+               Margin="25" 
+               Padding="25" 
+               HasShadow="True"
+               HorizontalOptions="Fill">
 
-    <Frame BackgroundColor="White" 
-           CornerRadius="20" 
-           Margin="30,0" 
-           Padding="20" 
-           HasShadow="True"
-           VerticalOptions="Center"
-           HorizontalOptions="Fill">
+            <VerticalStackLayout Spacing="30">
 
-        <VerticalStackLayout Spacing="40">
-
-            <Frame BackgroundColor="#E67E22" 
-                   CornerRadius="10" 
-                   Padding="30" 
-                   HasShadow="False"
-                   BorderColor="Transparent">
-
-                <VerticalStackLayout Spacing="15" HorizontalOptions="Center">
-                    <Label Text="{Binding SelectedReminder.Title}" 
-                           FontSize="28" 
-                           FontAttributes="Bold" 
-                           TextColor="White" 
-                           HorizontalOptions="Center" 
-                           HorizontalTextAlignment="Center"/>
-
-                    <Frame BackgroundColor="#1ABC9C" 
-                           CornerRadius="25" 
-                           Padding="20,8" 
-                           HorizontalOptions="Center"
-                           HasShadow="False">
-                        <Label Text="{Binding StatusText}" 
+                <Frame BackgroundColor="#E67E22" 
+                       CornerRadius="15" 
+                       Padding="20" 
+                       HasShadow="False"
+                       BorderColor="Transparent">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="{Binding SelectedReminder.Title}" 
+                               FontSize="26" 
+                               FontAttributes="Bold" 
                                TextColor="White" 
-                               FontSize="18"
-                               FontAttributes="Bold"/>
-                    </Frame>
+                               HorizontalOptions="Center" 
+                               HorizontalTextAlignment="Center"/>
+
+                        <Frame BackgroundColor="#1ABC9C" 
+                               CornerRadius="20" 
+                               Padding="15,5" 
+                               HorizontalOptions="Center"
+                               HasShadow="False">
+                            <Label Text="{Binding StatusText}" 
+                                   TextColor="White" 
+                                   FontSize="16"
+                                   FontAttributes="Bold"/>
+                        </Frame>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <VerticalStackLayout Spacing="15" Padding="10" HorizontalOptions="Start">
+
+                    <HorizontalStackLayout Spacing="15" HorizontalOptions="Start">
+                        <Label Text="⏰" FontSize="22" VerticalOptions="Center"/>
+                        <Label Text="Time:" FontSize="18" FontAttributes="Bold" TextColor="#2C3E50" VerticalOptions="Center"/>
+                        <Label Text="{Binding SelectedReminder.DueDate, StringFormat='{0:HH:mm}'}" 
+                               FontSize="18" TextColor="#2C3E50" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout Spacing="15" HorizontalOptions="Start">
+                        <Label Text="📅" FontSize="22" VerticalOptions="Center"/>
+                        <Label Text="Date:" FontSize="18" FontAttributes="Bold" TextColor="#2C3E50" VerticalOptions="Center"/>
+                        <Label Text="{Binding SelectedReminder.DueDate, StringFormat='{0:MMMM dd, yyyy}'}" 
+                               FontSize="18" TextColor="#2C3E50" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
                 </VerticalStackLayout>
-            </Frame>
 
-            <VerticalStackLayout Spacing="12" Margin="10,0" FlowDirection="LeftToRight">
+                <VerticalStackLayout Spacing="12">
+                    <Button Text="Mark as Done" 
+                            BackgroundColor="#1ABC9C" 
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="10"
+                            Command="{Binding MarkAsDoneCommand}"/>
 
-                <HorizontalStackLayout Spacing="10">
-                    <Label Text="Time:" 
-               FontSize="20" 
-               FontAttributes="Bold" 
-               TextColor="#2C3E50"/>
-                    <Label Text="{Binding SelectedReminder.DueDate, StringFormat='{0:HH:mm}'}" 
-               FontSize="20" 
-               TextColor="#2C3E50"/>
-                </HorizontalStackLayout>
+                    <Button Text="Mark as Not Done" 
+                            BackgroundColor="#F1C40F" 
+                            TextColor="#2C3E50"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="10"
+                            Command="{Binding MarkAsNotDoneCommand}"/>
 
-
-
-                <HorizontalStackLayout Spacing="10">
-                    <Label Text="Date:" 
-               FontSize="20" 
-               FontAttributes="Bold" 
-               TextColor="#2C3E50"/>
-                    <Label Text="{Binding SelectedReminder.DueDate, StringFormat='{0:dd.MM.yyyy}'}" 
-               FontSize="20" 
-               TextColor="#2C3E50"/>
-                </HorizontalStackLayout>
+                    <Button Text="Delete Reminder" 
+                            BackgroundColor="#D64550" 
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="10"
+                            Command="{Binding DeleteCommand}"
+                            Margin="0,10,0,0"/>
+                </VerticalStackLayout>
 
             </VerticalStackLayout>
-
-            <Grid ColumnDefinitions="*, *, *" ColumnSpacing="12" HeightRequest="110">
-
-                <Button Grid.Column="0" 
-                        Text="Delete" 
-                        BackgroundColor="#D64550" 
-                        TextColor="White"
-                        FontAttributes="Bold"
-                        CornerRadius="10"
-                        Command="{Binding DeleteCommand}"/>
-
-                <Button Grid.Column="1" 
-                        Text="Mark as done" 
-                        BackgroundColor="#1ABC9C" 
-                        TextColor="White"
-                        FontAttributes="Bold"
-                        CornerRadius="10"
-                        Command="{Binding MarkAsDoneCommand}"/>
-
-                <Button Grid.Column="2" 
-                        Text="mark as not done" 
-                        BackgroundColor="#F1C40F" 
-                        TextColor="#2C3E50"
-                        FontAttributes="Bold"
-                        CornerRadius="10"
-                        Command="{Binding MarkAsNotDoneCommand}"/>
-            </Grid>
-
-        </VerticalStackLayout>
-    </Frame>
+        </Frame>
+    </Grid>
 </ContentPage>

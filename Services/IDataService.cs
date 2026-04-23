@@ -1,22 +1,23 @@
 ﻿using CareReminderApp.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace CareReminderApp.Services
 {
     public interface IDataService
     {
         // ניהול משתמשים
-        Task<User?> GetUserAsync(string email, string password);
-        Task<bool> RegisterUserAsync(string firstName, string lastName, string email, string password, string mobile, UserRole role);
-        Task<List<User>> GetUsersAsync();
+        Task<User> GetUserAsync(string email, string password);
+        Task<bool> RegisterUserAsync(string id, string firstName, string lastName, string email, string password, string mobile, UserRole role); Task<List<User>> GetUsersAsync();
         Task<User?> GetUserByIdAsync(string id);
-        Task<User?> FindSeniorByEmailAsync(string email);
 
         // תזכורות
         Task<List<Reminder>> GetRemindersByUserIdAsync(string userId);
         Task<IEnumerable<Reminder>> GetRemindersAsync(string userId);
         Task SaveReminderAsync(Reminder reminder);
+        Task UpdateReminderAsync(Reminder reminder);
+        Task<bool> DeleteReminderAsync(string id);
 
         // קשרים
         Task<List<UserConnection>> GetUserConnectionsAsync(string userId);
@@ -30,9 +31,6 @@ namespace CareReminderApp.Services
         Task RejectConnectionAsync(PendingConnection request);
 
         Task<List<UserRole>> GetRolesAsync();
-        Task UpdateReminderAsync(Reminder reminder);
-        Task<bool> DeleteReminderAsync(string id);
-
         Task<bool> UpdateUserAsync(User user);
         Task<string> UploadUserImageAsync(Stream imageStream, string userId);
     }

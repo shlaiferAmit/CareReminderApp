@@ -82,44 +82,44 @@ namespace CareReminderApp.ViewModels
             {
                 IsBusy = true;
 
-                // 1. הרשמה מול Firebase
+                // 1. הרשמה מול Firebase Authentication
                 var authResult = await _authService.SignUpAsync(UserEmail, UserPassword);
 
-                if (authResult != null)
+                if (authResult != null && authResult.User != null)
                 {
-                    // 2. שמירת פרטי המשתמש ב-Database שלנו
+                    // השתמשי במילת המפתח var כדי שהקומפיילר יזהה שמדובר באובייקט של Firebase
+                    var firebaseUser = authResult.User;
+                    string firebaseUid = authResult.User.Uid;
+
+                    // 2. שמירת פרטי המשתמש ב-Database
+                    // כאן אנחנו שולחים את ה-firebaseUid שחילצנו למעלה
                     bool dbSuccess = await _dataService.RegisterUserAsync(
-                        FirstName, LastName, UserEmail, UserPassword, Mobile, SelectedRole);
+                        firebaseUid,
+                        FirstName,
+                        LastName,
+                        UserEmail,
+                        UserPassword,
+                        Mobile,
+                        SelectedRole);
 
                     if (dbSuccess)
                     {
-                        // 3. שליפת המשתמש המלא (כולל ה-ID וה-Role)
+                        // 3. שליפת המשתמש המעודכן והגדרת מצב מחובר
                         var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
-
-                        if (user != null)
+                        if (user != null && Shell.Current is AppShell appShell)
                         {
-                            // 4. הפעלת ה-AppShell לעדכון הטאבים וניווט לדף הבית
-                            if (Shell.Current is AppShell appShell)
-                            {
-                                appShell.SetLoggedInState(true, user);
-                            }
-                            else
-                            {
-                                // גיבוי למקרה שה-Shell לא זמין
-                                App.LoggedInUser = user;
-                                await Shell.Current.GoToAsync("//MainPage");
-                            }
+                            appShell.SetLoggedInState(true, user);
                         }
                     }
                     else
                     {
-                        await Shell.Current.DisplayAlert("Error", "Registration failed in database", "OK");
+                        await Shell.Current.DisplayAlert("שגיאה", "הרישום ל-Auth הצליח אך השמירה למסד הנתונים נכשלה", "OK");
                     }
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+                await Shell.Current.DisplayAlert("שגיאה", ex.Message, "OK");
             }
             finally
             {

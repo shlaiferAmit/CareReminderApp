@@ -41,15 +41,18 @@ namespace CareReminderApp.ViewModels
             {
                 try
                 {
-                    // שליפת המידע מהפיירבייס בצורה אסינכרונית
+                    // שליפת המידע הכי עדכני מה-Firebase לפי ה-ID
                     var userFromServer = await _dataService.GetUserByIdAsync(App.LoggedInUser.Id);
 
                     if (userFromServer != null)
                     {
-                        // כאן קורה הקסם - ברגע שזה מתעדכן, המסך מתמלא
+                        // 1. עדכון המשתמש לתצוגה במסך הפרופיל
                         DisplayUser = userFromServer;
 
-                        // עדכון תמונה וכותרת
+                        // 2. עדכון המשתמש הגלובלי ב-App - זה הפתרון לבעיה שלך!
+                        App.LoggedInUser = userFromServer;
+
+                        // 3. עדכון אלמנטים ויזואליים
                         UpdateProfileImage();
                         ProfileTitle = "My Profile";
                         IsMyPersonalProfile = true;
@@ -57,7 +60,9 @@ namespace CareReminderApp.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    await Shell.Current.DisplayAlert("שגיאה", "לא הצלחנו לטעון נתונים", "אוקיי");
+                    // הדפסה ללוג לצורכי ניפוי שגיאות
+                    System.Diagnostics.Debug.WriteLine($">>> Profile Load Error: {ex.Message}");
+                    await Shell.Current.DisplayAlert("שגיאה", "לא הצלחנו לרענן את נתוני הפרופיל מהשרת", "אוקיי");
                 }
             }
         }
@@ -169,12 +174,7 @@ namespace CareReminderApp.ViewModels
                 await Shell.Current.GoToAsync("//FamilyDashboardPage");
         }
 
-        [RelayCommand]
-        private async Task SaveChanges()
-        {
-            // כאן תבוא לוגיקת השמירה (למשל ל-Firebase)
-            await Shell.Current.GoToAsync("..");
-        }
+        
 
         [RelayCommand]
         private async Task GoToSeniors()

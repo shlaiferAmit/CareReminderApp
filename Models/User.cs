@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Newtonsoft.Json;
 
 namespace CareReminderApp.Models
 {
@@ -7,6 +6,10 @@ namespace CareReminderApp.Models
     {
         [ObservableProperty]
         private string id = string.Empty;
+
+        // הוספת השדה הזה כי ה-ViewModel מחפש אותו
+        [ObservableProperty]
+        private string localId = string.Empty;
 
         [ObservableProperty]
         private string firstName = string.Empty;
@@ -29,7 +32,7 @@ namespace CareReminderApp.Models
         [ObservableProperty]
         private string? profilePictureUrl;
 
-        // הוסיפי את השורה הזו:
+        // הוספת השדה הזה כדי לפתור את השגיאה ב-ProfileViewModel
         [ObservableProperty]
         private string? profilePicturePath;
     }
