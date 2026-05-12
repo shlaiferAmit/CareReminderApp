@@ -4,18 +4,31 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:CareReminderApp.Views"
-    
     FlyoutBehavior="Flyout" 
-    
     Shell.BackgroundColor="#A1CFFF"
     Shell.ForegroundColor="Black">
 
+    <!-- דף הכניסה הראשי -->
     <ShellContent 
         x:Name="MainPageContent"
         Title="Welcome" 
         ContentTemplate="{DataTemplate views:MainPage}" 
         Route="MainPage"
-        Shell.TabBarIsVisible="False" />
+        Shell.FlyoutItemIsVisible="False" />
+
+    <!-- הוספת דף ההתחברות -->
+    <ShellContent
+        Title="Sign In"
+        ContentTemplate="{DataTemplate views:SignInPage}"
+        Route="SignInPage"
+        Shell.FlyoutItemIsVisible="False" />
+
+    <!-- הוספת דף ההרשמה -->
+    <ShellContent
+        Title="Sign Up"
+        ContentTemplate="{DataTemplate views:SignUpPage}"
+        Route="SignUpPage"
+        Shell.FlyoutItemIsVisible="False" />
 
     <MenuItem Text="Log Out" Clicked="OnLogoutClicked" />
 </Shell>

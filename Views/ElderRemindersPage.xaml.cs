@@ -1,7 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using CareReminderApp.ViewModels;
-using CareReminderApp.Services;
-
+﻿using CareReminderApp.ViewModels;
 
 namespace CareReminderApp.Views
 {
@@ -16,11 +13,11 @@ namespace CareReminderApp.Views
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-
-            // בכל פעם שהדף מופיע (גם בחזרה מניווט), אנחנו מעדכנים את הספירה
             if (BindingContext is ElderRemindersViewModel vm)
             {
+                // רענון אוטומטי של הנתונים כדי לעדכן את IsNextReminderVisible
                 await vm.LoadRemindersAsync();
+                await vm.CheckPendingRequestsAsync();
             }
         }
     }

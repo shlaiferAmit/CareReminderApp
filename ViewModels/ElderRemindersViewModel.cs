@@ -21,9 +21,6 @@ namespace CareReminderApp.ViewModels
         private string _welcomeMessage = string.Empty;
 
         [ObservableProperty]
-        private string _remindersSummaryText = string.Empty;
-
-        [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(RemindersCountMessage))]
         private ObservableCollection<Reminder> _elderRemindersList = new();
 
@@ -43,6 +40,9 @@ namespace CareReminderApp.ViewModels
         private Reminder? _nextReminder;
 
         [ObservableProperty]
+        private bool _isNextReminderVisible; // משתנה השליטה
+
+        [ObservableProperty]
         private bool _hasReminders;
 
         public ElderRemindersViewModel(IDataService dataService)
@@ -57,7 +57,6 @@ namespace CareReminderApp.ViewModels
             }
         }
 
-        // --- פונקציית טעינה מאוחדת (רק אחת כזו!) ---
         public async Task LoadRemindersAsync()
         {
             if (CurrentUser == null) return;
@@ -69,22 +68,23 @@ namespace CareReminderApp.ViewModels
                 if (result != null)
                 {
                     var allToday = result.ToList();
-
-                    // עדכון הרשימה (מפעיל את ה-Count)
                     ElderRemindersList = new ObservableCollection<Reminder>(allToday);
 
-                    // 1. חישוב התקדמות
                     int total = allToday.Count;
                     int completed = allToday.Count(r => r.IsCompleted);
 
                     HasReminders = total > 0;
                     ProgressValue = total > 0 ? (double)completed / total : 0;
                     ProgressText = $"{completed} out of {total} completed today";
-                    // 2. מציאת התזכורת הבאה (הראשונה שטרם בוצעה)
+
+                    // מציאת התזכורת הבאה שטרם בוצעה
                     NextReminder = allToday
                         .Where(r => !r.IsCompleted)
                         .OrderBy(r => r.DueDate)
                         .FirstOrDefault();
+
+                    // עדכון המצב: אם יש תזכורת היא תוצג, אם אין יוצג ALL DONE
+                    IsNextReminderVisible = NextReminder != null;
                 }
             }
             catch (Exception)
@@ -124,7 +124,6 @@ namespace CareReminderApp.ViewModels
         public async Task CheckPendingRequestsAsync()
         {
             if (CurrentUser == null) return;
-
             try
             {
                 var requests = await _dataService.GetPendingForElderAsync(CurrentUser.Id);
@@ -143,7 +142,6 @@ namespace CareReminderApp.ViewModels
             if (request == null) return;
             await _dataService.ApproveConnectionAsync(request);
             await CheckPendingRequestsAsync();
-            await Shell.Current.DisplayAlert("Success", "Connection approved!", "OK");
         }
 
         [RelayCommand]
@@ -161,24 +159,6 @@ namespace CareReminderApp.ViewModels
             await Shell.Current.GoToAsync(nameof(ReminderDetailsPage), new Dictionary<string, object>
             {
                 { "SelectedReminder", reminder }
-            });
-        }
-
-        [RelayCommand]
-        private async Task NavigateToTodayReminders()
-        {
-            await Shell.Current.GoToAsync(nameof(TodayRemindersPage), new Dictionary<string, object>
-            {
-                { "CurrentUser", CurrentUser }
-            });
-        }
-
-        [RelayCommand]
-        private async Task NavigateToProfile()
-        {
-            await Shell.Current.GoToAsync("ProfilePage", new Dictionary<string, object>
-            {
-                { "CurrentUser", CurrentUser }
             });
         }
 

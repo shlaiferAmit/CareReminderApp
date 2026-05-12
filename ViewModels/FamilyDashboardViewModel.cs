@@ -1,8 +1,10 @@
 ﻿using CareReminderApp.Models;
 using CareReminderApp.Services;
+using CareReminderApp.Views; // הוספתי עבור ElderProfilePage
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,11 +25,14 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private bool isBusy;
 
+        [ObservableProperty]
+        private ObservableCollection<User> elders;
+
         public FamilyDashboardViewModel(IDataService dataService)
         {
             _dataService = dataService;
+            Elders = new ObservableCollection<User>();
 
-            // גיבוי: אם CurrentUser לא הגיע דרך הניווט, ננסה לקחת אותו מהסטייט הגלובלי
             if (CurrentUser == null && App.LoggedInUser != null)
             {
                 CurrentUser = App.LoggedInUser;
@@ -41,32 +46,64 @@ namespace CareReminderApp.ViewModels
         }
 
         [RelayCommand]
+        public async Task LoadElders()
+        {
+            var activeUser = CurrentUser ?? App.LoggedInUser;
+            if (IsBusy || activeUser == null) return;
+
+            IsBusy = true;
+            try
+            {
+                var result = await _dataService.GetEldersForFamilyAsync(activeUser.Id);
+                Elders.Clear();
+                foreach (var elder in result)
+                {
+                    Elders.Add(elder);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading elders: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task GoToProfile(User elder)
+        {
+            if (elder == null) return;
+            await Shell.Current.GoToAsync(nameof(ElderProfilePage), new Dictionary<string, object>
+            {
+                { "Elder", elder }
+            });
+        }
+
+        [RelayCommand]
         private async Task AddSenior()
         {
             if (IsBusy) return;
-
-            // בדיקת אבטחה למשתמש המחובר
             var activeUser = CurrentUser ?? App.LoggedInUser;
 
             if (activeUser == null)
             {
-                await Shell.Current.DisplayAlert("שגיאה", "לא ניתן לזהות את המשתמש המחובר. נסה להתחבר מחדש.", "אוקיי");
+                await Shell.Current.DisplayAlert("Error", "User not identified.", "OK");
                 return;
             }
 
             string emailInput = await Shell.Current.DisplayPromptAsync(
-                "הוספת מבוגר",
-                "הכניסי את כתובת האימייל של המבוגר שאליו תרצי להתחבר:",
-                "הוספה",
-                "ביטול"
-                );
+                "Add Senior",
+                "Enter the senior's email address:",
+                "Add",
+                "Cancel");
 
             if (string.IsNullOrWhiteSpace(emailInput)) return;
 
             IsBusy = true;
             try
             {
-                // הבאת כל המשתמשים וסינון לפי אימייל ותפקיד "Senior"
                 var allUsers = await _dataService.GetUsersAsync();
                 var emailToFind = emailInput.Trim().ToLower();
 
@@ -76,25 +113,25 @@ namespace CareReminderApp.ViewModels
 
                 if (senior == null)
                 {
-                    await Shell.Current.DisplayAlert("לא נמצא", "לא נמצא משתמש מבוגר עם אימייל זה במערכת.", "הבנתי");
+                    await Shell.Current.DisplayAlert("Not Found", "No senior found with this email.", "OK");
                     return;
                 }
 
-                // מניעת חיבור של משתמש לעצמו
                 if (senior.Id == activeUser.Id)
                 {
-                    await Shell.Current.DisplayAlert("פעולה לא חוקית", "לא ניתן להוסיף את עצמך כמבוגר.", "אוקיי");
+                    await Shell.Current.DisplayAlert("Error", "You cannot add yourself.", "OK");
                     return;
                 }
 
-                // שליחת בקשת חיבור ל-Firebase
                 await _dataService.InviteElderAsync(activeUser.Id, senior.Id);
+                await Shell.Current.DisplayAlert("Success", $"Request sent to {senior.FirstName}.", "Great");
 
-                await Shell.Current.DisplayAlert("נשלח בהצלחה", $"בקשת חיבור נשלחה אל {senior.FirstName}. עליו לאשר אותה באפליקציה שלו.", "מעולה");
+                // רענון הרשימה לאחר הוספה
+                await LoadElders();
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("שגיאה", $"אירעה שגיאה בתהליך: {ex.Message}", "אוקיי");
+                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
             }
             finally
             {

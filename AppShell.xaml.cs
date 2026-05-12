@@ -15,7 +15,8 @@ namespace CareReminderApp
 
             RegisterRoutes();
 
-            // התחלה בעמוד הבית
+            // התחלה בעמוד הבית (MainPage - עמוד הלוגין/הרשמה)
+            // ודאי שקיים ShellContent ב-XAML עם x:Name="MainPageContent"
             this.CurrentItem = MainPageContent;
         }
 
@@ -27,12 +28,13 @@ namespace CareReminderApp
             Routing.RegisterRoute(nameof(ReminderDetailsPage), typeof(ReminderDetailsPage));
             Routing.RegisterRoute(nameof(ChangeProfilePage), typeof(ChangeProfilePage));
             Routing.RegisterRoute(nameof(ElderProfilePage), typeof(ElderProfilePage));
+            // הוספת דף הבית של המשפחה ל-Routes
+            Routing.RegisterRoute(nameof(FamilyDashboardPage), typeof(FamilyDashboardPage));
         }
 
-        // --- פונקציה לבניית ה-Tabs דינמית לפי סוג המשתמש ---
         private void BuildTabs(User currentUser)
         {
-            // ✅ הסרת כל TabBar קיים
+            // 1. הסרת כל TabBar קיים
             for (int i = this.Items.Count - 1; i >= 0; i--)
             {
                 if (this.Items[i] is TabBar)
@@ -40,13 +42,14 @@ namespace CareReminderApp
             }
 
             if (currentUser == null)
-                return; // אין משתמש – לא יוצרים Tabs
+                return;
 
             TabBar mainTabBar = new TabBar();
 
+            // --- תפריט למשתמש משפחה ---
             if (currentUser.Role == UserRole.FamilyMember)
             {
-                var familyTab = new Tab { Title = "Family Home", Icon = "home.png" };
+                var familyTab = new Tab { Title = "Home", Icon = "home.png" };
                 familyTab.Items.Add(new ShellContent
                 {
                     ContentTemplate = new DataTemplate(typeof(FamilyDashboardPage)),
@@ -54,17 +57,12 @@ namespace CareReminderApp
                 });
                 mainTabBar.Items.Add(familyTab);
 
-                var elderListTab = new Tab { Title = "My Seniors", Icon = "list_icon.png" };
-                elderListTab.Items.Add(new ShellContent
-                {
-                    ContentTemplate = new DataTemplate(typeof(EldersListPage)),
-                    Route = "EldersListPage"
-                });
-                mainTabBar.Items.Add(elderListTab);
+                // הוסר הטאב של EldersListPage - הרשימה כבר נמצאת בתוך ה-Dashboard
             }
+            // --- תפריט למשתמש מבוגר ---
             else if (currentUser.Role == UserRole.Senior)
             {
-                var elderTab = new Tab { Title = "Elder Home", Icon = "home.png" };
+                var elderTab = new Tab { Title = "Home", Icon = "home.png" };
                 elderTab.Items.Add(new ShellContent
                 {
                     ContentTemplate = new DataTemplate(typeof(ElderRemindersPage)),
@@ -72,7 +70,7 @@ namespace CareReminderApp
                 });
                 mainTabBar.Items.Add(elderTab);
 
-                var todayTab = new Tab { Title = "Today’s Reminders", Icon = "list_icon.png" };
+                var todayTab = new Tab { Title = "Today", Icon = "list_icon.png" };
                 todayTab.Items.Add(new ShellContent
                 {
                     ContentTemplate = new DataTemplate(typeof(TodayRemindersPage)),
@@ -81,7 +79,8 @@ namespace CareReminderApp
                 mainTabBar.Items.Add(todayTab);
             }
 
-            var profileTab = new Tab { Title = "My Profile", Icon = "profile_icon.png" };
+            // --- טאב פרופיל משותף לכולם ---
+            var profileTab = new Tab { Title = "Profile", Icon = "profile_icon.png" };
             profileTab.Items.Add(new ShellContent
             {
                 ContentTemplate = new DataTemplate(typeof(ProfilePage)),
@@ -95,14 +94,15 @@ namespace CareReminderApp
         public async void SetLoggedInState(bool isLoggedIn, User? currentUser = null)
         {
             IsUserLoggedIn = isLoggedIn;
-            App.LoggedInUser = currentUser; // עכשיו זה תקין
+            App.LoggedInUser = currentUser;
 
             BuildTabs(currentUser);
 
             if (isLoggedIn && currentUser != null)
             {
                 await Task.Delay(100);
-                if (this.Items.LastOrDefault() is TabBar mainBar && mainBar.Items.Count > 0)
+                // ניווט לטאב הראשון שנוצר ב-TabBar החדש
+                if (this.Items.FirstOrDefault(i => i is TabBar) is TabBar mainBar && mainBar.Items.Count > 0)
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
@@ -112,26 +112,19 @@ namespace CareReminderApp
             }
             else
             {
-                // ודאי ש-MainPageContent מוגדר ב-XAML שלך
-                // this.CurrentItem = MainPageContent; 
+                // חזרה לעמוד הראשי בניתוק
+                this.CurrentItem = MainPageContent;
             }
         }
 
-        // --- Logout ---
         private async void OnLogoutClicked(object sender, EventArgs e)
         {
-            // 1. סגירת התפריט הצידי באופן מיידי כדי שלא "יתקע" על המסך
             this.FlyoutIsPresented = false;
-
-            // 2. ניקוי נתוני המשתמש מהזיכרון
             Preferences.Default.Clear();
             App.LoggedInUser = null;
 
-            // 3. עדכון מצב ההתחברות ל-false
-            // זה יגרום ל-BuildTabs למחוק את הטאבים ול-CurrentItem להפוך ל-MainPageContent
             SetLoggedInState(false, null);
 
-            // 4. ניווט מפורש לדף ה-MainPage (ליתר ביטחון כדי לאפס את ה-Stack)
             await Shell.Current.GoToAsync("//MainPage");
         }
     }

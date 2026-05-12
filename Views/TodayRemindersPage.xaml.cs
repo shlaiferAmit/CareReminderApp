@@ -1,4 +1,4 @@
-﻿using CareReminderApp.ViewModels;
+using CareReminderApp.ViewModels;
 
 namespace CareReminderApp.Views
 {
@@ -13,7 +13,6 @@ namespace CareReminderApp.Views
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            // ריענון הנתונים בכל פעם שהדף עולה
             if (BindingContext is TodayRemindersViewModel vm)
             {
                 await vm.LoadDataAsync();

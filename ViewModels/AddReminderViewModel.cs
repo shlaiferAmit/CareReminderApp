@@ -2,6 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using CareReminderApp.Services;
 using CareReminderApp.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
 {
@@ -22,6 +24,9 @@ namespace CareReminderApp.ViewModels
         [ObservableProperty]
         private DateTime _selectedDate = DateTime.Now;
 
+        [ObservableProperty]
+        private TimeSpan _selectedTime = DateTime.Now.TimeOfDay; // שדה חדש לבחירת שעה
+
         public AddReminderViewModel(IDataService dataService)
         {
             _dataService = dataService;
@@ -32,28 +37,37 @@ namespace CareReminderApp.ViewModels
         {
             try
             {
-                // בדיקה שהנתונים לא ריקים
                 if (string.IsNullOrWhiteSpace(ReminderTitle) || SelectedElder == null)
                 {
                     await Shell.Current.DisplayAlert("חסרים פרטים", "נא למלא כותרת ולבחור מבוגר", "אוקיי");
                     return;
                 }
 
+                // חיבור התאריך והשעה לאובייקט DateTime אחד
+                DateTime finalDueDate = SelectedDate.Date + SelectedTime;
+
+                // בדיקה שהזמן לא עבר כבר
+                if (finalDueDate < DateTime.Now)
+                {
+                    await Shell.Current.DisplayAlert("זמן לא תקין", "לא ניתן לקבוע תזכורת לזמן שעבר", "אוקיי");
+                    return;
+                }
+
                 var newReminder = new Reminder
                 {
+                    Id = Guid.NewGuid().ToString(), // הוספת מזהה ייחודי
                     Title = ReminderTitle,
                     Description = Notes,
-                    DueDate = SelectedDate,
+                    DueDate = finalDueDate, // הזמן המשולב
                     UserId = SelectedElder.Id,
                     IsCompleted = false
                 };
 
-                // זה ידפיס לך הודעה ב-Visual Studio ברגע הלחיצה!
-                System.Diagnostics.Debug.WriteLine("נסיונית לשמור תזכורת ל-Firebase...");
+                System.Diagnostics.Debug.WriteLine($"שומר תזכורת לתאריך: {newReminder.DueDate}");
 
                 await _dataService.SaveReminderAsync(newReminder);
 
-                await Shell.Current.DisplayAlert("הצלחה", "התזכורת נשמרה בהצלחה!", "מעולה");
+                await Shell.Current.DisplayAlert("הצלחה", "התזכורת נשמרה וסונכרנה!", "מעולה");
                 await Shell.Current.GoToAsync("..");
             }
             catch (Exception ex)

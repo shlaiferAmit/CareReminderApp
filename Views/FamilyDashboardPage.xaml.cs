@@ -9,5 +9,16 @@ namespace CareReminderApp.Views
             InitializeComponent();
             BindingContext = vm;
         }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            // טעינת רשימת המבוגרים בכל פעם שנכנסים לדף
+            if (BindingContext is FamilyDashboardViewModel vm)
+            {
+                await vm.LoadEldersCommand.ExecuteAsync(null);
+            }
+        }
     }
 }

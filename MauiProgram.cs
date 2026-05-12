@@ -28,7 +28,6 @@ namespace CareReminderApp
             builder.Services.AddTransient<SignInPageViewModel>();
             builder.Services.AddTransient<SignUpPageViewModel>();
             builder.Services.AddTransient<ElderRemindersViewModel>();
-            builder.Services.AddTransient<EldersListViewModel>();
             builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddTransient<TodayRemindersViewModel>();
             builder.Services.AddTransient<FamilyDashboardViewModel>();
@@ -42,7 +41,6 @@ namespace CareReminderApp
             builder.Services.AddTransient<SignInPage>();
             builder.Services.AddTransient<SignUpPage>();
             builder.Services.AddTransient<ElderRemindersPage>();
-            builder.Services.AddTransient<EldersListPage>();
             builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<TodayRemindersPage>();
             builder.Services.AddTransient<FamilyDashboardPage>();

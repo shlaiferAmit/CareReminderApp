@@ -72,7 +72,7 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task GoToSignIn()
         {
-            await Shell.Current.GoToAsync("///SignInPage");
+            await Shell.Current.GoToAsync("//SignInPage");
         }
 
         [RelayCommand(CanExecute = nameof(CanSignUp))]

@@ -174,7 +174,7 @@ namespace CareReminderApp.ViewModels
                 await Shell.Current.GoToAsync("//FamilyDashboardPage");
         }
 
-        
+
 
         [RelayCommand]
         private async Task GoToSeniors()
