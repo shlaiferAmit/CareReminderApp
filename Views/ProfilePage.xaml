@@ -25,35 +25,30 @@
 
                     <VerticalStackLayout HorizontalOptions="Center" Spacing="10">
                         <Grid HeightRequest="160" WidthRequest="160">
-                            <Frame CornerRadius="80" 
-                                   HeightRequest="160" 
-                                   WidthRequest="160" 
-                                   Padding="0" 
-                                   IsClippedToBounds="True"
-                                   HasShadow="False"
-                                   BorderColor="#3498DB">
-                                <Image Source="{Binding ProfileImageSource}" 
-                                       Aspect="AspectFill" />
+
+                            <!-- תמונת פרופיל -->
+                            <Frame CornerRadius="80"
+           HeightRequest="160"
+           WidthRequest="160"
+           Padding="0"
+           IsClippedToBounds="True"
+           HasShadow="False"
+           BorderColor="#3498DB">
+                                <Image Source="{Binding ProfileImageSource}"
+               Aspect="AspectFill" />
                             </Frame>
 
-                            <Frame BackgroundColor="#3498DB"
-                                   HeightRequest="40"
-                                   WidthRequest="40"
-                                   CornerRadius="20"
-                                   Padding="0"
-                                   HorizontalOptions="End"
-                                   VerticalOptions="End"
-                                   HasShadow="True">
-                                <Label Text="📷" TextColor="White" 
-                                       HorizontalOptions="Center" 
-                                       VerticalOptions="Center"/>
-                            </Frame>
-
-                            <ImageButton Command="{Binding ChangePhotoCommand}"
-                                         BackgroundColor="Transparent"
-                                         HeightRequest="160"
-                                         WidthRequest="160"
-                                         CornerRadius="80"/>
+                            <!-- כפתור מצלמה קטן -->
+                            <ImageButton Source="camera_icon.png"
+                 WidthRequest="40"
+                 HeightRequest="40"
+                 BackgroundColor="#3498DB"
+                 CornerRadius="20"
+                 Padding="8"
+                 Command="{Binding ChangePhotoCommand}"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,0,5,5"/>
                         </Grid>
                     </VerticalStackLayout>
 

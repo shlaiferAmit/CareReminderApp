@@ -98,8 +98,14 @@ namespace CareReminderApp.Services
 
         public async Task<string> UploadUserImageAsync(Stream imageStream, string userId)
         {
-            var storage = new FirebaseStorage("care-reminder-app-amit.appspot.com");
-            return await storage.Child("ProfileImages").Child($"{userId}.jpg").PutAsync(imageStream);
+            var storage = new FirebaseStorage("remaindsdb.firebasestorage.app");
+            var uploadTask = await storage
+                .Child("ProfileImages")
+                .Child($"{userId}.jpg")
+                .PutAsync(imageStream);
+
+            // 🔥 חשוב: לוודא שזה URL תקין לתצוגה
+            return uploadTask;
         }
 
         public async Task<List<Reminder>> GetRemindersByUserIdAsync(string userId)
