@@ -42,6 +42,11 @@
                     </Grid>
                 </Frame>
 
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="0,5">
+                    <CheckBox IsChecked="{Binding IsRememberMeSelected}" Color="#2C3E50" />
+                    <Label Text="Remember Me" VerticalOptions="Center" TextColor="#2C3E50" FontSize="16" />
+                </HorizontalStackLayout>
+
                 <!-- LOGIN Button -->
                 <Button Text="LOGIN" 
                         Command="{Binding SignInCommand}" 

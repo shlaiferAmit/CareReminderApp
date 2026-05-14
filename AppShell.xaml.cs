@@ -15,21 +15,15 @@ namespace CareReminderApp
 
             RegisterRoutes();
 
-            // התחלה בעמוד הבית (MainPage - עמוד הלוגין/הרשמה)
-            // ודאי שקיים ShellContent ב-XAML עם x:Name="MainPageContent"
-            this.CurrentItem = MainPageContent;
+
         }
 
         private void RegisterRoutes()
         {
-            Routing.RegisterRoute(nameof(SignUpPage), typeof(SignUpPage));
-            Routing.RegisterRoute(nameof(SignInPage), typeof(SignInPage));
             Routing.RegisterRoute(nameof(AddReminderPage), typeof(AddReminderPage));
             Routing.RegisterRoute(nameof(ReminderDetailsPage), typeof(ReminderDetailsPage));
             Routing.RegisterRoute(nameof(ChangeProfilePage), typeof(ChangeProfilePage));
             Routing.RegisterRoute(nameof(ElderProfilePage), typeof(ElderProfilePage));
-            // הוספת דף הבית של המשפחה ל-Routes
-            Routing.RegisterRoute(nameof(FamilyDashboardPage), typeof(FamilyDashboardPage));
         }
 
         private void BuildTabs(User currentUser)
@@ -96,24 +90,29 @@ namespace CareReminderApp
             IsUserLoggedIn = isLoggedIn;
             App.LoggedInUser = currentUser;
 
+            this.FlyoutBehavior = isLoggedIn
+    ? FlyoutBehavior.Flyout
+    : FlyoutBehavior.Disabled;
+
+
             BuildTabs(currentUser);
 
             if (isLoggedIn && currentUser != null)
             {
                 await Task.Delay(100);
-                // ניווט לטאב הראשון שנוצר ב-TabBar החדש
-                if (this.Items.FirstOrDefault(i => i is TabBar) is TabBar mainBar && mainBar.Items.Count > 0)
+
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    MainThread.BeginInvokeOnMainThread(() =>
+                    if (this.Items.FirstOrDefault(i => i is TabBar) is TabBar mainBar)
                     {
                         this.CurrentItem = mainBar.Items[0];
-                    });
-                }
+                    }
+                });
             }
             else
             {
-                // חזרה לעמוד הראשי בניתוק
-                this.CurrentItem = MainPageContent;
+                // חזרה לעמוד הראשי בניתוק - ודאי שגם כאן יש //
+                await Shell.Current.GoToAsync("//MainPage");
             }
         }
 

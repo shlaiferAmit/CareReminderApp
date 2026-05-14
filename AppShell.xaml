@@ -30,5 +30,7 @@
         Route="SignUpPage"
         Shell.FlyoutItemIsVisible="False" />
 
+
+
     <MenuItem Text="Log Out" Clicked="OnLogoutClicked" />
 </Shell>

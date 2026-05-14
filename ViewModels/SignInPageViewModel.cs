@@ -22,6 +22,10 @@ namespace CareReminderApp.ViewModels
         private string _userPassword = string.Empty;
 
         [ObservableProperty]
+        private bool _isRememberMeSelected;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(PasswordImage))]
         private bool _entryAsPassword = true;
 
         [ObservableProperty]
@@ -35,18 +39,12 @@ namespace CareReminderApp.ViewModels
 
         public string PasswordImage => EntryAsPassword ? "closeeye.png" : "openeye.png";
 
-        // אלו הפונקציות שמוודאות שהכפתור יבדוק את עצמו מחדש בכל לחיצת מקש
-        partial void OnUserEmailChanged(string value) => SignInCommand.NotifyCanExecuteChanged();
-        partial void OnUserPasswordChanged(string value) => SignInCommand.NotifyCanExecuteChanged();
-        partial void OnEntryAsPasswordChanged(bool value) => OnPropertyChanged(nameof(PasswordImage));
-
         [RelayCommand]
         private void ShowPassword() => EntryAsPassword = !EntryAsPassword;
 
         [RelayCommand]
-        private async Task GoToSignUp() => await Shell.Current.GoToAsync(nameof(SignUpPage));
+        private async Task GoToSignUp() => await Shell.Current.GoToAsync("//SignUpPage");
 
-        // התנאי שקובע אם הכפתור פעיל או לא
         private bool CanSignIn() => !string.IsNullOrWhiteSpace(UserEmail) && !string.IsNullOrWhiteSpace(UserPassword);
 
         [RelayCommand(CanExecute = nameof(CanSignIn))]
@@ -68,6 +66,14 @@ namespace CareReminderApp.ViewModels
                 var user = await _dataService.GetUserAsync(cleanedEmail, password);
                 if (user != null && Shell.Current is AppShell appShell)
                 {
+                    if (IsRememberMeSelected)
+                    {
+                        Preferences.Default.Set("UserEmail", cleanedEmail);
+                        Preferences.Default.Set("UserPassword", password);
+                        Preferences.Default.Set("IsRemembered", true);
+                    }
+
+                    // שימוש בשיטה הדינמית שלך מה-AppShell
                     appShell.SetLoggedInState(true, user);
                 }
             }

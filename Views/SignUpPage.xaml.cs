@@ -12,6 +12,9 @@ namespace CareReminderApp.Views
         {
             InitializeComponent();
             BindingContext = viewModel;
+
+            Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
+
         }
 
     }
