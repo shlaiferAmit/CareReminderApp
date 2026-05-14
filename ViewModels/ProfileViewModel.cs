@@ -85,55 +85,7 @@ namespace CareReminderApp.ViewModels
                 ProfileImageSource = "user_placeholder.png";
             }
         }
-        [RelayCommand]
-        private async Task ChangePhoto()
-        {
-            if (DisplayUser == null)
-                return;
-
-            try
-            {
-                var action = await Shell.Current.DisplayActionSheet(
-                    "Select Photo Source",
-                    "Cancel",
-                    null,
-                    "Gallery",
-                    "Camera");
-
-                FileResult photo = null;
-
-                if (action == "Gallery")
-                    photo = await MediaPicker.Default.PickPhotoAsync();
-
-                else if (action == "Camera")
-                    photo = await MediaPicker.Default.CapturePhotoAsync();
-
-                if (photo == null)
-                    return;
-
-                // 📥 פותחים stream אחד בלבד
-                using var stream = await photo.OpenReadAsync();
-
-                // 📤 מעלים לפיירבייס
-                string firebaseUrl = await _dataService.UploadUserImageAsync(stream, DisplayUser.Id);
-
-                if (!string.IsNullOrEmpty(firebaseUrl))
-                {
-                    // 💾 עדכון משתמש
-                    DisplayUser.ProfilePictureUrl = firebaseUrl;
-                    await _dataService.UpdateUserAsync(DisplayUser);
-
-                    // 🔄 עדכון UI
-                    ProfileImageSource = ImageSource.FromUri(new Uri(firebaseUrl));
-
-                    await Shell.Current.DisplayAlert("Success", "Profile photo updated!", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
-            }
-        }
+       
 
         [RelayCommand]
         private async Task LoadRemindersAsync()

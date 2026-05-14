@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using System.Net.Mail;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Microsoft.Maui.Media;
+using Firebase.Storage;
 
 namespace CareReminderApp.ViewModels;
 
@@ -18,6 +20,35 @@ public partial class ChangeProfileViewModel : ObservableObject, IQueryAttributab
     public ChangeProfileViewModel(IDataService dataService)
     {
         _dataService = dataService;
+    }
+
+    [RelayCommand]
+    public async Task ChangePhoto()
+    {
+        try
+        {
+            var photo = await MediaPicker.Default.PickPhotoAsync();
+            if (photo == null) return;
+
+            using var stream = await photo.OpenReadAsync();
+
+            // העלאה ל-Firebase (שימוש בכתובת הנכונה מה-Console שלך)
+            var task = new FirebaseStorage("remaindsdb.firebasestorage.app")
+                .Child("Users")
+                .Child($"{EditableUser.Id}.jpg")
+                .PutAsync(stream);
+
+            var downloadUrl = await task;
+
+            // עדכון ה-URL במודל הזמני (זה יעדכן את התמונה במסך מיד)
+            EditableUser.ProfilePictureUrl = downloadUrl;
+
+            await Shell.Current.DisplayAlert("Success", "Photo uploaded! Don't forget to save changes.", "OK");
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+        }
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
