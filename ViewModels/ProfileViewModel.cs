@@ -1,9 +1,11 @@
 ﻿using CareReminderApp.Models;
 using CareReminderApp.Services;
+using CareReminderApp.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using CareReminderApp.Views;
+using System.Diagnostics;
+using System.Diagnostics;
 
 namespace CareReminderApp.ViewModels
 {
@@ -41,8 +43,21 @@ namespace CareReminderApp.ViewModels
             {
                 try
                 {
+                    Debug.WriteLine($"LoggedInUser ID: {App.LoggedInUser?.Id}");
+                    Debug.WriteLine($"LoggedInUser Email: {App.LoggedInUser?.UserEmail}");
+                    Debug.WriteLine($"LoggedInUser Role: {App.LoggedInUser?.Role}");
                     // שליפת המידע הכי עדכני מה-Firebase לפי ה-ID
                     var userFromServer = await _dataService.GetUserByIdAsync(App.LoggedInUser.Id);
+
+                    if (userFromServer == null)
+                    {
+                        await Shell.Current.DisplayAlert(
+                            "שגיאה",
+                            "המשתמש לא נמצא בשרת",
+                            "OK");
+
+                        return;
+                    }
 
                     if (userFromServer != null)
                     {
@@ -60,32 +75,44 @@ namespace CareReminderApp.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    // הדפסה ללוג לצורכי ניפוי שגיאות
-                    System.Diagnostics.Debug.WriteLine($">>> Profile Load Error: {ex.Message}");
-                    await Shell.Current.DisplayAlert("שגיאה", "לא הצלחנו לרענן את נתוני הפרופיל מהשרת", "אוקיי");
+                    // זה ידפיס לך בחלון ה-Output של Visual Studio את הסיבה המדויקת
+                    Debug.WriteLine($"Full Error: {ex}");
+
+                    // זה יציג לך את הודעת השגיאה האמיתית על המסך של הטלפון
+                    await Shell.Current.DisplayAlert("אבחון שגיאה", ex.Message, "הבנתי");
                 }
             }
         }
 
         private void UpdateProfileImage()
         {
-            // קודם בודקים אם יש כתובת אינטרנטית (Firebase)
-            if (DisplayUser != null && !string.IsNullOrEmpty(DisplayUser.ProfilePictureUrl))
+            try
             {
-                ProfileImageSource = ImageSource.FromUri(new Uri(DisplayUser.ProfilePictureUrl));
+                // 1. בדיקה שהשדה לא ריק ומתחיל ב-http (סימן שזה URL מהענן)
+                if (DisplayUser != null &&
+                    !string.IsNullOrWhiteSpace(DisplayUser.ProfilePictureUrl) &&
+                    Uri.IsWellFormedUriString(DisplayUser.ProfilePictureUrl, UriKind.Absolute))
+                {
+                    ProfileImageSource = ImageSource.FromUri(new Uri(DisplayUser.ProfilePictureUrl));
+                }
+                // 2. בדיקה אם יש נתיב מקומי
+                else if (DisplayUser != null && !string.IsNullOrWhiteSpace(DisplayUser.ProfilePicturePath))
+                {
+                    ProfileImageSource = ImageSource.FromFile(DisplayUser.ProfilePicturePath);
+                }
+                // 3. ברירת מחדל
+                else
+                {
+                    ProfileImageSource = "user_placeholder.png";
+                }
             }
-            // אם אין, בודקים נתיב מקומי (למקרה של אופליין או פיתוח)
-            else if (DisplayUser != null && !string.IsNullOrEmpty(DisplayUser.ProfilePicturePath))
+            catch (Exception ex)
             {
-                ProfileImageSource = ImageSource.FromFile(DisplayUser.ProfilePicturePath);
-            }
-            // ברירת מחדל
-            else
-            {
-                ProfileImageSource = "user_placeholder.png";
+                Debug.WriteLine($"Error setting image source: {ex.Message}");
+                ProfileImageSource = "user_placeholder.png"; // הגנה אחרונה
             }
         }
-       
+
 
         [RelayCommand]
         private async Task LoadRemindersAsync()

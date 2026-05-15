@@ -7,7 +7,6 @@ namespace CareReminderApp.Models
         [ObservableProperty]
         private string id = string.Empty;
 
-        // הוספת השדה הזה כי ה-ViewModel מחפש אותו
         [ObservableProperty]
         private string localId = string.Empty;
 
@@ -30,9 +29,8 @@ namespace CareReminderApp.Models
         private UserRole role;
 
         [ObservableProperty]
-        private string? profilePictureUrl;
+        private string? profilePictureUrl = "default_user.png";
 
-        // הוספת השדה הזה כדי לפתור את השגיאה ב-ProfileViewModel
         [ObservableProperty]
         private string? profilePicturePath;
     }

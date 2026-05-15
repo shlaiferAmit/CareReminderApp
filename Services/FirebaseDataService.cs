@@ -56,21 +56,55 @@ namespace CareReminderApp.Services
         {
             try
             {
-                var authUser = await _authService.SignInAsync(email, password);
-                return await GetUserByIdAsync(authUser.User.Uid);
+                var users = await _firebase
+                    .Child("Users")
+                    .OnceAsync<User>();
+
+                var user = users
+                    .Select(u =>
+                    {
+                        var currentUser = u.Object;
+                        currentUser.Id = u.Key;
+                        return currentUser;
+                    })
+                    .FirstOrDefault(u =>
+                        u.UserEmail.ToLower().Trim() == email.ToLower().Trim());
+
+                return user;
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"GetUserAsync ERROR: {ex}");
+                return null;
+            }
         }
 
         public async Task<User?> GetUserByIdAsync(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                Debug.WriteLine("GetUserByIdAsync: ID is null or empty!");
+                return null;
+            }
+
             try
             {
-                var user = await _firebase.Child("Users").Child(id).OnceSingleAsync<User>();
-                if (user != null) user.Id = id;
+                var user = await _firebase
+                    .Child("Users")
+                    .Child(id)
+                    .OnceSingleAsync<User>();
+
+                if (user != null)
+                    user.Id = id;
+
                 return user;
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"GetUserByIdAsync DATABASE ERROR: {ex.Message}");
+                // כאן תוכלי לראות אם זו בעיית הרשאות (403) או בעיית רשת
+                return null;
+            }
         }
 
         public async Task<List<User>> GetUsersAsync()

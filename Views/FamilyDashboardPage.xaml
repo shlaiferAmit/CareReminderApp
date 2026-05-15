@@ -85,19 +85,18 @@
                             <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
                                 <!-- תמונה/אות משמאל -->
                                 <Border Grid.Column="0"
-                                        WidthRequest="50"
-                                        HeightRequest="50"
-                                        StrokeShape="RoundRectangle 25"
-                                        StrokeThickness="0"
-                                        BackgroundColor="#E67E22">
-                                    <Label Text="{Binding FirstName[0]}" 
-                                           HorizontalOptions="Center"
-                                           VerticalOptions="Center"
-                                           TextColor="White"
-                                           FontAttributes="Bold"
-                                           FontSize="18"/>
-                                </Border>
+                                    WidthRequest="50"
+                                    HeightRequest="50"
+                                    StrokeShape="RoundRectangle 25"
+                                    StrokeThickness="0"
+                                    BackgroundColor="#ECF0F1">
+                                    <!-- הסרנו את IsClippedToBounds מכאן -->
 
+                                    <Image Source="{Binding ProfilePictureUrl}"
+                                       Aspect="AspectFill"
+                                       HeightRequest="50"
+                                       WidthRequest="50" />
+                                </Border>
                                 <!-- טקסט במרכז/שמאל -->
                                 <VerticalStackLayout Grid.Column="1" 
                                                      VerticalOptions="Center"

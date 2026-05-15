@@ -19,30 +19,30 @@
 
             <VerticalStackLayout Spacing="20">
 
+                <!-- החלפת ה-Frame של התמונה בראש הדף -->
                 <HorizontalStackLayout Spacing="15" HorizontalOptions="Start">
-                    <Frame WidthRequest="70" 
-                           HeightRequest="70" 
-                           CornerRadius="35" 
-                           BackgroundColor="#E67E22" 
-                           Padding="0" 
-                           HasShadow="False"
-                           BorderColor="Transparent">
-                        <Label Text="{Binding Elder.FirstName}" 
-                               TextColor="White" 
-                               FontSize="20" 
-                               FontAttributes="Bold" 
-                               HorizontalOptions="Center" 
-                               VerticalOptions="Center"/>
+                    <Frame WidthRequest="80" 
+           HeightRequest="80" 
+           CornerRadius="40" 
+           Padding="0" 
+           IsClippedToBounds="True"
+           HasShadow="False"
+           BorderColor="#3498DB">
+
+                        <Image Source="{Binding Elder.ProfilePictureUrl}"
+       Aspect="AspectFill"
+       HeightRequest="80"
+       WidthRequest="80" />
                     </Frame>
 
                     <VerticalStackLayout VerticalOptions="Center" Spacing="2">
                         <Label Text="{Binding Elder.FirstName}" 
-                               FontSize="24" 
-                               FontAttributes="Bold" 
-                               TextColor="#2C3E50"/>
+               FontSize="24" 
+               FontAttributes="Bold" 
+               TextColor="#2C3E50"/>
                         <Label Text="Family Member" 
-                               FontSize="14" 
-                               TextColor="#7F8C8D"/>
+               FontSize="14" 
+               TextColor="#7F8C8D"/>
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
 

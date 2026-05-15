@@ -33,16 +33,20 @@
 
                 <!-- 1. תמונת פרופיל -->
                 <VerticalStackLayout Grid.Row="0" HorizontalOptions="Center" Margin="0,5,0,20">
-                    <Frame CornerRadius="80"
-                           HeightRequest="160"
-                           WidthRequest="160"
-                           Padding="0"
-                           IsClippedToBounds="True"
-                           HasShadow="False"
-                           BorderColor="#3498DB">
+                    <Border Stroke="#3498DB"
+            StrokeThickness="2"
+            HeightRequest="160"
+            WidthRequest="160"
+            BackgroundColor="#F0F0F0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="80"/>
+                        </Border.StrokeShape>
+
                         <Image Source="{Binding ProfileImageSource}"
-                               Aspect="AspectFill" />
-                    </Frame>
+               Aspect="AspectFill"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
+                    </Border>
                 </VerticalStackLayout>
 
                 <!-- 2. פרטי המשתמש - תופסים את מרכז המסך -->
