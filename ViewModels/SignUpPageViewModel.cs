@@ -4,50 +4,49 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using CareReminderApp.Views;
-
 
 namespace CareReminderApp.ViewModels
 {
     public partial class SignUpPageViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-        private readonly AuthService _authService; // שירות האימות החדש
+        private readonly AuthService _authService;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SignUpCommand))]
         private string _firstName = string.Empty;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SignUpCommand))]
         private string _lastName = string.Empty;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SignUpCommand))]
         private string _userEmail = string.Empty;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SignUpCommand))]
         private string _userPassword = string.Empty;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SignUpCommand))]
         private string _mobile = string.Empty;
 
         [ObservableProperty]
         private bool _entryAsPassword = true;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SignUpCommand))]
         private UserRole _selectedRole;
 
         [ObservableProperty]
         private bool isBusy;
+
+        // משתני שגיאה
+        [ObservableProperty]
+        private string _emailError = string.Empty;
+
+        [ObservableProperty]
+        private string _passwordError = string.Empty;
+
+        [ObservableProperty]
+        private string _mobileError = string.Empty;
 
         public List<UserRole> RoleOptions { get; } = new List<UserRole>
         {
@@ -55,25 +54,81 @@ namespace CareReminderApp.ViewModels
             UserRole.FamilyMember
         };
 
-        // הוספנו את AuthService לבנאי
         public SignUpPageViewModel(IDataService dataService, AuthService authService)
         {
             _dataService = dataService;
             _authService = authService;
         }
 
-        public string PasswordImage => EntryAsPassword ? "closeeye.png" : "openeye.png";
+        // --- לוגיקת בדיקת תקינות (Validation) ---
+        private void Validate()
+        {
+            // בדיקת אימייל
+            if (string.IsNullOrWhiteSpace(UserEmail))
+                EmailError = "";
+            else if (!Regex.IsMatch(UserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                EmailError = "Invalid email format";
+            else
+                EmailError = "";
 
+            // בדיקת סיסמה
+            if (string.IsNullOrWhiteSpace(UserPassword))
+                PasswordError = "";
+            else if (UserPassword.Length < 6)
+                PasswordError = "Must be at least 6 characters";
+            else
+                PasswordError = "";
+
+            // בדיקת טלפון - רק מספרים ו-10 ספרות
+            if (string.IsNullOrWhiteSpace(Mobile))
+                MobileError = "";
+            else if (!Regex.IsMatch(Mobile, @"^\d+$"))
+                MobileError = "Numbers only";
+            else if (Mobile.Length != 10)
+                MobileError = "Must be exactly 10 digits";
+            else
+                MobileError = "";
+        }
+
+        // --- עדכון מצב הכפתור והשגיאות בכל שינוי ---
+        partial void OnFirstNameChanged(string value) => SignUpCommand.NotifyCanExecuteChanged();
+        partial void OnLastNameChanged(string value) => SignUpCommand.NotifyCanExecuteChanged();
+
+        partial void OnUserEmailChanged(string value)
+        {
+            Validate();
+            SignUpCommand.NotifyCanExecuteChanged();
+        }
+
+        partial void OnUserPasswordChanged(string value)
+        {
+            Validate();
+            SignUpCommand.NotifyCanExecuteChanged();
+        }
+
+        partial void OnMobileChanged(string value)
+        {
+            Validate();
+            SignUpCommand.NotifyCanExecuteChanged();
+        }
+
+        public string PasswordImage => EntryAsPassword ? "closeeye.png" : "openeye.png";
         partial void OnEntryAsPasswordChanged(bool value) => OnPropertyChanged(nameof(PasswordImage));
 
         [RelayCommand]
         private void TogglePassword() => EntryAsPassword = !EntryAsPassword;
 
         [RelayCommand]
-        private async Task GoToSignIn()
-        {
-            await Shell.Current.GoToAsync("//SignInPage");
-        }
+        private async Task GoToSignIn() => await Shell.Current.GoToAsync("//SignInPage");
+
+        // הכפתור יהיה כתום/פעיל רק כשאין שגיאות וכל השדות מלאים
+        private bool CanSignUp() =>
+            !IsBusy &&
+            !string.IsNullOrWhiteSpace(FirstName) &&
+            !string.IsNullOrWhiteSpace(LastName) &&
+            string.IsNullOrEmpty(EmailError) && !string.IsNullOrWhiteSpace(UserEmail) &&
+            string.IsNullOrEmpty(PasswordError) && !string.IsNullOrWhiteSpace(UserPassword) &&
+            string.IsNullOrEmpty(MobileError) && !string.IsNullOrWhiteSpace(Mobile);
 
         [RelayCommand(CanExecute = nameof(CanSignUp))]
         private async Task SignUp()
@@ -81,58 +136,27 @@ namespace CareReminderApp.ViewModels
             try
             {
                 IsBusy = true;
-
-                // 1. הרשמה מול Firebase Authentication
                 var authResult = await _authService.SignUpAsync(UserEmail, UserPassword);
 
-                if (authResult != null && authResult.User != null)
+                if (authResult?.User != null)
                 {
-                    // השתמשי במילת המפתח var כדי שהקומפיילר יזהה שמדובר באובייקט של Firebase
-                    var firebaseUser = authResult.User;
                     string firebaseUid = authResult.User.Uid;
-
-                    // 2. שמירת פרטי המשתמש ב-Database
-                    // כאן אנחנו שולחים את ה-firebaseUid שחילצנו למעלה
                     bool dbSuccess = await _dataService.RegisterUserAsync(
-                        firebaseUid,
-                        FirstName,
-                        LastName,
-                        UserEmail,
-                        UserPassword,
-                        Mobile,
-                        SelectedRole);
+                        firebaseUid, FirstName, LastName, UserEmail, UserPassword, Mobile, SelectedRole);
 
                     if (dbSuccess)
                     {
-                        // 3. שליפת המשתמש המעודכן והגדרת מצב מחובר
                         var user = await _dataService.GetUserAsync(UserEmail, UserPassword);
                         if (user != null && Shell.Current is AppShell appShell)
-                        {
                             appShell.SetLoggedInState(true, user);
-                        }
-                    }
-                    else
-                    {
-                        await Shell.Current.DisplayAlert("שגיאה", "הרישום ל-Auth הצליח אך השמירה למסד הנתונים נכשלה", "OK");
                     }
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("שגיאה", ex.Message, "OK");
+                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
             }
-            finally
-            {
-                IsBusy = false;
-            }
+            finally { IsBusy = false; }
         }
-
-        private bool CanSignUp() =>
-            !string.IsNullOrWhiteSpace(FirstName) &&
-            !string.IsNullOrWhiteSpace(LastName) &&
-            !string.IsNullOrWhiteSpace(UserEmail) &&
-            !string.IsNullOrWhiteSpace(UserPassword) &&
-            UserPassword.Length >= 6 && // Firebase דורש לפחות 6 תווים
-            !string.IsNullOrWhiteSpace(Mobile);
     }
 }

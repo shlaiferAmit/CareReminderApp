@@ -6,131 +6,97 @@
              x:DataType="viewmodels:SignUpPageViewModel"
              BackgroundColor="#99C1E9"
              FlowDirection="LeftToRight">
-    <!-- הגדרה גלובלית לדף משמאל לימין -->
 
-    <Grid>
-        <ScrollView>
-            <VerticalStackLayout Margin="30,40,30,20" Spacing="12">
+    <Grid RowDefinitions="*" ColumnDefinitions="*">
 
-                <Label Text="SIGN UP"
-                       FontSize="32"
-                       FontAttributes="Bold"
-                       TextColor="#2C3E50"
-                       HorizontalOptions="Center"
-                       Margin="0,0,0,15"/>
+        <VerticalStackLayout Grid.Row="0" 
+                             Margin="30,20,30,20" 
+                             Spacing="8" 
+                             VerticalOptions="Center">
 
-                <!-- שדות קלט -->
+            <Label Text="SIGN UP" 
+                   FontSize="32" 
+                   FontAttributes="Bold" 
+                   TextColor="#2C3E50" 
+                   HorizontalOptions="Center" 
+                   Margin="0,0,0,10"/>
+
+            <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
+                <Entry Placeholder="First Name" Text="{Binding FirstName}" HorizontalTextAlignment="Start"/>
+            </Frame>
+
+            <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
+                <Entry Placeholder="Last Name" Text="{Binding LastName}" HorizontalTextAlignment="Start"/>
+            </Frame>
+
+            <VerticalStackLayout>
                 <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
-                    <Entry Placeholder="First Name"
-                           PlaceholderColor="Gray"
-                           Text="{Binding FirstName}"
-                           TextColor="#333"
-                           HorizontalTextAlignment="Start"/>
-                    <!-- שינוי יישור הטקסט להתחלה (שמאל) -->
+                    <Entry Placeholder="Email" Keyboard="Email" Text="{Binding UserEmail}" HorizontalTextAlignment="Start"/>
                 </Frame>
+                <Label Text="{Binding EmailError}" TextColor="Red" FontSize="11" Margin="5,2,0,0" HeightRequest="15"/>
+            </VerticalStackLayout>
 
-                <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
-                    <Entry Placeholder="Last Name"
-                           PlaceholderColor="Gray"
-                           Text="{Binding LastName}"
-                           TextColor="#333"
-                           HorizontalTextAlignment="Start"/>
-                </Frame>
-
-                <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
-                    <Entry Placeholder="Email"
-                           PlaceholderColor="Gray"
-                           Keyboard="Email"
-                           Text="{Binding UserEmail}"
-                           TextColor="#333"
-                           HorizontalTextAlignment="Start"/>
-                </Frame>
-
+            <VerticalStackLayout>
                 <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Entry Placeholder="Password"
-                               PlaceholderColor="Gray"
-                               IsPassword="{Binding EntryAsPassword}"
-                               Text="{Binding UserPassword}"
-                               TextColor="#333"
-                               HorizontalTextAlignment="Start"
-                               Grid.Column="0"/>
-
-                        <ImageButton Source="{Binding PasswordImage}"
-                                     Command="{Binding TogglePasswordCommand}"
-                                     BackgroundColor="Transparent"
-                                     HeightRequest="20"
-                                     WidthRequest="20"
-                                     VerticalOptions="Center"
-                                     Grid.Column="1"/>
+                        <Entry Placeholder="Password" IsPassword="{Binding EntryAsPassword}" Text="{Binding UserPassword}" HorizontalTextAlignment="Start" Grid.Column="0"/>
+                        <ImageButton Source="{Binding PasswordImage}" Command="{Binding TogglePasswordCommand}" BackgroundColor="Transparent" HeightRequest="20" WidthRequest="20" VerticalOptions="Center" Grid.Column="1"/>
                     </Grid>
                 </Frame>
-
-                <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
-                    <Entry Placeholder="Mobile"
-                           PlaceholderColor="Gray"
-                           Keyboard="Telephone"
-                           Text="{Binding Mobile}"
-                           TextColor="#333"
-                           HorizontalTextAlignment="Start"/>
-                </Frame>
-
-                <!-- כאן השינוי שביקשת ל-Register as -->
-                <Label Text="Register as:" 
-                       TextColor="#2C3E50" 
-                       FontAttributes="Bold" 
-                       Margin="5,5,0,0"
-                       HorizontalOptions="Start" />
-                <!-- גורם לטקסט להיצמד לשמאל -->
-
-                <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
-                    <Picker Title="Select Account Type"
-                            TitleColor="Gray"
-                            ItemsSource="{Binding RoleOptions}"
-                            SelectedItem="{Binding SelectedRole}"
-                            TextColor="#333"
-                            HorizontalTextAlignment="Start"/>
-                    <!-- יישור תוכן הפילטר לשמאל -->
-                </Frame>
-
-                <Button Text="SIGN UP"
-                        Command="{Binding SignUpCommand}"
-                        BackgroundColor="#8D7B68" 
-                        TextColor="White"
-                        HeightRequest="60"
-                        CornerRadius="5"
-                        FontAttributes="Bold"
-                        Margin="0,15,0,0"/>
-
-                <BoxView HeightRequest="1" 
-                         BackgroundColor="White" 
-                         HorizontalOptions="Fill" 
-                         Margin="20,10,20,0"/>
-
-                <Button Text="Already have an account? Sign In"
-                        BackgroundColor="Transparent"
-                        TextColor="White"
-                        FontSize="14"
-                        HorizontalOptions="Center"
-                        Command="{Binding GoToSignInCommand}" />
-
+                <Label Text="{Binding PasswordError}" TextColor="Red" FontSize="11" Margin="5,2,0,0" HeightRequest="15"/>
             </VerticalStackLayout>
-        </ScrollView>
 
-        <!-- Loading Overlay -->
-        <Grid IsVisible="{Binding IsBusy}"
-              BackgroundColor="Black"
-              Opacity="0.5">
-            <ActivityIndicator IsRunning="True"
-                               Color="White"
-                               WidthRequest="100"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"/>
-            <Label Text="Loading..."
-                   TextColor="White"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"
-                   Margin="0,60,0,0"/>
+            <VerticalStackLayout>
+                <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
+                    <Entry Placeholder="Mobile (10 digits)" Keyboard="Numeric" Text="{Binding Mobile}" MaxLength="10" HorizontalTextAlignment="Start"/>
+                </Frame>
+                <Label Text="{Binding MobileError}" TextColor="Red" FontSize="11" Margin="5,2,0,0" HeightRequest="15"/>
+            </VerticalStackLayout>
+
+            <Label Text="Register as:" TextColor="#2C3E50" FontAttributes="Bold" Margin="5,0,0,5" HorizontalOptions="Start" />
+
+            <Frame BackgroundColor="White" CornerRadius="5" Padding="15,2" HasShadow="False" BorderColor="Transparent">
+                <Picker Title="Select Account Type" ItemsSource="{Binding RoleOptions}" SelectedItem="{Binding SelectedRole}" HorizontalTextAlignment="Start"/>
+            </Frame>
+
+            <Button Text="SIGN UP" 
+                    Command="{Binding SignUpCommand}" 
+                    HeightRequest="55" 
+                    TextColor="White" 
+                    CornerRadius="10" 
+                    FontAttributes="Bold" 
+                    Margin="0,10,0,0">
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#E67E22" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#BDC3C7" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </VisualStateManager.VisualStateGroups>
+            </Button>
+
+            <BoxView HeightRequest="1" BackgroundColor="White" HorizontalOptions="Fill" Margin="20,10,20,5"/>
+
+            <Button Text="Already have an account? Sign In" 
+                    BackgroundColor="Transparent" 
+                    TextColor="White" 
+                    FontSize="14" 
+                    HorizontalOptions="Center" 
+                    Command="{Binding GoToSignInCommand}" />
+        </VerticalStackLayout>
+
+        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="Black" Opacity="0.5">
+            <ActivityIndicator IsRunning="True" Color="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Label Text="Loading..." TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,60,0,0"/>
         </Grid>
     </Grid>
 </ContentPage>
