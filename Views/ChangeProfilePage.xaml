@@ -21,19 +21,20 @@
         <VerticalStackLayout Grid.Row="1" HorizontalOptions="Center" Margin="0,0,0,10">
             <Grid HeightRequest="140" WidthRequest="140">
 
-                <Border Stroke="#3498DB"
-                StrokeThickness="2"
-                HeightRequest="140"
-                WidthRequest="140"
-                BackgroundColor="#E1E1E1">
+                <Border HeightRequest="140"
+        WidthRequest="140"
+        HorizontalOptions="Center"
+        StrokeThickness="0">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="70"/>
                     </Border.StrokeShape>
 
                     <Image Source="{Binding ProfileImageSource}"
-                   Aspect="AspectFill" 
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
+           Aspect="AspectFill" 
+           HeightRequest="140"
+           WidthRequest="140"
+           HorizontalOptions="Center"
+           VerticalOptions="Center" />
                 </Border>
 
                 <ImageButton Source="camera_icon.png"

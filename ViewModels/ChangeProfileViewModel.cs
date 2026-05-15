@@ -71,12 +71,30 @@ public partial class ChangeProfileViewModel : ObservableObject, IQueryAttributab
     {
         try
         {
-            var photo = await MediaPicker.Default.PickPhotoAsync();
+            // 1. פתיחת תפריט בחירה
+            string source = await Shell.Current.DisplayActionSheet("Select Photo Source", "Cancel", null, "Camera", "Gallery");
+
+            FileResult photo = null;
+
+            if (source == "Camera")
+            {
+                if (MediaPicker.Default.IsCaptureSupported)
+                    photo = await MediaPicker.Default.CapturePhotoAsync();
+                else
+                    await Shell.Current.DisplayAlert("Error", "Camera not supported on this device", "OK");
+            }
+            else if (source == "Gallery")
+            {
+                photo = await MediaPicker.Default.PickPhotoAsync();
+            }
+
             if (photo == null) return;
+
+            // הצגת אינדיקציה למשתמש שהעלאה התחילה
+            // אפשר להוסיף כאן IsBusy = true; אם יש לך משתנה כזה
 
             using var stream = await photo.OpenReadAsync();
 
-            // וודא שזהו שם ה-Bucket המדויק מהקונסול של פיירבייס
             var storage = new FirebaseStorage("remaindsdb.firebasestorage.app");
 
             var downloadUrl = await storage
@@ -84,15 +102,16 @@ public partial class ChangeProfileViewModel : ObservableObject, IQueryAttributab
                 .Child($"{EditableUser.Id}.jpg")
                 .PutAsync(stream);
 
+            // עדכון המודל והתמונה במסך
             EditableUser.ProfilePictureUrl = downloadUrl;
             SetProfileImage(downloadUrl);
 
-            await Shell.Current.DisplayAlert("Success", "Photo uploaded! Don't forget to save.", "OK");
+            await Shell.Current.DisplayAlert("Success", "Photo uploaded! Save to apply changes.", "OK");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Upload Error: {ex}");
-            await Shell.Current.DisplayAlert("Error", "Failed to upload photo", "OK");
+            await Shell.Current.DisplayAlert("Error", "Failed to process photo", "OK");
         }
     }
 

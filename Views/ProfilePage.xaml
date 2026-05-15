@@ -34,16 +34,19 @@
                 <!-- 1. תמונת פרופיל -->
                 <VerticalStackLayout Grid.Row="0" HorizontalOptions="Center" Margin="0,5,0,20">
                     <Border Stroke="#3498DB"
-            StrokeThickness="2"
+            StrokeThickness="3"
             HeightRequest="160"
             WidthRequest="160"
-            BackgroundColor="#F0F0F0">
+            BackgroundColor="#F0F0F0"
+            Padding="0">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="80"/>
                         </Border.StrokeShape>
 
                         <Image Source="{Binding ProfileImageSource}"
                Aspect="AspectFill"
+               HeightRequest="160" 
+               WidthRequest="160"
                HorizontalOptions="Center"
                VerticalOptions="Center" />
                     </Border>
