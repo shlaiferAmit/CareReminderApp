@@ -1,9 +1,7 @@
-﻿using CareReminderApp.Models;
-using CareReminderApp.Services;
-using CareReminderApp.Views;
+﻿using CareReminderApp.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
@@ -14,38 +12,86 @@ namespace CareReminderApp.ViewModels
         private readonly AuthService _authService;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SignInCommand))]
-        private string _userEmail = string.Empty;
+        private string userEmail = string.Empty;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SignInCommand))]
-        private string _userPassword = string.Empty;
-
-        [ObservableProperty]
-        private bool _isRememberMeSelected;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(PasswordImage))]
-        private bool _entryAsPassword = true;
+        private string userPassword = string.Empty;
 
         [ObservableProperty]
         private bool isBusy;
+
+        [ObservableProperty]
+        private bool isRememberMeSelected;
+
+        [ObservableProperty]
+        private bool entryAsPassword = true;
+
+        [ObservableProperty]
+        private string emailError = string.Empty;
+
+        [ObservableProperty]
+        private string passwordError = string.Empty;
 
         public SignInPageViewModel(IDataService dataService, AuthService authService)
         {
             _dataService = dataService;
             _authService = authService;
+
+            LoadRememberedUser();
         }
 
-        public string PasswordImage => EntryAsPassword ? "closeeye.png" : "openeye.png";
+        private void LoadRememberedUser()
+        {
+            if (Preferences.Default.Get("IsRemembered", false))
+            {
+                UserEmail = Preferences.Default.Get("UserEmail", "");
+                UserPassword = Preferences.Default.Get("UserPassword", "");
+                IsRememberMeSelected = true;
+            }
+        }
 
-        [RelayCommand]
-        private void ShowPassword() => EntryAsPassword = !EntryAsPassword;
+        public bool CanSignIn =>
+            !IsBusy &&
+            string.IsNullOrWhiteSpace(EmailError) &&
+            string.IsNullOrWhiteSpace(PasswordError) &&
+            !string.IsNullOrWhiteSpace(UserEmail) &&
+            !string.IsNullOrWhiteSpace(UserPassword);
 
-        [RelayCommand]
-        private async Task GoToSignUp() => await Shell.Current.GoToAsync("//SignUpPage");
+        partial void OnUserEmailChanged(string value)
+        {
+            Validate();
+            SignInCommand.NotifyCanExecuteChanged();
+        }
 
-        private bool CanSignIn() => !string.IsNullOrWhiteSpace(UserEmail) && !string.IsNullOrWhiteSpace(UserPassword);
+        partial void OnUserPasswordChanged(string value)
+        {
+            Validate();
+            SignInCommand.NotifyCanExecuteChanged();
+        }
+
+        partial void OnIsBusyChanged(bool value)
+        {
+            SignInCommand.NotifyCanExecuteChanged();
+        }
+
+        private void Validate()
+        {
+            // EMAIL
+            if (string.IsNullOrWhiteSpace(UserEmail))
+                EmailError = "Email is required";
+            else if (!Regex.IsMatch(UserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                EmailError = "Invalid email format";
+            else
+                EmailError = string.Empty;
+
+            // PASSWORD
+            if (string.IsNullOrWhiteSpace(UserPassword))
+                PasswordError = "Password is required";
+            else if (UserPassword.Length < 6)
+                PasswordError = "Password must be at least 6 characters";
+            else
+                PasswordError = string.Empty;
+        }
 
         [RelayCommand(CanExecute = nameof(CanSignIn))]
         private async Task SignIn()
@@ -53,27 +99,35 @@ namespace CareReminderApp.ViewModels
             try
             {
                 IsBusy = true;
-                string cleanedEmail = UserEmail?.Trim().ToLower() ?? string.Empty;
-                string password = UserPassword?.Trim() ?? string.Empty;
 
-                var userCredential = await _authService.SignInAsync(cleanedEmail, password);
-                if (userCredential == null)
+                var email = UserEmail.Trim().ToLower();
+                var password = UserPassword.Trim();
+
+                var result = await _authService.SignInAsync(email, password);
+
+                if (result == null)
                 {
                     await Shell.Current.DisplayAlert("Error", "Login failed", "OK");
                     return;
                 }
 
-                var user = await _dataService.GetUserAsync(cleanedEmail, password);
+                var user = await _dataService.GetUserAsync(email, password);
+
                 if (user != null && Shell.Current is AppShell appShell)
                 {
                     if (IsRememberMeSelected)
                     {
-                        Preferences.Default.Set("UserEmail", cleanedEmail);
+                        Preferences.Default.Set("UserEmail", email);
                         Preferences.Default.Set("UserPassword", password);
                         Preferences.Default.Set("IsRemembered", true);
                     }
+                    else
+                    {
+                        Preferences.Default.Remove("UserEmail");
+                        Preferences.Default.Remove("UserPassword");
+                        Preferences.Default.Set("IsRemembered", false);
+                    }
 
-                    // שימוש בשיטה הדינמית שלך מה-AppShell
                     appShell.SetLoggedInState(true, user);
                 }
             }
@@ -85,6 +139,26 @@ namespace CareReminderApp.ViewModels
             {
                 IsBusy = false;
             }
+        }
+
+        [RelayCommand]
+        private void ShowPassword()
+        {
+            EntryAsPassword = !EntryAsPassword;
+        }
+
+        public string PasswordImage =>
+            EntryAsPassword ? "closeeye.png" : "openeye.png";
+
+        partial void OnEntryAsPasswordChanged(bool value)
+        {
+            OnPropertyChanged(nameof(PasswordImage));
+        }
+
+        [RelayCommand]
+        private async Task GoToSignUp()
+        {
+            await Shell.Current.GoToAsync("//SignUpPage");
         }
     }
 }

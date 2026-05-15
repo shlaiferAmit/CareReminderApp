@@ -4,81 +4,148 @@
              xmlns:vm="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.SignInPage"
              x:DataType="vm:SignInPageViewModel"
-             BackgroundColor="#99C1E9"
-             FlowDirection="LeftToRight">
+             BackgroundColor="#99C1E9">
 
     <Grid>
+
         <ScrollView>
-            <VerticalStackLayout Margin="30,50,30,20" Spacing="20" VerticalOptions="Center">
 
-                <Label Text="SIGN IN" FontSize="32" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Center" Margin="0,0,0,20"/>
+            <VerticalStackLayout Margin="30,50,30,20"
+                                 Spacing="15"
+                                 HorizontalOptions="Fill">
 
-                <!-- Email Entry -->
-                <Frame BackgroundColor="White" CornerRadius="5" Padding="15,5" HasShadow="False" BorderColor="Transparent">
-                    <Entry Placeholder="Email"
-                           PlaceholderColor="Gray"
+                <!-- TITLE (CENTER) -->
+                <Label Text="SIGN IN"
+                       FontSize="32"
+                       FontAttributes="Bold"
+                       TextColor="#2C3E50"
+                       HorizontalOptions="Center"/>
+
+                <!-- EMAIL -->
+                <Frame BackgroundColor="White"
+                       Padding="15,5"
+                       HorizontalOptions="Fill">
+
+                    <Entry Text="{Binding UserEmail, Mode=TwoWay}"
+                           Placeholder="Email"
                            Keyboard="Email"
-                           Text="{Binding UserEmail, Mode=TwoWay, UpdateSourceEventName=TextChanged}" 
-                           TextColor="#333"
-                           FontSize="16"/>
+                           HorizontalTextAlignment="End"/>
                 </Frame>
 
-                <!-- Password Entry -->
-                <Frame BackgroundColor="White" CornerRadius="5" Padding="15,5" HasShadow="False" BorderColor="Transparent">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Entry Placeholder="Password"
-                               PlaceholderColor="Gray"
-                               IsPassword="{Binding EntryAsPassword}"
-                               Text="{Binding UserPassword, Mode=TwoWay, UpdateSourceEventName=TextChanged}"
-                               TextColor="#333"
-                               FontSize="16"
-                               Grid.Column="0"/>
+                <!-- EMAIL ERROR -->
+                <Label Text="{Binding EmailError}"
+                       TextColor="Red"
+                       FontSize="12"
+                       HorizontalOptions="End"
+                       HorizontalTextAlignment="End"/>
 
+                <!-- PASSWORD -->
+                <!-- PASSWORD -->
+                <!-- PASSWORD -->
+                <Frame BackgroundColor="White"
+       Padding="15,5"
+       HorizontalOptions="Fill">
+
+                    <Grid ColumnDefinitions="Auto,*"
+          VerticalOptions="Center">
+
+                        <!-- EYE BUTTON (קצה שמאל) -->
                         <ImageButton Source="{Binding PasswordImage}"
-                                     Command="{Binding ShowPasswordCommand}"
-                                     BackgroundColor="Transparent"
-                                     HeightRequest="20" WidthRequest="20" VerticalOptions="Center"
-                                     Grid.Column="1"/>
-                    </Grid>
-                </Frame>
+                     Command="{Binding ShowPasswordCommand}"
+                     BackgroundColor="Transparent"
+                     HeightRequest="20"
+                     WidthRequest="20"
+                     VerticalOptions="Center"
+                     HorizontalOptions="Start"
+                     Grid.Column="0"/>
 
-                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="0,5">
-                    <CheckBox IsChecked="{Binding IsRememberMeSelected}" Color="#2C3E50" />
-                    <Label Text="Remember Me" VerticalOptions="Center" TextColor="#2C3E50" FontSize="16" />
+                        <!-- ENTRY -->
+                        <Entry Text="{Binding UserPassword, Mode=TwoWay}"
+               IsPassword="{Binding EntryAsPassword}"
+               Placeholder="Password"
+               HorizontalTextAlignment="End"
+               VerticalOptions="Center"
+               Grid.Column="1"/>
+                    </Grid>
+
+                </Frame>
+                <!-- PASSWORD ERROR -->
+                <Label Text="{Binding PasswordError}"
+                       TextColor="Red"
+                       FontSize="12"
+                       HorizontalOptions="End"
+                       HorizontalTextAlignment="End"/>
+
+                <!-- REMEMBER ME -->
+                <HorizontalStackLayout Spacing="10"
+                                       HorizontalOptions="End"
+                                       VerticalOptions="Center">
+
+                    <Label Text="Remember Me"
+                           TextColor="#2C3E50"
+                           VerticalOptions="Center"/>
+
+                    <CheckBox IsChecked="{Binding IsRememberMeSelected}"
+                              Color="#2C3E50"/>
+
                 </HorizontalStackLayout>
 
-                <!-- LOGIN Button -->
-                <Button Text="LOGIN" 
-                        Command="{Binding SignInCommand}" 
-                        TextColor="White" 
-                        HeightRequest="60" 
-                        CornerRadius="5" 
-                        FontSize="18" 
-                        FontAttributes="Bold" 
-                        Margin="0,10,0,0">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <!-- צבע ברירת המחדל (כתום - כשפעיל) -->
-                            <Setter Property="BackgroundColor" Value="#E67E22" />
-                            <Style.Triggers>
-                                <!-- כשחסר מידע והכפתור מושבת, הוא יהיה אפור -->
-                                <Trigger TargetType="Button" Property="IsEnabled" Value="False">
-                                    <Setter Property="BackgroundColor" Value="#BDC3C7" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
+                <!-- LOGIN BUTTON -->
+                <Button Text="LOGIN"
+        Command="{Binding SignInCommand}"
+        HeightRequest="60"
+        TextColor="White"
+        CornerRadius="10"
+        HorizontalOptions="Fill">
+
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroupList>
+                            <VisualStateGroup x:Name="CommonStates">
+
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="#E67E22" />
+                                    </VisualState.Setters>
+                                </VisualState>
+
+                                <VisualState x:Name="Disabled">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="#BDC3C7" />
+                                    </VisualState.Setters>
+                                </VisualState>
+
+                            </VisualStateGroup>
+                        </VisualStateGroupList>
+                    </VisualStateManager.VisualStateGroups>
                 </Button>
 
-                <BoxView HeightRequest="1" BackgroundColor="White" HorizontalOptions="FillAndExpand" Margin="20,10"/>
-                <Button Text="Don't have an account? Sign Up" Command="{Binding GoToSignUpCommand}" BackgroundColor="Transparent" TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <BoxView HeightRequest="1" 
+           BackgroundColor="White" 
+           HorizontalOptions="Fill" 
+           Margin="20,10,20,0"/>
+
+                <!-- SIGN UP (CENTER) -->
+                <Button Text="Don't have an account? Sign Up"
+                        Command="{Binding GoToSignUpCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="White"
+                        HorizontalOptions="Center"/>
 
             </VerticalStackLayout>
+
         </ScrollView>
 
-        <!-- Loading Overlay -->
-        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="Black" Opacity="0.5">
-            <ActivityIndicator IsRunning="True" Color="White" WidthRequest="100" HorizontalOptions="Center" VerticalOptions="Center"/>
+        <!-- LOADING -->
+        <Grid IsVisible="{Binding IsBusy}"
+              BackgroundColor="Black"
+              Opacity="0.5">
+
+            <ActivityIndicator IsRunning="True"
+                               Color="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+
         </Grid>
+
     </Grid>
 </ContentPage>
