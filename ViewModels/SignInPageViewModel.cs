@@ -107,7 +107,7 @@ namespace CareReminderApp.ViewModels
 
                 if (result == null)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Login failed", "OK");
+                    await Shell.Current.DisplayAlert("Login Error", "Incorrect email or password.", "OK");
                     return;
                 }
 
@@ -133,7 +133,25 @@ namespace CareReminderApp.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+                string errorMessage = ex.Message;
+
+                // Checking for common Firebase authentication errors
+                if (errorMessage.Contains("INVALID_LOGIN_CREDENTIALS") ||
+                    errorMessage.Contains("INVALID_PASSWORD") ||
+                    errorMessage.Contains("EMAIL_NOT_FOUND") ||
+                    errorMessage.Contains("USER_NOT_FOUND"))
+                {
+                    await Shell.Current.DisplayAlert("Error", "Incorrect email or password.", "OK");
+                }
+                else if (errorMessage.Contains("TOO_MANY_ATTEMPTS_TRY_LATER"))
+                {
+                    await Shell.Current.DisplayAlert("Error", "Access to this account has been temporarily disabled due to many failed login attempts. Please try again later.", "OK");
+                }
+                else
+                {
+                    // For connection issues or other unexpected system errors
+                    await Shell.Current.DisplayAlert("Error", "Connection error. Please check your internet and try again.", "OK");
+                }
             }
             finally
             {

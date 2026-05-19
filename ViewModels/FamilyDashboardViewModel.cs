@@ -1,6 +1,6 @@
 ﻿using CareReminderApp.Models;
 using CareReminderApp.Services;
-using CareReminderApp.Views; // הוספתי עבור ElderProfilePage
+using CareReminderApp.Views; 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;

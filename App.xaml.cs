@@ -1,4 +1,4 @@
-﻿using CareReminderApp.Models; // חובה להוסיף כדי שהמחשב יכיר את המילה User
+﻿using CareReminderApp.Models; 
 using CareReminderApp.Services;
 using CareReminderApp.Views;
 
@@ -13,7 +13,6 @@ namespace CareReminderApp
             InitializeComponent();
             MainPage = new AppShell();
 
-            // הפעלת הבדיקה האוטומטית
             CheckRememberedUser(dataService, authService);
         }
 
@@ -41,7 +40,6 @@ namespace CareReminderApp
 
                 if (Shell.Current is AppShell appShell)
                 {
-                    // רק מעדכן את מצב ההתחברות ובונה את הטאבים
                     appShell.SetLoggedInState(true, user);
                 }
             }

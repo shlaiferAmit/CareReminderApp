@@ -163,7 +163,6 @@ namespace CareReminderApp.ViewModels
         [RelayCommand]
         private async Task GoToProfile()
         {
-            // אנחנו כבר כאן, אז אולי רק רענון או כלום
         }
     }
 }

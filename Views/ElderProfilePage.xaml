@@ -19,7 +19,6 @@
 
             <VerticalStackLayout Spacing="20">
 
-                <!-- החלפת ה-Frame של התמונה בראש הדף -->
                 <HorizontalStackLayout Spacing="15" HorizontalOptions="Start">
                     <Frame WidthRequest="80" 
            HeightRequest="80" 

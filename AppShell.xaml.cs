@@ -28,7 +28,6 @@ namespace CareReminderApp
 
         private void BuildTabs(User currentUser)
         {
-            // 1. הסרת כל TabBar קיים
             for (int i = this.Items.Count - 1; i >= 0; i--)
             {
                 if (this.Items[i] is TabBar)
@@ -51,7 +50,6 @@ namespace CareReminderApp
                 });
                 mainTabBar.Items.Add(familyTab);
 
-                // הוסר הטאב של EldersListPage - הרשימה כבר נמצאת בתוך ה-Dashboard
             }
             // --- תפריט למשתמש מבוגר ---
             else if (currentUser.Role == UserRole.Senior)
@@ -111,7 +109,6 @@ namespace CareReminderApp
             }
             else
             {
-                // חזרה לעמוד הראשי בניתוק - ודאי שגם כאן יש //
                 await Shell.Current.GoToAsync("//MainPage");
             }
         }

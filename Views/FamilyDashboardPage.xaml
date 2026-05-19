@@ -81,7 +81,6 @@
                                     CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
 
-                            <!-- הגדרת עמודות משמאל לימין -->
                             <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
                                 <!-- תמונה/אות משמאל -->
                                 <Border Grid.Column="0"
@@ -90,14 +89,12 @@
                                     StrokeShape="RoundRectangle 25"
                                     StrokeThickness="0"
                                     BackgroundColor="#ECF0F1">
-                                    <!-- הסרנו את IsClippedToBounds מכאן -->
 
                                     <Image Source="{Binding ProfilePictureUrl}"
                                        Aspect="AspectFill"
                                        HeightRequest="50"
                                        WidthRequest="50" />
                                 </Border>
-                                <!-- טקסט במרכז/שמאל -->
                                 <VerticalStackLayout Grid.Column="1" 
                                                      VerticalOptions="Center"
                                                      HorizontalOptions="Start">
@@ -112,7 +109,6 @@
                                            HorizontalTextAlignment="Start"/>
                                 </VerticalStackLayout>
 
-                                <!-- חץ ניווט בימין -->
                                 <Label Grid.Column="2" 
                                        Text="›" 
                                        FontSize="24" 

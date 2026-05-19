@@ -47,8 +47,6 @@
             </Frame>
 
             <!-- Section: Next Reminder or ALL DONE -->
-            <!-- Section: Next Reminder or ALL DONE -->
-            <!-- Section: Next Reminder or ALL DONE -->
             <VerticalStackLayout Grid.Row="3" Spacing="10">
 
                 <!-- Next Reminder Card -->

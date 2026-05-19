@@ -16,7 +16,6 @@ namespace CareReminderApp.Views
 
             if (BindingContext is ProfileViewModel vm)
             {
-                // במקום להגיד לו "קח את מה שזכור לך", נגיד לו "תתרענן מהשרת"
                 vm.ApplyQueryAttributes(new Dictionary<string, object>());
             }
         }

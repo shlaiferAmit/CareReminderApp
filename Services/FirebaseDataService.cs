@@ -40,7 +40,7 @@ namespace CareReminderApp.Services
 
                 await _firebase
                     .Child("Users")
-                    .Child(id) // משתמשים ב-ID של Firebase כקי (Key)
+                    .Child(id) 
                     .PutAsync(newUser);
 
                 return true;
@@ -102,7 +102,6 @@ namespace CareReminderApp.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"GetUserByIdAsync DATABASE ERROR: {ex.Message}");
-                // כאן תוכלי לראות אם זו בעיית הרשאות (403) או בעיית רשת
                 return null;
             }
         }
@@ -123,8 +122,8 @@ namespace CareReminderApp.Services
             {
                 await _firebase
                     .Child("Users")
-                    .Child(user.Id) // או user.LocalId תלוי איך שמרת
-                    .PutAsync(user); // Put מחליף את כל האובייקט, לכן ה-user חייב להכיל Role
+                    .Child(user.Id) 
+                    .PutAsync(user); 
                 return true;
             }
             catch { return false; }
@@ -138,7 +137,6 @@ namespace CareReminderApp.Services
                 .Child($"{userId}.jpg")
                 .PutAsync(imageStream);
 
-            // 🔥 חשוב: לוודא שזה URL תקין לתצוגה
             return uploadTask;
         }
 
@@ -163,7 +161,6 @@ namespace CareReminderApp.Services
         {
             try
             {
-                // ודאי שהנתיב כאן תואם למבנה ה-Firebase שלך
                 await _firebase
                     .Child("Reminders")
                     .Child(reminderId)

@@ -23,7 +23,6 @@ namespace CareReminderApp.Services
 
         public async Task<bool> RegisterUserAsync(string id, string firstName, string lastName, string email, string password, string mobile, UserRole role)
         {
-            // המימוש כאן לא באמת משנה כי את משתמשת ב-Firebase, אבל הוא חייב להיות קיים
             await Task.Delay(10);
             return true;
         }

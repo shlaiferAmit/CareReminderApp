@@ -150,13 +150,43 @@ namespace CareReminderApp.ViewModels
                         if (user != null && Shell.Current is AppShell appShell)
                             appShell.SetLoggedInState(true, user);
                     }
+                    else
+                    {
+                        await Shell.Current.DisplayAlert("Registration Error", "Failed to save user data. Please try again.", "OK");
+                    }
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Registration Error", "Sign up failed. Please try again.", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+                string errorMessage = ex.Message;
+
+                // Checking for common Firebase registration errors
+                if (errorMessage.Contains("EMAIL_EXISTS") || errorMessage.Contains("email already in use"))
+                {
+                    await Shell.Current.DisplayAlert("Error", "This email address is already registered.", "OK");
+                }
+                else if (errorMessage.Contains("WEAK_PASSWORD") || errorMessage.Contains("password should be at least"))
+                {
+                    await Shell.Current.DisplayAlert("Error", "The password is too weak. Please use at least 6 characters.", "OK");
+                }
+                else if (errorMessage.Contains("INVALID_EMAIL"))
+                {
+                    await Shell.Current.DisplayAlert("Error", "The email address is badly formatted.", "OK");
+                }
+                else
+                {
+                    // For connection issues or other database errors
+                    await Shell.Current.DisplayAlert("Error", "Connection error. Please check your internet and try again.", "OK");
+                }
             }
-            finally { IsBusy = false; }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }

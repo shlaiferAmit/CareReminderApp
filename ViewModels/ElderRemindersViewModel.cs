@@ -40,7 +40,7 @@ namespace CareReminderApp.ViewModels
         private Reminder? _nextReminder;
 
         [ObservableProperty]
-        private bool _isNextReminderVisible; // משתנה השליטה
+        private bool _isNextReminderVisible; 
 
         [ObservableProperty]
         private bool _hasReminders;

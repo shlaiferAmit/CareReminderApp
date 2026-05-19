@@ -25,7 +25,7 @@ namespace CareReminderApp.ViewModels
         private DateTime _selectedDate = DateTime.Now;
 
         [ObservableProperty]
-        private TimeSpan _selectedTime = DateTime.Now.TimeOfDay; // שדה חדש לבחירת שעה
+        private TimeSpan _selectedTime = DateTime.Now.TimeOfDay; 
 
         public AddReminderViewModel(IDataService dataService)
         {

@@ -10,7 +10,6 @@
              Title="Add Reminder"
              FlowDirection="LeftToRight">
 
-    <!-- שימוש ב-Grid במקום ScrollView כדי לקבע את הגובה למסך -->
     <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" 
           Padding="30" 
           RowSpacing="15">
@@ -57,7 +56,6 @@
             </Frame>
         </VerticalStackLayout>
 
-        <!-- Notes Input - הקטנת הגובה ל-80 -->
         <VerticalStackLayout Grid.Row="4" Spacing="5">
             <Label Text="Additional Notes" TextColor="#2C3E50" FontAttributes="Bold" />
             <Frame BackgroundColor="White" CornerRadius="10" Padding="10" HasShadow="False">
@@ -69,7 +67,6 @@
             </Frame>
         </VerticalStackLayout>
 
-        <!-- Save Button -->
         <Button Grid.Row="5"
                 Text="Save and Send Reminder" 
                 Command="{Binding SaveAndSendReminderCommand}"

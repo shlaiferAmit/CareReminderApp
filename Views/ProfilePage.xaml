@@ -8,7 +8,6 @@
              Shell.NavBarIsVisible="True"
              FlowDirection="LeftToRight">
 
-    <!-- שימוש ב-Grid עם שורות קבועות ללא ScrollView -->
     <Grid RowDefinitions="Auto, *">
 
         <!-- כותרת העמוד -->
@@ -20,7 +19,6 @@
                TextColor="#2C3E50" 
                Margin="0,20,0,10"/>
 
-        <!-- תוכן הפרופיל בתוך Frame קבוע -->
         <Frame Grid.Row="1"
                BackgroundColor="White" 
                Margin="25,10,25,30" 
@@ -52,7 +50,6 @@
                     </Border>
                 </VerticalStackLayout>
 
-                <!-- 2. פרטי המשתמש - תופסים את מרכז המסך -->
                 <VerticalStackLayout Grid.Row="1" Spacing="15" VerticalOptions="Center">
 
                     <VerticalStackLayout Spacing="2">
