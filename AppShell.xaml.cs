@@ -51,7 +51,7 @@ namespace CareReminderApp
             // תפריט למשתמש מסוג בן משפחה
             if (currentUser.Role == UserRole.FamilyMember)
             {
-                var familyTab = new Tab { Title = "בית", Icon = "home.png" };
+                var familyTab = new Tab { Title = "Home", Icon = "home.png" };
 
                 familyTab.Items.Add(new ShellContent
                 {
@@ -64,7 +64,7 @@ namespace CareReminderApp
             // תפריט למשתמש מסוג מבוגר
             else if (currentUser.Role == UserRole.Senior)
             {
-                var elderTab = new Tab { Title = "בית", Icon = "home.png" };
+                var elderTab = new Tab { Title = "Home", Icon = "home.png" };
 
                 elderTab.Items.Add(new ShellContent
                 {
@@ -74,7 +74,7 @@ namespace CareReminderApp
 
                 mainTabBar.Items.Add(elderTab);
 
-                var todayTab = new Tab { Title = "היום", Icon = "list_icon.png" };
+                var todayTab = new Tab { Title = "Today's reminds", Icon = "list_icon.png" };
 
                 todayTab.Items.Add(new ShellContent
                 {
@@ -86,7 +86,7 @@ namespace CareReminderApp
             }
 
             // טאב פרופיל משותף לכל המשתמשים
-            var profileTab = new Tab { Title = "פרופיל", Icon = "profile_icon.png" };
+            var profileTab = new Tab { Title = "My Profile", Icon = "profile_icon.png" };
 
             profileTab.Items.Add(new ShellContent
             {
@@ -136,14 +136,17 @@ namespace CareReminderApp
         {
             this.FlyoutIsPresented = false;
 
-            // ניקוי נתוני התחברות שמורים
-            Preferences.Default.Clear();
+            Preferences.Default.Remove("UserEmail");
+            Preferences.Default.Remove("UserPassword");
+            Preferences.Default.Set("IsRemembered", false);
 
             App.LoggedInUser = null;
 
-            SetLoggedInState(false, null);
-
             await Shell.Current.GoToAsync("//MainPage");
+
+            // חשוב מאוד:
+            await Task.Delay(100);
+            SetLoggedInState(false, null);
         }
     }
 }

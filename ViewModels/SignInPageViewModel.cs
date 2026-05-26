@@ -55,12 +55,19 @@ namespace CareReminderApp.ViewModels
         // טעינת משתמש שנשמר קודם במכשיר
         private void LoadRememberedUser()
         {
-            if (Preferences.Default.Get("IsRemembered", false))
+            var isRemembered = Preferences.Default.Get("IsRemembered", false);
+
+            if (!isRemembered)
             {
-                UserEmail = Preferences.Default.Get("UserEmail", "");
-                UserPassword = Preferences.Default.Get("UserPassword", "");
-                IsRememberMeSelected = true;
+                UserEmail = string.Empty;
+                UserPassword = string.Empty;
+                IsRememberMeSelected = false;
+                return;
             }
+
+            UserEmail = Preferences.Default.Get("UserEmail", string.Empty);
+            UserPassword = string.Empty; // לא לטעון סיסמה אף פעם
+            IsRememberMeSelected = true;
         }
 
         // בדיקה האם ניתן לבצע התחברות

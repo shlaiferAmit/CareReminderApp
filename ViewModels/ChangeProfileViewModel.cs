@@ -79,47 +79,65 @@ namespace CareReminderApp.ViewModels
         {
             try
             {
-                // פתיחת תפריט בחירה למקור תמונה
-                string source = await Shell.Current.DisplayActionSheet("בחירת מקור תמונה", "ביטול", null, "מצלמה", "גלריה");
+                // פתיחת תפריט בחירה
+                string source = await Shell.Current.DisplayActionSheet(
+                    "Select Photo Source",
+                    "Cancel",
+                    null,
+                    "Camera",
+                    "Gallery");
 
                 FileResult photo = null;
 
-                // בחירה מהמצלמה
                 if (source == "Camera")
                 {
                     if (MediaPicker.Default.IsCaptureSupported)
                         photo = await MediaPicker.Default.CapturePhotoAsync();
                     else
-                        await Shell.Current.DisplayAlert("שגיאה", "המצלמה לא נתמכת במכשיר זה", "אישור");
+                    {
+                        await Shell.Current.DisplayAlert("Error", "Camera not supported", "OK");
+                        return;
+                    }
                 }
-                // בחירה מהגלריה
                 else if (source == "Gallery")
                 {
+                    // בקשת הרשאה (חשוב במיוחד באנדרואיד)
+                    var status = await Permissions.RequestAsync<Permissions.Photos>();
+                    if (status != PermissionStatus.Granted)
+                        return;
+
                     photo = await MediaPicker.Default.PickPhotoAsync();
                 }
 
-                if (photo == null) return;
+                if (photo == null)
+                    return;
 
                 using var stream = await photo.OpenReadAsync();
 
+                // שם קובץ ייחודי כדי למנוע cache ישן
+                var fileName = $"{EditableUser.Id}_{DateTime.UtcNow.Ticks}.jpg";
+
                 var storage = new FirebaseStorage("remaindsdb.firebasestorage.app");
 
-                // העלאת תמונה לפיירבייס סטורג'
                 var downloadUrl = await storage
                     .Child("Users")
-                    .Child($"{EditableUser.Id}.jpg")
+                    .Child(fileName)
                     .PutAsync(stream);
 
-                // עדכון נתוני המשתמש והתמונה במסך
+                // עדכון המשתמש
                 EditableUser.ProfilePictureUrl = downloadUrl;
-                SetProfileImage(downloadUrl);
 
-                await Shell.Current.DisplayAlert("הצלחה", "התמונה הועלתה! יש לשמור את השינויים", "אישור");
+                // עדכון תמונה במסך (עם מניעת cache)
+                ProfileImageSource = ImageSource.FromUri(
+                    new Uri(downloadUrl + $"?v={DateTime.Now.Ticks}")
+                );
+
+                await Shell.Current.DisplayAlert("Success", "Photo updated successfully!", "OK");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"שגיאת העלאה: {ex}");
-                await Shell.Current.DisplayAlert("שגיאה", "העלאת התמונה נכשלה", "אישור");
+                System.Diagnostics.Debug.WriteLine($"Upload Error: {ex}");
+                await Shell.Current.DisplayAlert("Error", "Failed to update photo", "OK");
             }
         }
 
