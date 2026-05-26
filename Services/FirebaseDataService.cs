@@ -11,22 +11,29 @@ using System.Threading.Tasks;
 
 namespace CareReminderApp.Services
 {
+    // מחלקה זו אחראית על כל הפעולות מול בסיס הנתונים פיירבייס ריל טיים דטאבייס
+    // כולל משתמשים, תזכורות, חיבורים בין משתמשים, ובקשות חיבור
     public class FirebaseDataService : IDataService
     {
         private readonly FirebaseClient _firebase;
         private readonly AuthService _authService;
+
+        // כתובת בסיס של מסד הנתונים בפיירבייס
         private const string FirebaseUrl = "https://remaindsdb-default-rtdb.europe-west1.firebasedatabase.app";
 
         public FirebaseDataService(AuthService authService)
         {
+            // יצירת חיבור למסד הנתונים של פיירבייס
             _firebase = new FirebaseClient(FirebaseUrl);
             _authService = authService;
         }
 
+        // רישום משתמש חדש ושמירתו במסד הנתונים
         public async Task<bool> RegisterUserAsync(string id, string firstName, string lastName, string email, string password, string mobile, UserRole role)
         {
             try
             {
+                // יצירת אובייקט משתמש חדש
                 var newUser = new User
                 {
                     Id = id,
@@ -38,6 +45,7 @@ namespace CareReminderApp.Services
                     Role = role
                 };
 
+                // שמירת המשתמש תחת צומת משתמשים לפי מזהה ייחודי
                 await _firebase
                     .Child("Users")
                     .Child(id) 
@@ -47,11 +55,13 @@ namespace CareReminderApp.Services
             }
             catch (Exception ex)
             {
+                // הדפסת שגיאה לצורך בדיקה
                 System.Diagnostics.Debug.WriteLine($"DB Error: {ex.Message}");
                 return false;
             }
         }
 
+        // קבלת משתמש לפי אימייל וסיסמה - חיפוש במסד הנתונים
         public async Task<User?> GetUserAsync(string email, string password)
         {
             try
@@ -79,6 +89,7 @@ namespace CareReminderApp.Services
             }
         }
 
+        // קבלת משתמש לפי מזהה ייחודי
         public async Task<User?> GetUserByIdAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -106,6 +117,7 @@ namespace CareReminderApp.Services
             }
         }
 
+        // קבלת כל המשתמשים במערכת
         public async Task<List<User>> GetUsersAsync()
         {
             var users = await _firebase.Child("Users").OnceAsync<User>();
@@ -116,6 +128,8 @@ namespace CareReminderApp.Services
                 return user;
             }).ToList();
         }
+
+        // עדכון פרטי משתמש קיים במסד הנתונים
         public async Task<bool> UpdateUserAsync(User user)
         {
             try
@@ -129,6 +143,7 @@ namespace CareReminderApp.Services
             catch { return false; }
         }
 
+        // העלאת תמונת פרופיל לפיירבייס סטורג'
         public async Task<string> UploadUserImageAsync(Stream imageStream, string userId)
         {
             var storage = new FirebaseStorage("remaindsdb.firebasestorage.app");
@@ -140,6 +155,7 @@ namespace CareReminderApp.Services
             return uploadTask;
         }
 
+        // קבלת כל התזכורות של משתמש מסוים
         public async Task<List<Reminder>> GetRemindersByUserIdAsync(string userId)
         {
             var data = await _firebase.Child("Reminders").OnceAsync<Reminder>();
@@ -149,14 +165,17 @@ namespace CareReminderApp.Services
 
         public async Task<IEnumerable<Reminder>> GetRemindersAsync(string userId) => await GetRemindersByUserIdAsync(userId);
 
+        // שמירת תזכורת חדשה
         public async Task SaveReminderAsync(Reminder reminder) => await _firebase.Child("Reminders").PostAsync(reminder);
 
+        // עדכון תזכורת קיימת
         public async Task UpdateReminderAsync(Reminder reminder)
         {
             if (string.IsNullOrEmpty(reminder.Id)) return;
             await _firebase.Child("Reminders").Child(reminder.Id).PutAsync(reminder);
         }
 
+        // מחיקת תזכורת מהמערכת
         public async Task<bool> DeleteReminderAsync(string reminderId)
         {
             try
@@ -174,17 +193,20 @@ namespace CareReminderApp.Services
             }
         }
 
+        // יצירת קשר בין בן משפחה לקשיש
         public async Task AddUserConnectionAsync(string familyId, string seniorId)
         {
             await _firebase.Child("UserConnections").PostAsync(new UserConnection { UserId = familyId, ConnectedUserId = seniorId });
         }
 
+        // קבלת כל הקשרים של משתמש
         public async Task<List<UserConnection>> GetUserConnectionsAsync(string userId)
         {
             var connections = await _firebase.Child("UserConnections").OnceAsync<UserConnection>();
             return connections.Select(c => c.Object).Where(c => c.UserId == userId || c.ConnectedUserId == userId).ToList();
         }
 
+        // קבלת כל הקשישים של בן משפחה
         public async Task<IEnumerable<User>> GetEldersForFamilyAsync(string familyId)
         {
             var connections = await GetUserConnectionsAsync(familyId);
@@ -193,11 +215,13 @@ namespace CareReminderApp.Services
             return allUsers.Where(u => ids.Contains(u.Id));
         }
 
+        // שליחת הזמנה לקשר בין משתמשים
         public async Task InviteElderAsync(string familyId, string elderId)
         {
             await _firebase.Child("PendingConnections").PostAsync(new PendingConnection { FamilyId = familyId, ElderId = elderId });
         }
 
+        // קבלת בקשות חיבור ממתינות לקשיש
         public async Task<IEnumerable<PendingConnection>> GetPendingForElderAsync(string elderId)
         {
             var data = await _firebase.Child("PendingConnections").OnceAsync<PendingConnection>();
@@ -205,6 +229,7 @@ namespace CareReminderApp.Services
                        .Where(x => x.ElderId == elderId && !x.IsApproved && !x.IsRejected);
         }
 
+        // אישור בקשת חיבור
         public async Task ApproveConnectionAsync(PendingConnection request)
         {
             request.IsApproved = true;
@@ -212,12 +237,14 @@ namespace CareReminderApp.Services
             await AddUserConnectionAsync(request.FamilyId, request.ElderId);
         }
 
+        // דחיית בקשת חיבור
         public async Task RejectConnectionAsync(PendingConnection request)
         {
             request.IsRejected = true;
             await _firebase.Child("PendingConnections").Child(request.Id).PutAsync(request);
         }
 
+        // החזרת רשימת סוגי המשתמשים במערכת
         public async Task<List<UserRole>> GetRolesAsync() => new List<UserRole> { UserRole.Senior, UserRole.FamilyMember };
     }
 }

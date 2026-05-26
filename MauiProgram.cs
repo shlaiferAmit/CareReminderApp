@@ -4,6 +4,9 @@ using CareReminderApp.ViewModels;
 using CareReminderApp.Views;
 using CommunityToolkit.Maui;
 
+// עמוד פתיחה ראשי של האפליקציה
+// מציג אפשרויות כניסה והרשמה למשתמש
+
 namespace CareReminderApp
 {
     public static class MauiProgram
@@ -20,11 +23,11 @@ namespace CareReminderApp
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            // רישום השירותים
+            // רישום שירותי לוגיקה של האפליקציה
             builder.Services.AddSingleton<IDataService, FirebaseDataService>();
             builder.Services.AddSingleton<AuthService>();
 
-            // רישום ה-ViewModels (Transient יוצר מופע חדש בכל כניסה לדף)
+            // רישום מודלי תצוגה - כל כניסה יוצרת מופע חדש
             builder.Services.AddTransient<SignInPageViewModel>();
             builder.Services.AddTransient<SignUpPageViewModel>();
             builder.Services.AddTransient<ElderRemindersViewModel>();
@@ -36,8 +39,7 @@ namespace CareReminderApp
             builder.Services.AddTransient<ElderProfileViewModel>();
             builder.Services.AddTransient<ChangeProfileViewModel>();
 
-
-            // רישום הדפים
+            // רישום דפי ממשק המשתמש
             builder.Services.AddTransient<SignInPage>();
             builder.Services.AddTransient<SignUpPage>();
             builder.Services.AddTransient<ElderRemindersPage>();

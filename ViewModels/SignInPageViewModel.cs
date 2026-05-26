@@ -6,29 +6,41 @@ using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
 {
+    // מחלקת מודל תצוגה עבור מסך התחברות
+    // אחראית על ביצוע התחברות, ולידציה של שדות, שמירת משתמש במכשיר וניווט לאחר התחברות
     public partial class SignInPageViewModel : ObservableObject
     {
+        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
+
+        // שירות אימות משתמשים מול פיירבייס
         private readonly AuthService _authService;
 
+        // כתובת אימייל שהמשתמש מזין
         [ObservableProperty]
         private string userEmail = string.Empty;
 
+        // סיסמה שהמשתמש מזין
         [ObservableProperty]
         private string userPassword = string.Empty;
 
+        // מצב טעינה בזמן התחברות
         [ObservableProperty]
         private bool isBusy;
 
+        // האם לזכור את המשתמש במכשיר
         [ObservableProperty]
         private bool isRememberMeSelected;
 
+        // האם להציג סיסמה כטקסט מוסתר
         [ObservableProperty]
         private bool entryAsPassword = true;
 
+        // הודעת שגיאה עבור אימייל
         [ObservableProperty]
         private string emailError = string.Empty;
 
+        // הודעת שגיאה עבור סיסמה
         [ObservableProperty]
         private string passwordError = string.Empty;
 
@@ -40,6 +52,7 @@ namespace CareReminderApp.ViewModels
             LoadRememberedUser();
         }
 
+        // טעינת משתמש שנשמר קודם במכשיר
         private void LoadRememberedUser()
         {
             if (Preferences.Default.Get("IsRemembered", false))
@@ -50,6 +63,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // בדיקה האם ניתן לבצע התחברות
         public bool CanSignIn =>
             !IsBusy &&
             string.IsNullOrWhiteSpace(EmailError) &&
@@ -57,23 +71,27 @@ namespace CareReminderApp.ViewModels
             !string.IsNullOrWhiteSpace(UserEmail) &&
             !string.IsNullOrWhiteSpace(UserPassword);
 
+        // מופעל כאשר משתנה האימייל (לביצוע בדיקות תקינות)
         partial void OnUserEmailChanged(string value)
         {
             Validate();
             SignInCommand.NotifyCanExecuteChanged();
         }
 
+        // מופעל כאשר משתנה הסיסמה (לביצוע בדיקות תקינות)
         partial void OnUserPasswordChanged(string value)
         {
             Validate();
             SignInCommand.NotifyCanExecuteChanged();
         }
 
+        // מופעל כאשר משתנה מצב טעינה
         partial void OnIsBusyChanged(bool value)
         {
             SignInCommand.NotifyCanExecuteChanged();
         }
 
+        // בדיקת תקינות של אימייל וסיסמה
         private void Validate()
         {
             // EMAIL
@@ -93,6 +111,7 @@ namespace CareReminderApp.ViewModels
                 PasswordError = string.Empty;
         }
 
+        // פעולת התחברות למערכת
         [RelayCommand(CanExecute = nameof(CanSignIn))]
         private async Task SignIn()
         {
@@ -111,10 +130,12 @@ namespace CareReminderApp.ViewModels
                     return;
                 }
 
+                // שליפת המשתמש ממסד הנתונים
                 var user = await _dataService.GetUserAsync(email, password);
 
                 if (user != null && Shell.Current is AppShell appShell)
                 {
+                    // שמירת משתמש במכשיר אם נבחר
                     if (IsRememberMeSelected)
                     {
                         Preferences.Default.Set("UserEmail", email);
@@ -127,7 +148,7 @@ namespace CareReminderApp.ViewModels
                         Preferences.Default.Remove("UserPassword");
                         Preferences.Default.Set("IsRemembered", false);
                     }
-
+                    // עדכון מצב התחברות באפליקציה
                     appShell.SetLoggedInState(true, user);
                 }
             }
@@ -135,7 +156,7 @@ namespace CareReminderApp.ViewModels
             {
                 string errorMessage = ex.Message;
 
-                // Checking for common Firebase authentication errors
+                // טיפול בשגיאות התחברות נפוצות
                 if (errorMessage.Contains("INVALID_LOGIN_CREDENTIALS") ||
                     errorMessage.Contains("INVALID_PASSWORD") ||
                     errorMessage.Contains("EMAIL_NOT_FOUND") ||
@@ -149,7 +170,6 @@ namespace CareReminderApp.ViewModels
                 }
                 else
                 {
-                    // For connection issues or other unexpected system errors
                     await Shell.Current.DisplayAlert("Error", "Connection error. Please check your internet and try again.", "OK");
                 }
             }
@@ -159,20 +179,24 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // הצגת / הסתרת סיסמה
         [RelayCommand]
         private void ShowPassword()
         {
             EntryAsPassword = !EntryAsPassword;
         }
 
+        // תמונה בהתאם למצב הצגת סיסמה
         public string PasswordImage =>
             EntryAsPassword ? "closeeye.png" : "openeye.png";
 
+        // עדכון אוטומטי של האייקון כשהמצב משתנה
         partial void OnEntryAsPasswordChanged(bool value)
         {
             OnPropertyChanged(nameof(PasswordImage));
         }
 
+        // מעבר למסך הרשמה
         [RelayCommand]
         private async Task GoToSignUp()
         {

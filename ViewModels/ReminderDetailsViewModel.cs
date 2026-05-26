@@ -6,13 +6,18 @@ using CareReminderApp.Services;
 namespace CareReminderApp.ViewModels
 {
     [QueryProperty(nameof(SelectedReminder), "SelectedReminder")]
+    // מחלקת מודל תצוגה עבור מסך פרטי תזכורת
+    // אחראית על הצגת פרטי תזכורת, שינוי סטטוס (בוצע / לא בוצע) ומחיקה מהמערכת
     public partial class ReminderDetailsViewModel : ObservableObject
     {
+        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
 
+        // התזכורת שנבחרה להצגה
         [ObservableProperty]
         private Reminder? selectedReminder;
 
+        // טקסט המציג את סטטוס התזכורת למשתמש
         [ObservableProperty]
         private string statusText = "Not Done";
 
@@ -21,6 +26,7 @@ namespace CareReminderApp.ViewModels
             _dataService = dataService;
         }
 
+        // מופעל אוטומטית כאשר התזכורת הנבחרת משתנה
         partial void OnSelectedReminderChanged(Reminder? value)
         {
             if (value != null)
@@ -29,11 +35,13 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // עדכון טקסט הסטטוס בהתאם אם התזכורת בוצעה או לא
         private void UpdateStatusText(bool isCompleted)
         {
             StatusText = isCompleted ? "Done" : "Not Done";
         }
 
+        // סימון תזכורת כבוצעה
         [RelayCommand]
         public async Task MarkAsDone()
         {
@@ -45,6 +53,7 @@ namespace CareReminderApp.ViewModels
             await Shell.Current.DisplayAlert("Status", "Reminder marked as done!", "OK");
         }
 
+        // סימון תזכורת כלא בוצעה
         [RelayCommand]
         public async Task MarkAsNotDone()
         {
@@ -55,6 +64,8 @@ namespace CareReminderApp.ViewModels
             UpdateStatusText(false);
             await Shell.Current.DisplayAlert("Status", "Reminder marked as not done", "OK");
         }
+
+        // מחיקת תזכורת מהמערכת
         [RelayCommand]
         public async Task Delete()
         {
@@ -72,7 +83,8 @@ namespace CareReminderApp.ViewModels
 
                 if (success)
                 {
-                    await Shell.Current.GoToAsync(".."); // חוזר חזרה לרשימה
+                    await Shell.Current.GoToAsync("..");    // חזרה למסך הקודם לאחר מחיקה מוצלחת
+
                 }
                 else
                 {

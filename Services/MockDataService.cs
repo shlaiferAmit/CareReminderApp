@@ -7,6 +7,8 @@ using System.IO;
 
 namespace CareReminderApp.Services
 {
+    // מחלקה זו מדמה שירות נתונים לצורך בדיקות ופיתוח ללא חיבור למסד נתונים אמיתי
+    // היא מחזיקה נתונים בזיכרון (רשימות) ומשמשת כתחליף זמני לפיירבייס
     public class MockDataService : IDataService
     {
         private List<User> _users = new List<User>();

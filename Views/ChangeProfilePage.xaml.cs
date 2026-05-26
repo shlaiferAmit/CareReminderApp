@@ -1,4 +1,7 @@
-﻿using CareReminderApp.ViewModels;
+﻿// עמוד עריכת פרופיל
+// אחראי על הצגת ממשק העריכה וחיבורו למודל התצוגה
+
+using CareReminderApp.ViewModels;
 
 namespace CareReminderApp.Views
 {
@@ -7,6 +10,8 @@ namespace CareReminderApp.Views
         public ChangeProfilePage(ChangeProfileViewModel viewModel)
         {
             InitializeComponent();
+
+            // קביעת מודל התצוגה כנתון הקישור של הדף
             BindingContext = viewModel;
         }
     }

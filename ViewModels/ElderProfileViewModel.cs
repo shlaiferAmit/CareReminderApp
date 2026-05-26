@@ -9,16 +9,23 @@ namespace CareReminderApp.ViewModels
 {
     // המפתח שמתקבל מהדף הקודם
     [QueryProperty(nameof(Elder), "Elder")]
+
+    // מחלקת מודל תצוגה עבור פרופיל של קשיש
+    // אחראית על הצגת פרטי הקשיש, טעינת תזכורות שלו והוספת תזכורות חדשות
     public partial class ElderProfileViewModel : ObservableObject
     {
+        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
 
+        // כותרת המסך (מתעדכנת לפי שם הקשיש)
         [ObservableProperty]
         private string title = "פרופיל מבוגר";
 
+        // אובייקט הקשיש שנבחר במסך הקודם
         [ObservableProperty]
         private User elder; // זה האובייקט שמכיל את FirstName, LastName וכו'
 
+        // רשימת התזכורות של הקשיש
         [ObservableProperty]
         private ObservableCollection<Reminder> reminders;
 
@@ -28,7 +35,7 @@ namespace CareReminderApp.ViewModels
             Reminders = new ObservableCollection<Reminder>();
         }
 
-        // פונקציה שרצה אוטומטית כשהמבוגר נטען
+        // פונקציה שמופעלת אוטומטית כאשר משתנה ערך הקשיש
         partial void OnElderChanged(User value)
         {
             if (value != null)
@@ -38,6 +45,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // טעינת כל התזכורות של הקשיש ממסד הנתונים
         [RelayCommand]
         public async Task LoadReminders()
         {
@@ -55,12 +63,12 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // מעבר למסך הוספת תזכורת עבור הקשיש הנוכחי
         [RelayCommand]
         private async Task AddReminder()
         {
             if (Elder == null) return;
 
-            // כאן אנחנו שולחים את המבוגר לדף הבא תחת המפתח ש-AddReminderViewModel מצפה לו
             await Shell.Current.GoToAsync(nameof(AddReminderPage), new Dictionary<string, object>
             {
                 { "SelectedElder", Elder }

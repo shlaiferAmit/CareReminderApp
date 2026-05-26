@@ -12,19 +12,26 @@ using System.Threading.Tasks;
 namespace CareReminderApp.ViewModels
 {
     [QueryProperty(nameof(CurrentUser), "CurrentUser")]
+    // מחלקת מודל תצוגה עבור לוח הבקרה של בן משפחה
+    // אחראית על הצגת הקשישים המקושרים, הוספת קשישים חדשים וניווט למסך פרופיל קשיש
     public partial class FamilyDashboardViewModel : ObservableObject
     {
+        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
 
+        // המשתמש המחובר כרגע
         [ObservableProperty]
         private User? currentUser;
 
+        // הודעת ברכה במסך הבית
         [ObservableProperty]
         private string welcomeMessage = "Hello!";
 
+        // מצב טעינה - מונע פעולות כפולות בזמן ריצה
         [ObservableProperty]
         private bool isBusy;
 
+        // רשימת הקשישים המשויכים לבן המשפחה
         [ObservableProperty]
         private ObservableCollection<User> elders;
 
@@ -33,18 +40,21 @@ namespace CareReminderApp.ViewModels
             _dataService = dataService;
             Elders = new ObservableCollection<User>();
 
+            // טעינת משתמש מחובר אם קיים
             if (CurrentUser == null && App.LoggedInUser != null)
             {
                 CurrentUser = App.LoggedInUser;
             }
         }
 
+        // עדכון הודעת ברכה כאשר המשתמש משתנה
         partial void OnCurrentUserChanged(User? value)
         {
             if (value != null)
                 WelcomeMessage = $"Good morning, {value.FirstName}!";
         }
 
+        // טעינת רשימת הקשישים המשויכים למשתמש
         [RelayCommand]
         public async Task LoadElders()
         {
@@ -71,6 +81,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // מעבר למסך פרופיל קשיש
         [RelayCommand]
         private async Task GoToProfile(User elder)
         {
@@ -81,6 +92,7 @@ namespace CareReminderApp.ViewModels
             });
         }
 
+        // הוספת קשיש חדש למערכת באמצעות אימייל
         [RelayCommand]
         private async Task AddSenior()
         {
@@ -126,7 +138,7 @@ namespace CareReminderApp.ViewModels
                 await _dataService.InviteElderAsync(activeUser.Id, senior.Id);
                 await Shell.Current.DisplayAlert("Success", $"Request sent to {senior.FirstName}.", "Great");
 
-                // רענון הרשימה לאחר הוספה
+                // רענון רשימת הקשישים
                 await LoadElders();
             }
             catch (Exception ex)

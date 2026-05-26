@@ -14,7 +14,7 @@
           Padding="30" 
           RowSpacing="15">
 
-        <!-- Title Header -->
+        <!-- כותרת המסך המציגה עבור מי נוצרת התזכורת -->
         <Label Grid.Row="0"
                Text="{Binding SelectedElder.FirstName, StringFormat='New Reminder for {0}'}" 
                FontSize="26" 
@@ -24,7 +24,7 @@
                HorizontalTextAlignment="Center"
                Margin="0,0,0,10"/>
 
-        <!-- Reminder Title Input -->
+        <!-- שדה להזנת כותרת התזכורת -->
         <VerticalStackLayout Grid.Row="1" Spacing="5">
             <Label Text="Reminder Title" TextColor="#2C3E50" FontAttributes="Bold" />
             <Frame BackgroundColor="White" CornerRadius="10" Padding="5,0" HasShadow="False">
@@ -35,7 +35,7 @@
             </Frame>
         </VerticalStackLayout>
 
-        <!-- Date Selection -->
+        <!-- בחירת תאריך לתזכורת -->
         <VerticalStackLayout Grid.Row="2" Spacing="5">
             <Label Text="Select Date" TextColor="#2C3E50" FontAttributes="Bold" />
             <Frame BackgroundColor="White" CornerRadius="10" Padding="5,0" HasShadow="False">
@@ -46,7 +46,7 @@
             </Frame>
         </VerticalStackLayout>
 
-        <!-- Time Selection -->
+        <!-- בחירת שעה לתזכורת -->
         <VerticalStackLayout Grid.Row="3" Spacing="5">
             <Label Text="Select Time" TextColor="#2C3E50" FontAttributes="Bold" />
             <Frame BackgroundColor="White" CornerRadius="10" Padding="5,0" HasShadow="False">
@@ -56,6 +56,7 @@
             </Frame>
         </VerticalStackLayout>
 
+        <!-- שדה הערות נוספות -->
         <VerticalStackLayout Grid.Row="4" Spacing="5">
             <Label Text="Additional Notes" TextColor="#2C3E50" FontAttributes="Bold" />
             <Frame BackgroundColor="White" CornerRadius="10" Padding="10" HasShadow="False">
@@ -67,6 +68,7 @@
             </Frame>
         </VerticalStackLayout>
 
+        <!-- כפתור שמירה ושליחה של התזכורת -->
         <Button Grid.Row="5"
                 Text="Save and Send Reminder" 
                 Command="{Binding SaveAndSendReminderCommand}"

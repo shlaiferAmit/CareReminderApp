@@ -7,20 +7,27 @@ using System.Collections.ObjectModel;
 
 namespace CareReminderApp.ViewModels
 {
+    // מחלקת מודל תצוגה עבור מסך תזכורות יומיות
+    // אחראית על הצגת תזכורות של המשתמש להיום, עדכון סטטוס וניווט לפרטי תזכורת
     public partial class TodayRemindersViewModel : ObservableObject
     {
+        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
 
+        // שם פרטי של המשתמש להצגת ברכה
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(WelcomeGreeting))]
         private string userFirstName = "User";
 
+        // מזהה המשתמש המחובר
         [ObservableProperty]
         private string userId;
 
+        // כמות התזכורות הכוללת להיום
         [ObservableProperty]
         private int totalRemindersCount = 0;
 
+        // רשימת כל התזכורות של היום
         [ObservableProperty]
         private ObservableCollection<Reminder> reminders = new();
 
@@ -38,6 +45,7 @@ namespace CareReminderApp.ViewModels
             _ = LoadDataAsync();
         }
 
+        // טעינת כל התזכורות של המשתמש מהשרת
         public async Task LoadDataAsync()
         {
             try
@@ -52,6 +60,7 @@ namespace CareReminderApp.ViewModels
                     TotalRemindersCount = Reminders.Count;
                 }
 
+                // עדכון תצוגת ברכה וסיכום
                 OnPropertyChanged(nameof(WelcomeGreeting));
                 OnPropertyChanged(nameof(RemindersSummary));
             }
@@ -61,9 +70,13 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // ברכת פתיחה למשתמש
         public string WelcomeGreeting => $"Good Morning, {UserFirstName}";
+
+        // סיכום מספר התזכורות
         public string RemindersSummary => $"You have {TotalRemindersCount} reminders today";
 
+        // מעבר למסך פרטי תזכורת
         [RelayCommand]
         public async Task NavigateToReminderDetails(Reminder reminder)
         {
@@ -75,6 +88,7 @@ namespace CareReminderApp.ViewModels
             });
         }
 
+        // עדכון סטטוס תזכורת ורענון רשימה
         [RelayCommand]
         public async Task UpdateReminderStatusAsync(Reminder reminder)
         {

@@ -10,38 +10,51 @@ using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
 {
+    // מחלקת מודל תצוגה עבור מסך התזכורות של קשיש
+    // אחראית על טעינת תזכורות, הצגת סטטוס התקדמות, טיפול בבקשות חיבור וניהול ניווט למסכים נוספים
     public partial class ElderRemindersViewModel : ObservableObject, IQueryAttributable
     {
+        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
 
+        // המשתמש המחובר כרגע
         [ObservableProperty]
         private User? _currentUser;
 
+        // הודעת ברכה למשתמש
         [ObservableProperty]
         private string _welcomeMessage = string.Empty;
 
+        // רשימת כל התזכורות של הקשיש
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(RemindersCountMessage))]
         private ObservableCollection<Reminder> _elderRemindersList = new();
 
+        // רשימת בקשות חיבור ממתינות
         [ObservableProperty]
         private ObservableCollection<PendingConnection> _pendingRequests = new();
 
+        // האם יש בקשות חיבור ממתינות
         [ObservableProperty]
         private bool _hasPendingRequests;
 
+        // ערך התקדמות (כמה תזכורות הושלמו מתוך כלל התזכורות)
         [ObservableProperty]
         private double _progressValue;
 
+        // טקסט המציג את מצב ההתקדמות
         [ObservableProperty]
         private string _progressText = string.Empty;
 
+        // התזכורת הבאה שעדיין לא בוצעה
         [ObservableProperty]
         private Reminder? _nextReminder;
 
+        // האם להציג את התזכורת הבאה
         [ObservableProperty]
-        private bool _isNextReminderVisible; 
+        private bool _isNextReminderVisible;
 
+        // האם קיימות תזכורות כלל
         [ObservableProperty]
         private bool _hasReminders;
 
@@ -49,6 +62,7 @@ namespace CareReminderApp.ViewModels
         {
             _dataService = dataService;
 
+            // אם יש משתמש מחובר, טוענים את הנתונים שלו
             if (App.LoggedInUser != null)
             {
                 CurrentUser = App.LoggedInUser;
@@ -57,6 +71,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // טעינת כל התזכורות של המשתמש וחישוב סטטיסטיקות
         public async Task LoadRemindersAsync()
         {
             if (CurrentUser == null) return;
@@ -77,13 +92,13 @@ namespace CareReminderApp.ViewModels
                     ProgressValue = total > 0 ? (double)completed / total : 0;
                     ProgressText = $"{completed} out of {total} completed today";
 
-                    // מציאת התזכורת הבאה שטרם בוצעה
+                    // מציאת התזכורת הקרובה ביותר שעדיין לא הושלמה
                     NextReminder = allToday
                         .Where(r => !r.IsCompleted)
                         .OrderBy(r => r.DueDate)
                         .FirstOrDefault();
 
-                    // עדכון המצב: אם יש תזכורת היא תוצג, אם אין יוצג ALL DONE
+                    // קביעה האם להציג את התזכורת הבאה
                     IsNextReminderVisible = NextReminder != null;
                 }
             }
@@ -93,6 +108,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // הודעה המציגה כמה תזכורות קיימות
         public string RemindersCountMessage
         {
             get
@@ -102,6 +118,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // קבלת פרמטרים מהמסך הקודם
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             if (query.TryGetValue("CurrentUser", out var user) || query.TryGetValue("SelectedElder", out user))
@@ -115,12 +132,14 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // אתחול כל הנתונים במסך
         private async Task InitializeDataAsync()
         {
             await LoadRemindersAsync();
             await CheckPendingRequestsAsync();
         }
 
+        // בדיקת בקשות חיבור ממתינות
         public async Task CheckPendingRequestsAsync()
         {
             if (CurrentUser == null) return;
@@ -136,6 +155,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
+        // אישור בקשת חיבור
         [RelayCommand]
         private async Task ApproveRequest(PendingConnection request)
         {
@@ -144,6 +164,7 @@ namespace CareReminderApp.ViewModels
             await CheckPendingRequestsAsync();
         }
 
+        // דחיית בקשת חיבור
         [RelayCommand]
         private async Task RejectRequest(PendingConnection request)
         {
@@ -152,6 +173,7 @@ namespace CareReminderApp.ViewModels
             await CheckPendingRequestsAsync();
         }
 
+        // מעבר למסך פרטי תזכורת
         [RelayCommand]
         private async Task NavigateToReminderDetails(Reminder reminder)
         {
@@ -162,6 +184,7 @@ namespace CareReminderApp.ViewModels
             });
         }
 
+        // רענון נתוני המסך
         [RelayCommand]
         private async Task Refresh()
         {
