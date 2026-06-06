@@ -3,6 +3,7 @@ using CareReminderApp.Services;
 using CareReminderApp.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,115 +11,129 @@ using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
 {
-    // מחלקת מודל תצוגה עבור מסך התזכורות של קשיש
-    // אחראית על טעינת תזכורות, הצגת סטטוס התקדמות, טיפול בבקשות חיבור וניהול ניווט למסכים נוספים
     public partial class ElderRemindersViewModel : ObservableObject, IQueryAttributable
     {
-        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
 
-        // המשתמש המחובר כרגע
+        // משתני האזנה (Subscriptions) כדי שנוכל לנתק אותם כשהדף נסגר
+        private IDisposable? _remindersSubscription;
+        private IDisposable? _requestsSubscription;
+
         [ObservableProperty]
         private User? _currentUser;
 
-        // הודעת ברכה למשתמש
         [ObservableProperty]
         private string _welcomeMessage = string.Empty;
 
-        // רשימת כל התזכורות של הקשיש
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(RemindersCountMessage))]
-        private ObservableCollection<Reminder> _elderRemindersList = new();
-
-        // רשימת בקשות חיבור ממתינות
-        [ObservableProperty]
-        private ObservableCollection<PendingConnection> _pendingRequests = new();
-
-        // האם יש בקשות חיבור ממתינות
         [ObservableProperty]
         private bool _hasPendingRequests;
 
-        // ערך התקדמות (כמה תזכורות הושלמו מתוך כלל התזכורות)
         [ObservableProperty]
         private double _progressValue;
 
-        // טקסט המציג את מצב ההתקדמות
         [ObservableProperty]
         private string _progressText = string.Empty;
 
-        // התזכורת הבאה שעדיין לא בוצעה
         [ObservableProperty]
         private Reminder? _nextReminder;
 
-        // האם להציג את התזכורת הבאה
         [ObservableProperty]
         private bool _isNextReminderVisible;
 
-        // האם קיימות תזכורות כלל
         [ObservableProperty]
         private bool _hasReminders;
+
+        // שינוי שמות האוספים כדי לעקוף ולדרוס את ה-Cache הבעייתי של ה-Source Generator
+        public ObservableCollection<Reminder> ElderRemindersCollection { get; } = new();
+        public ObservableCollection<PendingConnection> PendingRequestsCollection { get; } = new();
+
+        public string RemindersCountMessage =>
+            ElderRemindersCollection.Count == 1 ? "You have 1 reminder today" : $"You have {ElderRemindersCollection.Count} reminders today";
 
         public ElderRemindersViewModel(IDataService dataService)
         {
             _dataService = dataService;
 
-            // אם יש משתמש מחובר, טוענים את הנתונים שלו
             if (App.LoggedInUser != null)
             {
                 CurrentUser = App.LoggedInUser;
                 WelcomeMessage = $"Good Morning, {CurrentUser.FirstName}";
-                _ = InitializeDataAsync();
+                StartRealtimeListeners();
             }
         }
 
-        // טעינת כל התזכורות של המשתמש וחישוב סטטיסטיקות
-        public async Task LoadRemindersAsync()
+        /// <summary>
+        /// הפעלת צינורות האזנה בזמן אמת עבור תזכורות ובקשות חיבור
+        /// </summary>
+        public void StartRealtimeListeners()
         {
             if (CurrentUser == null) return;
 
-            try
-            {
-                var result = await _dataService.GetRemindersAsync(CurrentUser.Id);
+            // ניקוי האזנות קודמות למניעת כפילויות בזיכרון
+            StopRealtimeListeners();
 
-                if (result != null)
+            // 1. האזנה בזמן אמת לתזכורות
+            _remindersSubscription = _dataService.ListenRemindersForElder(CurrentUser.Id)
+                .Subscribe(list =>
                 {
-                    var allToday = result.ToList();
-                    ElderRemindersList = new ObservableCollection<Reminder>(allToday);
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        ElderRemindersCollection.Clear();
+                        var allToday = list.ToList();
 
-                    int total = allToday.Count;
-                    int completed = allToday.Count(r => r.IsCompleted);
+                        foreach (var reminder in allToday)
+                        {
+                            ElderRemindersCollection.Add(reminder);
+                        }
 
-                    HasReminders = total > 0;
-                    ProgressValue = total > 0 ? (double)completed / total : 0;
-                    ProgressText = $"{completed} out of {total} completed today";
+                        // עדכון לוגיקת התקדמות וסטטיסטיקה בזמן אמת
+                        int total = allToday.Count;
+                        int completed = allToday.Count(r => r.IsCompleted);
 
-                    // מציאת התזכורת הקרובה ביותר שעדיין לא הושלמה
-                    NextReminder = allToday
-                        .Where(r => !r.IsCompleted)
-                        .OrderBy(r => r.DueDate)
-                        .FirstOrDefault();
+                        HasReminders = total > 0;
+                        ProgressValue = total > 0 ? (double)completed / total : 0;
+                        ProgressText = $"{completed} out of {total} completed today";
 
-                    // קביעה האם להציג את התזכורת הבאה
-                    IsNextReminderVisible = NextReminder != null;
-                }
-            }
-            catch (Exception)
-            {
-                await Shell.Current.DisplayAlert("Error", "Could not load reminders", "OK");
-            }
+                        NextReminder = allToday
+                            .Where(r => !r.IsCompleted)
+                            .OrderBy(r => r.DueDate)
+                            .FirstOrDefault();
+
+                        IsNextReminderVisible = NextReminder != null;
+
+                        // מודיע למערכת שהודעת הכמות השתנתה
+                        OnPropertyChanged(nameof(RemindersCountMessage));
+                    });
+                }, error => System.Diagnostics.Debug.WriteLine($"Reminders Stream error: {error.Message}"));
+
+            // 2. האזנה בזמן אמת לבקשות חיבור ממתינות
+            _requestsSubscription = _dataService.ListenPendingConnectionsForElder(CurrentUser.Id)
+                .Subscribe(requests =>
+                {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        PendingRequestsCollection.Clear();
+                        foreach (var req in requests)
+                        {
+                            PendingRequestsCollection.Add(req);
+                        }
+                        HasPendingRequests = PendingRequestsCollection.Any();
+                    });
+                }, error => System.Diagnostics.Debug.WriteLine($"Requests Stream error: {error.Message}"));
         }
 
-        // הודעה המציגה כמה תזכורות קיימות
-        public string RemindersCountMessage
+        /// <summary>
+        /// ניתוק הצינורות כדי לחסוך בסוללה ובמשאבי רשת כשהמשתמש יוצא מהמסך
+        /// </summary>
+        public void StopRealtimeListeners()
         {
-            get
-            {
-                int count = ElderRemindersList?.Count ?? 0;
-                return count == 1 ? "You have 1 reminder today" : $"You have {count} reminders today";
-            }
+            _remindersSubscription?.Dispose();
+            _remindersSubscription = null;
+
+            _requestsSubscription?.Dispose();
+            _requestsSubscription = null;
         }
 
-        // קבלת פרמטרים מהמסך הקודם
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             if (query.TryGetValue("CurrentUser", out var user) || query.TryGetValue("SelectedElder", out user))
@@ -127,53 +142,27 @@ namespace CareReminderApp.ViewModels
                 {
                     CurrentUser = incomingUser;
                     WelcomeMessage = $"Good Morning, {CurrentUser.FirstName}";
-                    _ = InitializeDataAsync();
+                    StartRealtimeListeners();
                 }
             }
         }
 
-        // אתחול כל הנתונים במסך
-        private async Task InitializeDataAsync()
-        {
-            await LoadRemindersAsync();
-            await CheckPendingRequestsAsync();
-        }
-
-        // בדיקת בקשות חיבור ממתינות
-        public async Task CheckPendingRequestsAsync()
-        {
-            if (CurrentUser == null) return;
-            try
-            {
-                var requests = await _dataService.GetPendingForElderAsync(CurrentUser.Id);
-                PendingRequests = new ObservableCollection<PendingConnection>(requests);
-                HasPendingRequests = PendingRequests.Any();
-            }
-            catch
-            {
-                HasPendingRequests = false;
-            }
-        }
-
-        // אישור בקשת חיבור
         [RelayCommand]
         private async Task ApproveRequest(PendingConnection request)
         {
             if (request == null) return;
+            // ה-Stream יעדכן ויעלים את הכרטיס הצהוב אוטומטית ברגע שהסטטוס ישתנה ב-Firebase
             await _dataService.ApproveConnectionAsync(request);
-            await CheckPendingRequestsAsync();
         }
 
-        // דחיית בקשת חיבור
         [RelayCommand]
         private async Task RejectRequest(PendingConnection request)
         {
             if (request == null) return;
+            // ה-Stream יעדכן ויעלים את הכרטיס הצהוב אוטומטית
             await _dataService.RejectConnectionAsync(request);
-            await CheckPendingRequestsAsync();
         }
 
-        // מעבר למסך פרטי תזכורת
         [RelayCommand]
         private async Task NavigateToReminderDetails(Reminder reminder)
         {
@@ -182,14 +171,6 @@ namespace CareReminderApp.ViewModels
             {
                 { "SelectedReminder", reminder }
             });
-        }
-
-        // רענון נתוני המסך
-        [RelayCommand]
-        private async Task Refresh()
-        {
-            await LoadRemindersAsync();
-            await CheckPendingRequestsAsync();
         }
     }
 }

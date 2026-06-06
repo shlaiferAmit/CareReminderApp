@@ -8,6 +8,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace CareReminderApp.Services
 {
@@ -48,7 +51,7 @@ namespace CareReminderApp.Services
                 // שמירת המשתמש תחת צומת משתמשים לפי מזהה ייחודי
                 await _firebase
                     .Child("Users")
-                    .Child(id) 
+                    .Child(id)
                     .PutAsync(newUser);
 
                 return true;
@@ -129,15 +132,15 @@ namespace CareReminderApp.Services
             }).ToList();
         }
 
-        // עדכון פרטי משתמש קיים במסד הנתונים
+        // עדכון פרטי משתמש קים במסד הנתונים
         public async Task<bool> UpdateUserAsync(User user)
         {
             try
             {
                 await _firebase
                     .Child("Users")
-                    .Child(user.Id) 
-                    .PutAsync(user); 
+                    .Child(user.Id)
+                    .PutAsync(user);
                 return true;
             }
             catch { return false; }
@@ -255,7 +258,7 @@ namespace CareReminderApp.Services
         // החזרת רשימת סוגי המשתמשים במערכת
         public async Task<List<UserRole>> GetRolesAsync() => new List<UserRole> { UserRole.Senior, UserRole.FamilyMember };
 
-        //אופציה לניתוק קשר
+        // אופציה לניתוק קשר
         public async Task RemoveUserConnectionAsync(string familyId, string seniorId)
         {
             var connections = await _firebase
@@ -273,6 +276,111 @@ namespace CareReminderApp.Services
                     .Child(item.Key)
                     .DeleteAsync();
             }
+        }
+
+        public IObservable<List<User>> ListenEldersForFamily(string familyId)
+        {
+            return Observable.Create<List<User>>(observer =>
+            {
+                var cancellation = new System.Threading.CancellationTokenSource();
+
+                Task.Run(async () =>
+                {
+                    while (!cancellation.Token.IsCancellationRequested)
+                    {
+                        try
+                        {
+                            var elders = (await GetEldersForFamilyAsync(familyId)).ToList();
+                            observer.OnNext(elders);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex.Message);
+                        }
+
+                        try
+                        {
+                            await Task.Delay(3000, cancellation.Token);
+                        }
+                        catch (TaskCanceledException) { break; }
+                    }
+                }, cancellation.Token);
+
+                return () => cancellation.Cancel();
+            });
+        }
+
+        /// <summary>
+        /// האזנה רציפה בזמן אמת לכל התזכורות של המבוגר - שונה ל-List למניעת Ambiguity ושגיאות קומפילציה
+        /// </summary>
+        public IObservable<List<Reminder>> ListenRemindersForElder(string elderId)
+        {
+            return Observable.Create<List<Reminder>>(observer =>
+            {
+                var cancellation = new System.Threading.CancellationTokenSource();
+
+                Task.Run(async () =>
+                {
+                    while (!cancellation.Token.IsCancellationRequested)
+                    {
+                        try
+                        {
+                            // שליפת התזכורות העדכניות מהמסד כרשימה (List)
+                            var reminders = await GetRemindersByUserIdAsync(elderId);
+                            observer.OnNext(reminders);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Stream Error (Reminders): {ex.Message}");
+                        }
+
+                        try
+                        {
+                            // בדיקה כל 3 שניות בדומה למסך המשפחה
+                            await Task.Delay(3000, cancellation.Token);
+                        }
+                        catch (TaskCanceledException) { break; }
+                    }
+                }, cancellation.Token);
+
+                return () => cancellation.Cancel();
+            });
+        }
+
+        /// <summary>
+        /// האזנה רציפה בזמן אמת לבקשות חיבור ממתינות עבור המבוגר
+        /// </summary>
+        public IObservable<IEnumerable<PendingConnection>> ListenPendingConnectionsForElder(string elderId)
+        {
+            return Observable.Create<IEnumerable<PendingConnection>>(observer =>
+            {
+                var cancellation = new System.Threading.CancellationTokenSource();
+
+                Task.Run(async () =>
+                {
+                    while (!cancellation.Token.IsCancellationRequested)
+                    {
+                        try
+                        {
+                            // שליפת בקשות החיבור הממתינות והלא מאושרות/דחויות
+                            var requests = await GetPendingForElderAsync(elderId);
+                            observer.OnNext(requests);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Stream Error (Pending Connections): {ex.Message}");
+                        }
+
+                        try
+                        {
+                            await Task.Delay(3000, cancellation.Token);
+                        }
+                        catch (TaskCanceledException) { break; }
+                    }
+                }, cancellation.Token);
+
+                return () => cancellation.Cancel();
+            });
         }
     }
 }

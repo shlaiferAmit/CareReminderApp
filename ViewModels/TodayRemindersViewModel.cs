@@ -4,30 +4,26 @@ using CareReminderApp.Models;
 using CareReminderApp.Views;
 using CareReminderApp.Services;
 using System.Collections.ObjectModel;
+using System;
+using System.Linq;
 
 namespace CareReminderApp.ViewModels
 {
-    // מחלקת מודל תצוגה עבור מסך תזכורות יומיות
-    // אחראית על הצגת תזכורות של המשתמש להיום, עדכון סטטוס וניווט לפרטי תזכורת
     public partial class TodayRemindersViewModel : ObservableObject
     {
-        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
+        private IDisposable _remindersSubscription; // 👈 המנוי ששומר על הצינור הפתוח
 
-        // שם פרטי של המשתמש להצגת ברכה
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(WelcomeGreeting))]
         private string userFirstName = "User";
 
-        // מזהה המשתמש המחובר
         [ObservableProperty]
         private string userId;
 
-        // כמות התזכורות הכוללת להיום
         [ObservableProperty]
         private int totalRemindersCount = 0;
 
-        // רשימת כל התזכורות של היום
         [ObservableProperty]
         private ObservableCollection<Reminder> reminders = new();
 
@@ -35,48 +31,72 @@ namespace CareReminderApp.ViewModels
         {
             _dataService = dataService;
 
-            // שליפת המשתמש המחובר מהאפליקציה
             if (App.LoggedInUser != null)
             {
                 UserId = App.LoggedInUser.Id;
                 UserFirstName = App.LoggedInUser.FirstName;
             }
-
-            _ = LoadDataAsync();
         }
 
-        // טעינת כל התזכורות של המשתמש מהשרת
-        public async Task LoadDataAsync()
+        /// <summary>
+        /// פותח צינור האזנה בזמן אמת לכל התזכורות של היום
+        /// </summary>
+        public void StartListeningReminders()
         {
-            try
+            if (string.IsNullOrEmpty(UserId)) return;
+
+            // ליתר ביטחון, אם יש האזנה קודמת פתוחה - נסגור אותה
+            StopListeningReminders();
+
+            _remindersSubscription = _dataService.ListenRemindersForElder(UserId)
+                .Subscribe(
+                    userReminders =>
+                    {
+                        // סינון התזכורות כך שיוצגו רק אלו של היום הנוכחי
+                        var today = DateTime.Today;
+                        var filteredTodayList = userReminders
+                            .Where(r => r.DueDate.Date == today)
+                            .OrderBy(r => r.DueDate)
+                            .ToList();
+
+                        // עדכון ה-UI תמיד על ה-MainThread כדי למנוע קריסות
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                            Reminders.Clear();
+                            foreach (var reminder in filteredTodayList)
+                            {
+                                Reminders.Add(reminder);
+                            }
+
+                            TotalRemindersCount = Reminders.Count;
+
+                            // עדכון ה-Properties המחושבים ב-XAML
+                            OnPropertyChanged(nameof(WelcomeGreeting));
+                            OnPropertyChanged(nameof(RemindersSummary));
+                        });
+                    },
+                    error =>
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Realtime Stream Error: {error.Message}");
+                    }
+                );
+        }
+
+        /// <summary>
+        /// סוגר את צינור ההאזנה
+        /// </summary>
+        public void StopListeningReminders()
+        {
+            if (_remindersSubscription != null)
             {
-                if (string.IsNullOrEmpty(UserId)) return;
-
-                var userReminders = await _dataService.GetRemindersByUserIdAsync(UserId);
-
-                if (userReminders != null)
-                {
-                    Reminders = new ObservableCollection<Reminder>(userReminders);
-                    TotalRemindersCount = Reminders.Count;
-                }
-
-                // עדכון תצוגת ברכה וסיכום
-                OnPropertyChanged(nameof(WelcomeGreeting));
-                OnPropertyChanged(nameof(RemindersSummary));
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+                _remindersSubscription.Dispose();
+                _remindersSubscription = null;
             }
         }
 
-        // ברכת פתיחה למשתמש
         public string WelcomeGreeting => $"Good Morning, {UserFirstName}";
-
-        // סיכום מספר התזכורות
         public string RemindersSummary => $"You have {TotalRemindersCount} reminders today";
 
-        // מעבר למסך פרטי תזכורת
         [RelayCommand]
         public async Task NavigateToReminderDetails(Reminder reminder)
         {
@@ -88,13 +108,14 @@ namespace CareReminderApp.ViewModels
             });
         }
 
-        // עדכון סטטוס תזכורת ורענון רשימה
         [RelayCommand]
         public async Task UpdateReminderStatusAsync(Reminder reminder)
         {
             if (reminder == null) return;
+
+            // מעדכן את הסטטוס בפיירבייס/מוק - מכיוון שיש האזנה ברקע, 
+            // אין צורך לקרוא ל-LoadData ידנית! המסך יתעדכן מעצמו ברגע שהשרת ישתנה
             await _dataService.UpdateReminderAsync(reminder);
-            await LoadDataAsync();
         }
     }
 }

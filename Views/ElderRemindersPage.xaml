@@ -12,26 +12,25 @@
     <ScrollView>
         <Grid RowDefinitions="Auto, Auto, Auto, Auto" Padding="20" RowSpacing="15">
 
-            <!-- Header -->
             <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,10,0,10">
                 <Image Source="logo.png" HeightRequest="100" HorizontalOptions="Center"/>
                 <Label Text="Welcome Home!" FontSize="32" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Center"/>
                 <Label Text="CareRemind" FontSize="24" TextColor="#2C3E50" HorizontalOptions="Center"/>
             </VerticalStackLayout>
 
-            <!-- Pending Requests -->
-            <Frame Grid.Row="1" IsVisible="{Binding HasPendingRequests}" BackgroundColor="#FFF3CD" Padding="15" CornerRadius="15" HasShadow="True" BorderColor="#FFE69C">
+            <Border Grid.Row="1" IsVisible="{Binding HasPendingRequests}" BackgroundColor="#FFF3CD" Padding="15" StrokeShape="RoundRectangle 15" StrokeThickness="0">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="New Connection Requests" FontAttributes="Bold" TextColor="#856404" HorizontalOptions="Center" FontSize="16"/>
-                    <CollectionView ItemsSource="{Binding PendingRequests}" HeightRequest="120">
+
+                    <CollectionView ItemsSource="{Binding PendingRequestsCollection}" HeightRequest="120">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:PendingConnection">
                                 <Grid ColumnDefinitions="*, Auto, Auto" ColumnSpacing="8" Padding="5">
                                     <Label Text="{Binding FamilyName, StringFormat='Request from {0}'}"
-       VerticalOptions="Center"
-       TextColor="#856404"
-       FontSize="14"
-       FontAttributes="Bold"/>
+                                           VerticalOptions="Center"
+                                           TextColor="#856404"
+                                           FontSize="14"
+                                           FontAttributes="Bold"/>
                                     <Button Grid.Column="1" Text="Accept" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=ApproveRequestCommand}" CommandParameter="{Binding .}" BackgroundColor="#28A745" TextColor="White" HeightRequest="40" WidthRequest="80"/>
                                     <Button Grid.Column="2" Text="Decline" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ElderRemindersViewModel}}, Path=RejectRequestCommand}" CommandParameter="{Binding .}" BackgroundColor="#DC3545" TextColor="White" HeightRequest="40" WidthRequest="80"/>
                                 </Grid>
@@ -39,94 +38,88 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
-            <!-- Progress Card -->
-            <Frame Grid.Row="2" BackgroundColor="White" CornerRadius="15" Padding="20" IsVisible="{Binding HasReminders}">
+            <Border Grid.Row="2" BackgroundColor="White" StrokeShape="RoundRectangle 15" Padding="20" IsVisible="{Binding HasReminders}" StrokeThickness="0">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="{Binding WelcomeMessage}" FontSize="18" FontAttributes="Bold" TextColor="#2C3E50" HorizontalOptions="Center"/>
                     <ProgressBar Progress="{Binding ProgressValue}" ProgressColor="#1ABC9C" HeightRequest="12" ScaleY="2"/>
                     <Label Text="{Binding ProgressText}" FontSize="14" HorizontalOptions="Center" TextColor="#2C3E50" FontAttributes="Bold"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
-            <!-- Section: Next Reminder or ALL DONE -->
             <VerticalStackLayout Grid.Row="3" Spacing="10">
 
-                <!-- Next Reminder Card -->
-                <Frame BackgroundColor="#1ABC9C" 
-           CornerRadius="20" 
-           Padding="20" 
-           HasShadow="True"
-           IsVisible="{Binding IsNextReminderVisible}">
-                    <Frame.GestureRecognizers>
+                <Border BackgroundColor="#1ABC9C" 
+                        StrokeShape="RoundRectangle 20" 
+                        Padding="20" 
+                        StrokeThickness="0"
+                        IsVisible="{Binding IsNextReminderVisible}">
+                    <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding NavigateToReminderDetailsCommand}" 
-                                  CommandParameter="{Binding NextReminder}"/>
-                    </Frame.GestureRecognizers>
+                                              CommandParameter="{Binding NextReminder}"/>
+                    </Border.GestureRecognizers>
 
                     <VerticalStackLayout Spacing="10">
                         <Label Text="Your next reminder is:" 
-                   FontSize="18" 
-                   TextColor="White" 
-                   HorizontalOptions="Center" 
-                   Opacity="0.9"/>
+                               FontSize="18" 
+                               TextColor="White" 
+                               HorizontalOptions="Center" 
+                               Opacity="0.9"/>
 
                         <Label Text="{Binding NextReminder.Title}" 
-                   FontSize="28" 
-                   FontAttributes="Bold" 
-                   TextColor="White" 
-                   HorizontalOptions="Center"/>
+                               FontSize="28" 
+                               FontAttributes="Bold" 
+                               TextColor="White" 
+                               HorizontalOptions="Center"/>
 
                         <HorizontalStackLayout HorizontalOptions="Center" Spacing="5">
                             <Label Text="at:" 
-                       FontSize="20" 
-                       TextColor="White" 
-                       VerticalOptions="Center"/>
+                                   FontSize="20" 
+                                   TextColor="White" 
+                                   VerticalOptions="Center"/>
                             <Label Text="{Binding NextReminder.DueDate, StringFormat='{0:HH:mm}'}" 
-                       FontSize="24" 
-                       FontAttributes="Bold" 
-                       TextColor="White" 
-                       VerticalOptions="Center"/>
+                                   FontSize="24" 
+                                   FontAttributes="Bold" 
+                                   TextColor="White" 
+                                   VerticalOptions="Center"/>
                         </HorizontalStackLayout>
 
                         <Label Text="Tap for more details >" 
-                   FontSize="14" 
-                   TextColor="White" 
-                   HorizontalOptions="Center" 
-                   Opacity="0.7" 
-                   Margin="0,5,0,0"/>
+                               FontSize="14" 
+                               TextColor="White" 
+                               HorizontalOptions="Center" 
+                               Opacity="0.7" 
+                               Margin="0,5,0,0"/>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
-                <!-- All Tasks Completed Card -->
-                <Frame BackgroundColor="#3498DB" 
-           CornerRadius="20" 
-           Padding="30" 
-           HasShadow="True">
-                    <Frame.Triggers>
-                        <DataTrigger TargetType="Frame" Binding="{Binding IsNextReminderVisible}" Value="True">
+                <Border BackgroundColor="#3498DB" 
+                        StrokeShape="RoundRectangle 20" 
+                        Padding="30" 
+                        StrokeThickness="0">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsNextReminderVisible}" Value="True">
                             <Setter Property="IsVisible" Value="False" />
                         </DataTrigger>
-                        <DataTrigger TargetType="Frame" Binding="{Binding IsNextReminderVisible}" Value="False">
+                        <DataTrigger TargetType="Border" Binding="{Binding IsNextReminderVisible}" Value="False">
                             <Setter Property="IsVisible" Value="True" />
                         </DataTrigger>
-                    </Frame.Triggers>
+                    </Border.Triggers>
 
                     <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
                         <Label Text="ALL DONE" 
-                   FontSize="36" 
-                   FontAttributes="Bold" 
-                   TextColor="White" 
-                   HorizontalOptions="Center"/>
+                               FontSize="36" 
+                               FontAttributes="Bold" 
+                               TextColor="White" 
+                               HorizontalOptions="Center"/>
 
                         <Label Text="No more reminders for today" 
-                   FontSize="18" 
-                   TextColor="White" 
-                   HorizontalOptions="Center"/>
-
-                        
+                               FontSize="18" 
+                               TextColor="White" 
+                               HorizontalOptions="Center"/>
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
             </VerticalStackLayout>
         </Grid>
     </ScrollView>

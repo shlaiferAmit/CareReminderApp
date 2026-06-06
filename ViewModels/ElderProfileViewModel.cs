@@ -3,29 +3,25 @@ using CareReminderApp.Services;
 using CareReminderApp.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace CareReminderApp.ViewModels
 {
-    // המפתח שמתקבל מהדף הקודם
     [QueryProperty(nameof(Elder), "Elder")]
-
-    // מחלקת מודל תצוגה עבור פרופיל של קשיש
-    // אחראית על הצגת פרטי הקשיש, טעינת תזכורות שלו והוספת תזכורות חדשות
     public partial class ElderProfileViewModel : ObservableObject
     {
-        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
+        private IDisposable _remindersSubscription; // שומר את הרישום להאזנה בזמן אמת
 
-        // כותרת המסך (מתעדכנת לפי שם הקשיש)
         [ObservableProperty]
         private string title = "פרופיל מבוגר";
 
-        // אובייקט הקשיש שנבחר במסך הקודם
         [ObservableProperty]
-        private User elder; // זה האובייקט שמכיל את FirstName, LastName וכו'
+        private User elder;
 
-        // רשימת התזכורות של הקשיש
         [ObservableProperty]
         private ObservableCollection<Reminder> reminders;
 
@@ -35,35 +31,53 @@ namespace CareReminderApp.ViewModels
             Reminders = new ObservableCollection<Reminder>();
         }
 
-        // פונקציה שמופעלת אוטומטית כאשר משתנה ערך הקשיש
         partial void OnElderChanged(User value)
         {
             if (value != null)
             {
                 Title = $"פרופיל של {value.FirstName}";
-                LoadRemindersCommand.Execute(null);
+                // ברגע שהקשיש נטען, אנחנו מאתחלים את ההאזנה אם המסך כבר באוויר
+                StartListeningReminders();
             }
         }
 
-        // טעינת כל התזכורות של הקשיש ממסד הנתונים
-        [RelayCommand]
-        public async Task LoadReminders()
+        /// <summary>
+        /// מתחיל האזנה בזמן אמת לשינויים בתזכורות של הקשיש הנוכחי
+        /// </summary>
+        public void StartListeningReminders()
         {
             if (Elder == null) return;
-            try
-            {
-                var result = await _dataService.GetRemindersAsync(Elder.Id);
-                Reminders.Clear();
-                foreach (var r in result)
-                    Reminders.Add(r);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error loading reminders: {ex.Message}");
-            }
+
+            // מונע כפילות האזנות אם הפונקציה נקראת פעמיים
+            StopListeningReminders();
+
+            _remindersSubscription = _dataService.ListenRemindersForElder(Elder.Id)
+                .Subscribe(
+                    updatedReminders =>
+                    {
+                        // מעדכן את ממשק המשתמש בחוט הראשי (UI Thread)
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                            Reminders.Clear();
+                            foreach (var reminder in updatedReminders)
+                            {
+                                Reminders.Add(reminder);
+                            }
+                        });
+                    },
+                    ex => System.Diagnostics.Debug.WriteLine($"Error listening to reminders: {ex.Message}")
+                );
         }
 
-        // מעבר למסך הוספת תזכורת עבור הקשיש הנוכחי
+        /// <summary>
+        /// עוצר את ההאזנה כדי למנוע זליגות זיכרון וצריכת סוללה מיותרת
+        /// </summary>
+        public void StopListeningReminders()
+        {
+            _remindersSubscription?.Dispose();
+            _remindersSubscription = null;
+        }
+
         [RelayCommand]
         private async Task AddReminder()
         {

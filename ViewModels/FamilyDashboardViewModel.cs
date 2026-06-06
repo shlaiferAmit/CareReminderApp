@@ -1,6 +1,6 @@
 ﻿using CareReminderApp.Models;
 using CareReminderApp.Services;
-using CareReminderApp.Views; 
+using CareReminderApp.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -12,76 +12,80 @@ using System.Threading.Tasks;
 namespace CareReminderApp.ViewModels
 {
     [QueryProperty(nameof(CurrentUser), "CurrentUser")]
-    // מחלקת מודל תצוגה עבור לוח הבקרה של בן משפחה
-    // אחראית על הצגת הקשישים המקושרים, הוספת קשישים חדשים וניווט למסך פרופיל קשיש
     public partial class FamilyDashboardViewModel : ObservableObject
     {
-        // שירות הנתונים של האפליקציה (פיירבייס או שירות מדומה)
         private readonly IDataService _dataService;
+        private IDisposable? _eldersSubscription;
 
-        // המשתמש המחובר כרגע
         [ObservableProperty]
         private User? currentUser;
 
-        // הודעת ברכה במסך הבית
         [ObservableProperty]
         private string welcomeMessage = "Hello!";
 
-        // מצב טעינה - מונע פעולות כפולות בזמן ריצה
         [ObservableProperty]
         private bool isBusy;
 
-        // רשימת הקשישים המשויכים לבן המשפחה
-        [ObservableProperty]
-        private ObservableCollection<User> elders;
+        // הגדרה נקייה ויחידה של הרשימה - פותר את שגיאת ה-Ambiguity
+        public ObservableCollection<User> Elders { get; } = new ObservableCollection<User>();
 
         public FamilyDashboardViewModel(IDataService dataService)
         {
             _dataService = dataService;
-            Elders = new ObservableCollection<User>();
-
-            // טעינת משתמש מחובר אם קיים
-            if (CurrentUser == null && App.LoggedInUser != null)
-            {
-                CurrentUser = App.LoggedInUser;
-            }
         }
 
-        // עדכון הודעת ברכה כאשר המשתמש משתנה
+        /// <summary>
+        /// נקודת הכניסה האמיתית בזמן אמת - נקרא לה מקוד המסך (View Behind) בכל פעם שהמסך עולה
+        /// </summary>
+        public void StartListeningElders()
+        {
+            // לוקח את המשתמש הנוכחי שעבר ב-Query או את המשתמש הגלובלי באפליקציה
+            var activeUser = CurrentUser ?? App.LoggedInUser;
+            if (activeUser == null) return;
+
+            // ניקוי האזנה קודמת אם הייתה קיימת כדי למנוע כפילויות בזיכרון
+            StopListeningElders();
+
+            // האזנה אקטיבית ורציפה לשינויים ב-Firebase
+            _eldersSubscription = _dataService.ListenEldersForFamily(activeUser.Id)
+                .Subscribe(list =>
+                {
+                    // העברת העדכון לחוט הריצה הראשי (UI Thread) כדי שהמסך יתעדכן ויקפוץ מיד
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        Elders.Clear();
+                        foreach (var elder in list)
+                        {
+                            Elders.Add(elder);
+                        }
+                    });
+                }, error =>
+                {
+                    // טיפול בשגיאות זרימה במידה ויש בעיית תקשורת
+                    System.Diagnostics.Debug.WriteLine($"Stream error: {error.Message}");
+                });
+        }
+
+        /// <summary>
+        /// עצירת ההאזנה ברקע כשהמשתמש יוצא מהמסך (חוסך סוללה ומשאבי אינטרנט)
+        /// </summary>
+        public void StopListeningElders()
+        {
+            _eldersSubscription?.Dispose();
+            _eldersSubscription = null;
+        }
+
+        // עדכון הודעת ברכה ברגע שהמשתמש נקלט מה-QueryProperty
         partial void OnCurrentUserChanged(User? value)
         {
             if (value != null)
+            {
                 WelcomeMessage = $"Good morning, {value.FirstName}!";
-        }
-
-        // טעינת רשימת הקשישים המשויכים למשתמש
-        [RelayCommand]
-        public async Task LoadElders()
-        {
-            var activeUser = CurrentUser ?? App.LoggedInUser;
-            if (IsBusy || activeUser == null) return;
-
-            IsBusy = true;
-            try
-            {
-                var result = await _dataService.GetEldersForFamilyAsync(activeUser.Id);
-                Elders.Clear();
-                foreach (var elder in result)
-                {
-                    Elders.Add(elder);
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error loading elders: {ex.Message}");
-            }
-            finally
-            {
-                IsBusy = false;
+                // אם המשתמש הגיע באיחור מהניווט, נתניע את ההאזנה מחדש עבורו
+                StartListeningElders();
             }
         }
 
-        // מעבר למסך פרופיל קשיש
         [RelayCommand]
         private async Task GoToProfile(User elder)
         {
@@ -92,7 +96,6 @@ namespace CareReminderApp.ViewModels
             });
         }
 
-        // הוספת קשיש חדש למערכת באמצעות אימייל
         [RelayCommand]
         private async Task AddSenior()
         {
@@ -119,6 +122,7 @@ namespace CareReminderApp.ViewModels
                 var allUsers = await _dataService.GetUsersAsync();
                 var emailToFind = emailInput.Trim().ToLower();
 
+                // 🔥 תיקון הגנה: שימוש ב-UserEmail? כדי למנוע קריסה של NullReferenceException
                 var senior = allUsers.FirstOrDefault(u =>
                     u.UserEmail?.ToLower() == emailToFind &&
                     u.Role == UserRole.Senior);
@@ -137,9 +141,6 @@ namespace CareReminderApp.ViewModels
 
                 await _dataService.InviteElderAsync(activeUser.Id, senior.Id);
                 await Shell.Current.DisplayAlert("Success", $"Request sent to {senior.FirstName}.", "Great");
-
-                // רענון רשימת הקשישים
-                await LoadElders();
             }
             catch (Exception ex)
             {
@@ -151,15 +152,13 @@ namespace CareReminderApp.ViewModels
             }
         }
 
-        //מחיקת קשר
         [RelayCommand]
         private async Task RemoveConnection(User elder)
         {
-            if (elder == null || CurrentUser == null) return;
+            var activeUser = CurrentUser ?? App.LoggedInUser;
+            if (elder == null || activeUser == null) return;
 
-            await _dataService.RemoveUserConnectionAsync(CurrentUser.Id, elder.Id);
-
-            await LoadElders();
+            await _dataService.RemoveUserConnectionAsync(activeUser.Id, elder.Id);
         }
     }
 }

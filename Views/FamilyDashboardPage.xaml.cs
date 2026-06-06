@@ -4,21 +4,29 @@ namespace CareReminderApp.Views
 {
     public partial class FamilyDashboardPage : ContentPage
     {
-        public FamilyDashboardPage(FamilyDashboardViewModel vm)
+        // שימוש בשם פשוט ונקי - ה-using למעלה כבר דואג לזה
+        private readonly FamilyDashboardViewModel _viewModel;
+
+        public FamilyDashboardPage(FamilyDashboardViewModel viewModel)
         {
             InitializeComponent();
-            BindingContext = vm;
+
+            _viewModel = viewModel;
+            BindingContext = _viewModel;
         }
 
-        protected override async void OnAppearing()
+        // בכל פעם שהמסך עולה - מתחילים להקשיב בזמן אמת ל-Firebase
+        protected override void OnAppearing()
         {
             base.OnAppearing();
+            _viewModel?.StartListeningElders();
+        }
 
-            // טעינת רשימת המבוגרים בכל פעם שנכנסים לדף
-            if (BindingContext is FamilyDashboardViewModel vm)
-            {
-                await vm.LoadEldersCommand.ExecuteAsync(null);
-            }
+        // בכל פעם שהמשתמש עוזב את המסך - עוצרים את ההאזנה
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            _viewModel?.StopListeningElders();
         }
     }
 }

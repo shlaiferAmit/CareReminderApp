@@ -136,5 +136,53 @@ namespace CareReminderApp.Services
 
             await Task.CompletedTask;
         }
+
+        public IObservable<List<User>> ListenEldersForFamily(string familyId)
+        {
+            return System.Reactive.Linq.Observable.Create<List<User>>(observer =>
+            {
+                // שולח נתונים מיידית
+                var elders = _users
+                    .Where(u =>
+                        _connections.Any(c =>
+                            c.UserId == familyId && c.ConnectedUserId == u.Id))
+                    .ToList();
+
+                observer.OnNext(elders);
+
+                // Mock בלבד – אין real-time אמיתי
+                return System.Reactive.Disposables.Disposable.Empty;
+            });
+        }
+
+        /// <summary>
+        /// מימוש מדומה להאזנה לתזכורות של המבוגר - שונה ל-List<Reminder> לצורך תאימות מלאה לממשק
+        /// </summary>
+        public IObservable<List<Reminder>> ListenRemindersForElder(string elderId)
+        {
+            return System.Reactive.Linq.Observable.Create<List<Reminder>>(observer =>
+            {
+                // מחזיר מיד את רשימת התזכורות הקיימת בזיכרון כ-List
+                var userReminders = _reminders.Where(r => r.UserId == elderId).ToList();
+                observer.OnNext(userReminders);
+
+                return System.Reactive.Disposables.Disposable.Empty;
+            });
+        }
+
+        /// <summary>
+        /// מימוש מדומה להאזנה לבקשות חיבור של המבוגר
+        /// </summary>
+        public IObservable<IEnumerable<PendingConnection>> ListenPendingConnectionsForElder(string elderId)
+        {
+            return System.Reactive.Linq.Observable.Create<IEnumerable<PendingConnection>>(observer =>
+            {
+                // מחזיר מיד את רשימת הבקשות הממתינות בזיכרון
+                var pending = _pendingConnections.Where(x => x.ElderId == elderId && !x.IsApproved && !x.IsRejected).ToList();
+                observer.OnNext(pending);
+
+                return System.Reactive.Disposables.Disposable.Empty;
+            });
+        }
     }
 }

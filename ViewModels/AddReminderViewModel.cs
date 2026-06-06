@@ -33,7 +33,7 @@ namespace CareReminderApp.ViewModels
 
         // שעה שנבחרה לתזכורת
         [ObservableProperty]
-        private TimeSpan _selectedTime = DateTime.Now.TimeOfDay; 
+        private TimeSpan _selectedTime = DateTime.Now.TimeOfDay;
 
         public AddReminderViewModel(IDataService dataService)
         {
@@ -49,7 +49,8 @@ namespace CareReminderApp.ViewModels
                 // בדיקה שהוזנו כותרת ותבחר משתמש יעד
                 if (string.IsNullOrWhiteSpace(ReminderTitle) || SelectedElder == null)
                 {
-                    await Shell.Current.DisplayAlert("חסרים פרטים", "נא למלא כותרת ולבחור מבוגר", "אוקיי");
+                    // 👈 שונה לאנגלית
+                    await Shell.Current.DisplayAlert("Missing Details", "Please enter a title and select a senior.", "OK");
                     return;
                 }
 
@@ -59,7 +60,8 @@ namespace CareReminderApp.ViewModels
                 // בדיקה שהתאריך שנבחר לא עבר כבר
                 if (finalDueDate < DateTime.Now)
                 {
-                    await Shell.Current.DisplayAlert("זמן לא תקין", "לא ניתן לקבוע תזכורת לזמן שעבר", "אוקיי");
+                    // 👈 שונה לאנגלית
+                    await Shell.Current.DisplayAlert("Invalid Time", "Cannot set a reminder for a past date or time.", "OK");
                     return;
                 }
 
@@ -81,14 +83,15 @@ namespace CareReminderApp.ViewModels
                 await _dataService.SaveReminderAsync(newReminder);
 
                 // הודעת הצלחה וחזרה למסך הקודם
-                await Shell.Current.DisplayAlert("הצלחה", "התזכורת נשמרה וסונכרנה!", "מעולה");
+                // 👈 שונה לאנגלית
+                await Shell.Current.DisplayAlert("Success", "The reminder has been saved and synchronized successfully!", "Awesome");
                 await Shell.Current.GoToAsync("..");
             }
             catch (Exception ex)
             {
                 // טיפול בשגיאות בזמן שמירת התזכורת
-                System.Diagnostics.Debug.WriteLine($"שגיאה בשמירה: {ex.Message}");
-                await Shell.Current.DisplayAlert("שגיאה", "השמירה נכשלה: " + ex.Message, "אוקיי");
+                System.Diagnostics.Debug.WriteLine($"Save Error: {ex.Message}");             
+                await Shell.Current.DisplayAlert("Error", "Failed to save the reminder: " + ex.Message, "OK");
             }
         }
     }
