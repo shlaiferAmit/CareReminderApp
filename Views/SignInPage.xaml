@@ -4,7 +4,8 @@
              xmlns:vm="clr-namespace:CareReminderApp.ViewModels"
              x:Class="CareReminderApp.Views.SignInPage"
              x:DataType="vm:SignInPageViewModel"
-             BackgroundColor="#99C1E9">
+             BackgroundColor="#99C1E9"
+             FlowDirection="LeftToRight">
 
     <Grid>
 
@@ -29,15 +30,15 @@
                     <Entry Text="{Binding UserEmail, Mode=TwoWay}"
                            Placeholder="Email"
                            Keyboard="Email"
-                           HorizontalTextAlignment="End"/>
+                           HorizontalTextAlignment="Start"/>
                 </Frame>
 
                 <!-- EMAIL ERROR -->
                 <Label Text="{Binding EmailError}"
                        TextColor="Red"
                        FontSize="12"
-                       HorizontalOptions="End"
-                       HorizontalTextAlignment="End"/>
+                       HorizontalOptions="Start"
+HorizontalTextAlignment="Start"/>
 
                 <!-- PASSWORD -->
                 <!-- PASSWORD -->
@@ -46,26 +47,23 @@
        Padding="15,5"
        HorizontalOptions="Fill">
 
-                    <Grid ColumnDefinitions="Auto,*"
-          VerticalOptions="Center">
+                    <Grid ColumnDefinitions="*,Auto"
+      VerticalOptions="Center">
 
-                        <!-- EYE BUTTON (קצה שמאל) -->
-                        <ImageButton Source="{Binding PasswordImage}"
-                     Command="{Binding ShowPasswordCommand}"
-                     BackgroundColor="Transparent"
-                     HeightRequest="20"
-                     WidthRequest="20"
-                     VerticalOptions="Center"
-                     HorizontalOptions="Start"
-                     Grid.Column="0"/>
-
-                        <!-- ENTRY -->
                         <Entry Text="{Binding UserPassword, Mode=TwoWay}"
-               IsPassword="{Binding EntryAsPassword}"
-               Placeholder="Password"
-               HorizontalTextAlignment="End"
-               VerticalOptions="Center"
-               Grid.Column="1"/>
+           IsPassword="{Binding EntryAsPassword}"
+           Placeholder="Password"
+           HorizontalTextAlignment="Start"
+           VerticalOptions="Center"
+           Grid.Column="0"/>
+
+                        <ImageButton Source="{Binding PasswordImage}"
+                 Command="{Binding ShowPasswordCommand}"
+                 BackgroundColor="Transparent"
+                 HeightRequest="20"
+                 WidthRequest="20"
+                 VerticalOptions="Center"
+                 Grid.Column="1"/>
                     </Grid>
 
                 </Frame>
@@ -73,13 +71,13 @@
                 <Label Text="{Binding PasswordError}"
                        TextColor="Red"
                        FontSize="12"
-                       HorizontalOptions="End"
-                       HorizontalTextAlignment="End"/>
+                       HorizontalOptions="Start"
+HorizontalTextAlignment="Start"/>
 
                 <!-- REMEMBER ME -->
                 <HorizontalStackLayout Spacing="10"
-                                       HorizontalOptions="End"
-                                       VerticalOptions="Center">
+                       HorizontalOptions="Start"
+                       VerticalOptions="Center">
 
                     <Label Text="Remember Me"
                            TextColor="#2C3E50"
