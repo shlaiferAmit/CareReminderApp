@@ -27,5 +27,9 @@ namespace CareReminderApp.Models
 
         // תאריך ושעת יצירת בקשת החיבור
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        //שם בן המשפחה ששולח את בקשת ההתחברות
+        public string FamilyName { get; set; } = string.Empty;
+
     }
 }

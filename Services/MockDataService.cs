@@ -83,7 +83,19 @@ namespace CareReminderApp.Services
 
         public async Task InviteElderAsync(string familyId, string elderId)
         {
-            _pendingConnections.Add(new PendingConnection { Id = Guid.NewGuid().ToString(), FamilyId = familyId, ElderId = elderId });
+            var familyUser = _users.FirstOrDefault(u => u.Id == familyId);
+
+            _pendingConnections.Add(new PendingConnection
+            {
+                Id = Guid.NewGuid().ToString(),
+                FamilyId = familyId,
+                ElderId = elderId,
+                FamilyName = familyUser != null
+                    ? $"{familyUser.FirstName} {familyUser.LastName}"
+                    : "Unknown",
+                CreatedAt = DateTime.Now
+            });
+
             await Task.CompletedTask;
         }
 

@@ -218,7 +218,15 @@ namespace CareReminderApp.Services
         // שליחת הזמנה לקשר בין משתמשים
         public async Task InviteElderAsync(string familyId, string elderId)
         {
-            await _firebase.Child("PendingConnections").PostAsync(new PendingConnection { FamilyId = familyId, ElderId = elderId });
+            var familyUser = await GetUserByIdAsync(familyId);
+
+            await _firebase.Child("PendingConnections")
+                .PostAsync(new PendingConnection
+                {
+                    FamilyId = familyId,
+                    ElderId = elderId,
+                    FamilyName = $"{familyUser.FirstName} {familyUser.LastName}"
+                });
         }
 
         // קבלת בקשות חיבור ממתינות לקשיש
