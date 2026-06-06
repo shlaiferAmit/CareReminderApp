@@ -13,7 +13,6 @@ namespace CareReminderApp.Views
             Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
         }
 
-        // חשוב: מאפס את השדות בכל פעם שנכנסים למסך
         protected override void OnAppearing()
         {
             base.OnAppearing();

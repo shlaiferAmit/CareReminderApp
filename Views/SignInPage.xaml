@@ -15,14 +15,12 @@
                                  Spacing="15"
                                  HorizontalOptions="Fill">
 
-                <!-- TITLE (CENTER) -->
                 <Label Text="SIGN IN"
                        FontSize="32"
                        FontAttributes="Bold"
                        TextColor="#2C3E50"
                        HorizontalOptions="Center"/>
 
-                <!-- EMAIL -->
                 <Frame BackgroundColor="White"
                        Padding="15,5"
                        HorizontalOptions="Fill">
@@ -33,16 +31,12 @@
                            HorizontalTextAlignment="Start"/>
                 </Frame>
 
-                <!-- EMAIL ERROR -->
                 <Label Text="{Binding EmailError}"
                        TextColor="Red"
                        FontSize="12"
                        HorizontalOptions="Start"
 HorizontalTextAlignment="Start"/>
 
-                <!-- PASSWORD -->
-                <!-- PASSWORD -->
-                <!-- PASSWORD -->
                 <Frame BackgroundColor="White"
        Padding="15,5"
        HorizontalOptions="Fill">
@@ -67,14 +61,12 @@ HorizontalTextAlignment="Start"/>
                     </Grid>
 
                 </Frame>
-                <!-- PASSWORD ERROR -->
                 <Label Text="{Binding PasswordError}"
                        TextColor="Red"
                        FontSize="12"
                        HorizontalOptions="Start"
 HorizontalTextAlignment="Start"/>
 
-                <!-- REMEMBER ME -->
                 <HorizontalStackLayout Spacing="10"
                        HorizontalOptions="Start"
                        VerticalOptions="Center">
@@ -88,7 +80,6 @@ HorizontalTextAlignment="Start"/>
 
                 </HorizontalStackLayout>
 
-                <!-- LOGIN BUTTON -->
                 <Button Text="LOGIN"
         Command="{Binding SignInCommand}"
         HeightRequest="60"
@@ -122,7 +113,6 @@ HorizontalTextAlignment="Start"/>
            HorizontalOptions="Fill" 
            Margin="20,10,20,0"/>
 
-                <!-- SIGN UP (CENTER) -->
                 <Button Text="Don't have an account? Sign Up"
                         Command="{Binding GoToSignUpCommand}"
                         BackgroundColor="Transparent"
@@ -133,7 +123,6 @@ HorizontalTextAlignment="Start"/>
 
         </ScrollView>
 
-        <!-- LOADING -->
         <Grid IsVisible="{Binding IsBusy}"
               BackgroundColor="Black"
               Opacity="0.5">

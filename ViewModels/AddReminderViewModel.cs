@@ -49,7 +49,6 @@ namespace CareReminderApp.ViewModels
                 // בדיקה שהוזנו כותרת ותבחר משתמש יעד
                 if (string.IsNullOrWhiteSpace(ReminderTitle) || SelectedElder == null)
                 {
-                    // 👈 שונה לאנגלית
                     await Shell.Current.DisplayAlert("Missing Details", "Please enter a title and select a senior.", "OK");
                     return;
                 }
@@ -60,7 +59,6 @@ namespace CareReminderApp.ViewModels
                 // בדיקה שהתאריך שנבחר לא עבר כבר
                 if (finalDueDate < DateTime.Now)
                 {
-                    // 👈 שונה לאנגלית
                     await Shell.Current.DisplayAlert("Invalid Time", "Cannot set a reminder for a past date or time.", "OK");
                     return;
                 }
@@ -83,7 +81,6 @@ namespace CareReminderApp.ViewModels
                 await _dataService.SaveReminderAsync(newReminder);
 
                 // הודעת הצלחה וחזרה למסך הקודם
-                // 👈 שונה לאנגלית
                 await Shell.Current.DisplayAlert("Success", "The reminder has been saved and synchronized successfully!", "Awesome");
                 await Shell.Current.GoToAsync("..");
             }

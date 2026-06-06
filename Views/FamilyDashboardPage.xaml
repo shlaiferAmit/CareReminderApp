@@ -8,11 +8,9 @@
              BackgroundColor="#99C1E9"
              Shell.NavBarIsVisible="True"
              FlowDirection="RightToLeft">
-    <!-- 🚀 הופך את כל כיוון המסך מימין לשמאל -->
 
     <Grid RowDefinitions="Auto, Auto, *" Padding="20">
 
-        <!-- Logo & Header Section -->
         <VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,10,0,25">
             <Image Source="logo.png" 
                    HeightRequest="90" 
@@ -24,7 +22,6 @@
                    HorizontalOptions="Center"/>
         </VerticalStackLayout>
 
-        <!-- Action Section -->
         <VerticalStackLayout Grid.Row="1" Spacing="10">
             <Border BackgroundColor="#1ABC9C" 
                     StrokeShape="RoundRectangle 15"
@@ -47,7 +44,6 @@
                     FontAttributes="Bold"
                     Command="{Binding AddSeniorCommand}"/>
 
-            <!-- שונה ל-End כדי להצמיד לימין במסך RTL -->
             <Label Text="My Seniors:" 
                    TextColor="#2C3E50" 
                    FontSize="20" 
@@ -56,7 +52,6 @@
                    Margin="0,15,5,5"/>
         </VerticalStackLayout>
 
-        <!-- Seniors List Section -->
         <CollectionView Grid.Row="2"
                         ItemsSource="{Binding Elders}"
                         SelectionMode="None"
@@ -77,21 +72,17 @@
                                 CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
 
-                        <!-- כעת עמודה 0 תהיה הימנית ביותר ועמודה 3 תהיה השמאלית ביותר -->
                         <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="15">
 
-                            <!-- עמודה 0 (ימין): תמונת פרופיל -->
                             <Border Grid.Column="0" WidthRequest="50" HeightRequest="50" StrokeShape="RoundRectangle 25" StrokeThickness="0" BackgroundColor="#ECF0F1">
                                 <Image Source="{Binding ProfilePictureUrl}" Aspect="AspectFill" HeightRequest="50" WidthRequest="50" />
                             </Border>
 
-                            <!-- עמודה 1: שם וסטטוס (מוצמד לימין בתוך התא שלו) -->
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="End">
                                 <Label Text="{Binding FirstName}" FontSize="17" FontAttributes="Bold" TextColor="#2C3E50" HorizontalTextAlignment="Start"/>
                                 <Label Text="Connected" FontSize="12" TextColor="#7F8C8D" HorizontalTextAlignment="Start"/>
                             </VerticalStackLayout>
 
-                            <!-- עמודה 2: כפתור הסרה -->
                             <Button Grid.Column="2"
                                     Text="Remove"
                                     BackgroundColor="Gray"
@@ -104,7 +95,6 @@
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FamilyDashboardViewModel}}, Path=RemoveConnectionCommand}"
                                     CommandParameter="{Binding .}" />
 
-                            <!-- עמודה 3 (שמאל): חץ ניווט - שונה ל-‹ שפונה שמאלה בהתאם לכיוון התנועה -->
                             <Label Grid.Column="3" 
                                    Text="‹" 
                                    FontSize="24" 
@@ -116,7 +106,6 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
 
-            <!-- תצוגת רשימה ריקה מוצמדת לימין -->
             <CollectionView.EmptyView>
                 <Label Text="No seniors connected yet."
                        TextColor="#2C3E50"

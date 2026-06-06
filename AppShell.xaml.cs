@@ -144,7 +144,6 @@ namespace CareReminderApp
 
             await Shell.Current.GoToAsync("//MainPage");
 
-            // חשוב מאוד:
             await Task.Delay(100);
             SetLoggedInState(false, null);
         }

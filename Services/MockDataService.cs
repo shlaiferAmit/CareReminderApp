@@ -150,14 +150,11 @@ namespace CareReminderApp.Services
 
                 observer.OnNext(elders);
 
-                // Mock בלבד – אין real-time אמיתי
                 return System.Reactive.Disposables.Disposable.Empty;
             });
         }
 
-        /// <summary>
         /// מימוש מדומה להאזנה לתזכורות של המבוגר - שונה ל-List<Reminder> לצורך תאימות מלאה לממשק
-        /// </summary>
         public IObservable<List<Reminder>> ListenRemindersForElder(string elderId)
         {
             return System.Reactive.Linq.Observable.Create<List<Reminder>>(observer =>
@@ -170,9 +167,7 @@ namespace CareReminderApp.Services
             });
         }
 
-        /// <summary>
         /// מימוש מדומה להאזנה לבקשות חיבור של המבוגר
-        /// </summary>
         public IObservable<IEnumerable<PendingConnection>> ListenPendingConnectionsForElder(string elderId)
         {
             return System.Reactive.Linq.Observable.Create<IEnumerable<PendingConnection>>(observer =>

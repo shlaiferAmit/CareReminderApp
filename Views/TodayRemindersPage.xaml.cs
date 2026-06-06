@@ -16,7 +16,6 @@ namespace CareReminderApp.Views
 
             if (BindingContext is TodayRemindersViewModel vm)
             {
-                // 🚀 הפעלת ההאזנה הריאלטימית מיד עם פתיחת המסך
                 vm.StartListeningReminders();
             }
         }
@@ -27,7 +26,6 @@ namespace CareReminderApp.Views
 
             if (BindingContext is TodayRemindersViewModel vm)
             {
-                // 🛑 סגירת הצינור כשעוברים למסך אחר כדי לחסוך משאבים
                 vm.StopListeningReminders();
             }
         }

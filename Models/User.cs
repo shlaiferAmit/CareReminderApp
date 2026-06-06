@@ -15,27 +15,21 @@ namespace CareReminderApp.Models
         [ObservableProperty]
         private string localId = string.Empty;
 
-        // שם פרטי של המשתמש
         [ObservableProperty]
         private string firstName = string.Empty;
 
-        // שם משפחה של המשתמש
         [ObservableProperty]
         private string lastName = string.Empty;
 
-        // כתובת האימייל של המשתמש
         [ObservableProperty]
         private string userEmail = string.Empty;
 
-        // סיסמת המשתמש
         [ObservableProperty]
         private string userPassword = string.Empty;
 
-        // מספר הטלפון של המשתמש
         [ObservableProperty]
         private string mobile = string.Empty;
 
-        // סוג המשתמש במערכת - קשיש או בן משפחה
         [ObservableProperty]
         private UserRole role;
 

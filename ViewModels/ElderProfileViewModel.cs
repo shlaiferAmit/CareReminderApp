@@ -41,9 +41,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
-        /// <summary>
         /// מתחיל האזנה בזמן אמת לשינויים בתזכורות של הקשיש הנוכחי
-        /// </summary>
         public void StartListeningReminders()
         {
             if (Elder == null) return;
@@ -69,9 +67,7 @@ namespace CareReminderApp.ViewModels
                 );
         }
 
-        /// <summary>
         /// עוצר את ההאזנה כדי למנוע זליגות זיכרון וצריכת סוללה מיותרת
-        /// </summary>
         public void StopListeningReminders()
         {
             _remindersSubscription?.Dispose();

@@ -62,9 +62,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
-        /// <summary>
         /// הפעלת צינורות האזנה בזמן אמת עבור תזכורות ובקשות חיבור
-        /// </summary>
         public void StartRealtimeListeners()
         {
             if (CurrentUser == null) return;
@@ -122,9 +120,7 @@ namespace CareReminderApp.ViewModels
                 }, error => System.Diagnostics.Debug.WriteLine($"Requests Stream error: {error.Message}"));
         }
 
-        /// <summary>
         /// ניתוק הצינורות כדי לחסוך בסוללה ובמשאבי רשת כשהמשתמש יוצא מהמסך
-        /// </summary>
         public void StopRealtimeListeners()
         {
             _remindersSubscription?.Dispose();

@@ -4,7 +4,6 @@ namespace CareReminderApp.Views
 {
     public partial class FamilyDashboardPage : ContentPage
     {
-        // שימוש בשם פשוט ונקי - ה-using למעלה כבר דואג לזה
         private readonly FamilyDashboardViewModel _viewModel;
 
         public FamilyDashboardPage(FamilyDashboardViewModel viewModel)

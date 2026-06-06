@@ -310,9 +310,7 @@ namespace CareReminderApp.Services
             });
         }
 
-        /// <summary>
         /// האזנה רציפה בזמן אמת לכל התזכורות של המבוגר - שונה ל-List למניעת Ambiguity ושגיאות קומפילציה
-        /// </summary>
         public IObservable<List<Reminder>> ListenRemindersForElder(string elderId)
         {
             return Observable.Create<List<Reminder>>(observer =>
@@ -347,9 +345,7 @@ namespace CareReminderApp.Services
             });
         }
 
-        /// <summary>
         /// האזנה רציפה בזמן אמת לבקשות חיבור ממתינות עבור המבוגר
-        /// </summary>
         public IObservable<IEnumerable<PendingConnection>> ListenPendingConnectionsForElder(string elderId)
         {
             return Observable.Create<IEnumerable<PendingConnection>>(observer =>

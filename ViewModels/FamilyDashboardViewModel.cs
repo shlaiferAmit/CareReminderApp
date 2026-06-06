@@ -34,9 +34,7 @@ namespace CareReminderApp.ViewModels
             _dataService = dataService;
         }
 
-        /// <summary>
         /// נקודת הכניסה האמיתית בזמן אמת - נקרא לה מקוד המסך (View Behind) בכל פעם שהמסך עולה
-        /// </summary>
         public void StartListeningElders()
         {
             // לוקח את המשתמש הנוכחי שעבר ב-Query או את המשתמש הגלובלי באפליקציה
@@ -66,9 +64,7 @@ namespace CareReminderApp.ViewModels
                 });
         }
 
-        /// <summary>
         /// עצירת ההאזנה ברקע כשהמשתמש יוצא מהמסך (חוסך סוללה ומשאבי אינטרנט)
-        /// </summary>
         public void StopListeningElders()
         {
             _eldersSubscription?.Dispose();

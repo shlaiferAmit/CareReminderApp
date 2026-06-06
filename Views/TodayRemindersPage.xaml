@@ -9,7 +9,6 @@
              Shell.NavBarIsVisible="True"
              FlowDirection="LeftToRight">
 
-    <!-- שימוש ב-Grid עם חלוקה ברורה: כותרת תופסת כמה שצריך, והשאר ל-List -->
     <Grid RowDefinitions="Auto, *" Padding="20">
 
         <!-- כותרת מקובעת למעלה -->
@@ -26,12 +25,10 @@
                    HorizontalOptions="Center"/>
         </VerticalStackLayout>
 
-        <!-- CollectionView יציב -->
         <CollectionView Grid.Row="1" 
                         ItemsSource="{Binding Reminders}" 
                         SelectionMode="None"
                         VerticalScrollBarVisibility="Always">
-            <!-- גורם לפס הגלילה להיות קבוע ולא להזיז את התוכן -->
 
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
@@ -39,7 +36,6 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Reminder">
-                    <!-- שימוש ב-Border במקום Frame ליציבות מקסימלית -->
                     <Border StrokeShape="RoundRectangle 15"
                             StrokeThickness="0"
                             BackgroundColor="White"
@@ -55,7 +51,6 @@
 
                         <Grid ColumnDefinitions="60, 2, *, Auto" ColumnSpacing="10">
 
-                            <!-- זמן -->
                             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" HorizontalOptions="Center">
                                 <Label Text="{Binding DueDate, StringFormat='{0:HH:mm}'}" 
                                        FontSize="17" 
@@ -65,10 +60,8 @@
                                 <Label Text="Time" FontSize="10" Opacity="0.6" HorizontalOptions="Center"/>
                             </VerticalStackLayout>
 
-                            <!-- קו מפריד דק -->
                             <BoxView Grid.Column="1" WidthRequest="1" BackgroundColor="#EEEEEE" VerticalOptions="Fill" Margin="5,0"/>
 
-                            <!-- תוכן התזכורת -->
                             <VerticalStackLayout Grid.Column="2" VerticalOptions="Center">
                                 <Label Text="{Binding Title}" 
                                        FontSize="18" 
@@ -77,7 +70,6 @@
                                        LineBreakMode="TailTruncation"/>
                             </VerticalStackLayout>
 
-                            <!-- כפתור סטטוס -->
                             <Button Grid.Column="3"
                                     Text="{Binding IsCompleted, Converter={StaticResource StatusToTextConverter}}"
                                     BackgroundColor="{Binding IsCompleted, Converter={StaticResource StatusToColorConverter}}"

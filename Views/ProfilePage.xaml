@@ -10,7 +10,6 @@
 
     <Grid RowDefinitions="Auto, *">
 
-        <!-- כותרת העמוד -->
         <Label Grid.Row="0" 
                Text="My Profile" 
                FontSize="32" 
@@ -29,7 +28,6 @@
 
             <Grid RowDefinitions="Auto, *, Auto">
 
-                <!-- 1. תמונת פרופיל -->
                 <VerticalStackLayout Grid.Row="0" HorizontalOptions="Center" Margin="0,5,0,20">
                     <Border Stroke="#3498DB"
             StrokeThickness="3"
@@ -81,7 +79,6 @@
 
                 </VerticalStackLayout>
 
-                <!-- 3. כפתור עריכה תמיד בתחתית ה-Frame -->
                 <Button Grid.Row="2"
                         Text="EDIT PROFILE" 
                         Command="{Binding EditProfileCommand}"

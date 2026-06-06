@@ -2,7 +2,6 @@
 
 namespace CareReminderApp.Views;
 
-// עמוד הוספת תזכורת
 // אחראי על חיבור בין ממשק המשתמש לבין מודל התצוגה
 public partial class AddReminderPage : ContentPage
 {

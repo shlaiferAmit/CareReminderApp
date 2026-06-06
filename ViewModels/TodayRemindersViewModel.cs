@@ -12,7 +12,7 @@ namespace CareReminderApp.ViewModels
     public partial class TodayRemindersViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-        private IDisposable _remindersSubscription; // 👈 המנוי ששומר על הצינור הפתוח
+        private IDisposable _remindersSubscription; 
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(WelcomeGreeting))]
@@ -38,9 +38,7 @@ namespace CareReminderApp.ViewModels
             }
         }
 
-        /// <summary>
         /// פותח צינור האזנה בזמן אמת לכל התזכורות של היום
-        /// </summary>
         public void StartListeningReminders()
         {
             if (string.IsNullOrEmpty(UserId)) return;
@@ -82,9 +80,7 @@ namespace CareReminderApp.ViewModels
                 );
         }
 
-        /// <summary>
         /// סוגר את צינור ההאזנה
-        /// </summary>
         public void StopListeningReminders()
         {
             if (_remindersSubscription != null)
