@@ -150,5 +150,16 @@ namespace CareReminderApp.ViewModels
                 IsBusy = false;
             }
         }
+
+        //מחיקת קשר
+        [RelayCommand]
+        private async Task RemoveConnection(User elder)
+        {
+            if (elder == null || CurrentUser == null) return;
+
+            await _dataService.RemoveUserConnectionAsync(CurrentUser.Id, elder.Id);
+
+            await LoadElders();
+        }
     }
 }

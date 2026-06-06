@@ -125,5 +125,16 @@ namespace CareReminderApp.Services
         }
 
         public async Task<string> UploadUserImageAsync(Stream imageStream, string userId) => "https://placeholder.com/user.jpg";
+
+        public async Task RemoveUserConnectionAsync(string familyId, string seniorId)
+        {
+            var item = _connections.FirstOrDefault(c =>
+                c.UserId == familyId && c.ConnectedUserId == seniorId);
+
+            if (item != null)
+                _connections.Remove(item);
+
+            await Task.CompletedTask;
+        }
     }
 }

@@ -254,5 +254,25 @@ namespace CareReminderApp.Services
 
         // החזרת רשימת סוגי המשתמשים במערכת
         public async Task<List<UserRole>> GetRolesAsync() => new List<UserRole> { UserRole.Senior, UserRole.FamilyMember };
+
+        //אופציה לניתוק קשר
+        public async Task RemoveUserConnectionAsync(string familyId, string seniorId)
+        {
+            var connections = await _firebase
+                .Child("UserConnections")
+                .OnceAsync<UserConnection>();
+
+            var item = connections.FirstOrDefault(c =>
+                c.Object.UserId == familyId &&
+                c.Object.ConnectedUserId == seniorId);
+
+            if (item != null)
+            {
+                await _firebase
+                    .Child("UserConnections")
+                    .Child(item.Key)
+                    .DeleteAsync();
+            }
+        }
     }
 }

@@ -81,40 +81,33 @@
                                     CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
 
-                            <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
-                                <!-- תמונה/אות משמאל -->
-                                <Border Grid.Column="0"
-                                    WidthRequest="50"
-                                    HeightRequest="50"
-                                    StrokeShape="RoundRectangle 25"
-                                    StrokeThickness="0"
-                                    BackgroundColor="#ECF0F1">
-
-                                    <Image Source="{Binding ProfilePictureUrl}"
-                                       Aspect="AspectFill"
-                                       HeightRequest="50"
-                                       WidthRequest="50" />
+                            <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="15">
+                                <Border Grid.Column="0" WidthRequest="50" HeightRequest="50" StrokeShape="RoundRectangle 25" StrokeThickness="0" BackgroundColor="#ECF0F1">
+                                    <Image Source="{Binding ProfilePictureUrl}" Aspect="AspectFill" HeightRequest="50" WidthRequest="50" />
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" 
-                                                     VerticalOptions="Center"
-                                                     HorizontalOptions="Start">
-                                    <Label Text="{Binding FirstName}"
-                                           FontSize="17"
-                                           FontAttributes="Bold"
-                                           TextColor="#2C3E50"
-                                           HorizontalTextAlignment="Start"/>
-                                    <Label Text="Connected" 
-                                           FontSize="12" 
-                                           TextColor="#7F8C8D"
-                                           HorizontalTextAlignment="Start"/>
+
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="Start">
+                                    <Label Text="{Binding FirstName}" FontSize="17" FontAttributes="Bold" TextColor="#2C3E50" HorizontalTextAlignment="Start"/>
+                                    <Label Text="Connected" FontSize="12" TextColor="#7F8C8D" HorizontalTextAlignment="Start"/>
                                 </VerticalStackLayout>
 
-                                <Label Grid.Column="2" 
-                                       Text="›" 
-                                       FontSize="24" 
-                                       TextColor="#BDC3C7" 
-                                       VerticalOptions="Center" 
-                                       Margin="0,0,10,0"/>
+                                <Button Grid.Column="2"
+            Text="Remove"
+            BackgroundColor="Gray"
+            TextColor="White"
+            FontSize="12"
+            CornerRadius="8"
+            HeightRequest="35"
+            VerticalOptions="Center"
+            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FamilyDashboardViewModel}}, Path=RemoveConnectionCommand}"
+            CommandParameter="{Binding .}" />
+
+                                <Label Grid.Column="3" 
+           Text="›" 
+           FontSize="24" 
+           TextColor="#BDC3C7" 
+           VerticalOptions="Center" 
+           Margin="0,0,10,0"/>
                             </Grid>
                         </Border>
                     </DataTemplate>

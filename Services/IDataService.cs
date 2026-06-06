@@ -60,5 +60,7 @@ namespace CareReminderApp.Services
         Task<bool> UpdateUserAsync(User user);
         // העלאת תמונת פרופיל של משתמש
         Task<string> UploadUserImageAsync(Stream imageStream, string userId);
+
+        Task RemoveUserConnectionAsync(string familyId, string seniorId);
     }
 }
